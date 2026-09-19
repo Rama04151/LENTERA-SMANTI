@@ -423,6 +423,238 @@ exports.handler = async (event) => {
     // DELETE — HAPUS POIN
     // =========================
 
+    if (event.httpMethod === "PUT") {
+
+  try {
+
+    const body =
+      JSON.parse(event.body || "{}");
+
+    const {
+      id,
+      siswaId,
+      jenis,
+      poin,
+      keterangan,
+      tanggal,
+      admin
+    } = body;
+
+
+    if (
+      !id ||
+      !siswaId ||
+      !jenis ||
+      !poin ||
+      !keterangan
+    ) {
+
+      return response(400, {
+        success: false,
+        message: "Semua data wajib diisi."
+      });
+
+    }
+
+
+    if (
+      jenis !== "penghargaan" &&
+      jenis !== "pelanggaran"
+    ) {
+
+      return response(400, {
+        success: false,
+        message: "Jenis poin tidak valid."
+      });
+
+    }
+
+
+    const nilaiPoin =
+      Number(poin);
+
+    if (
+      !Number.isFinite(nilaiPoin) ||
+      nilaiPoin <= 0
+    ) {
+
+      return response(400, {
+        success: false,
+        message: "Jumlah poin harus lebih dari 0."
+      });
+
+    }
+
+
+    // =========================
+    // CEK SISWA
+    // =========================
+
+    const siswaResult =
+      await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "Siswa!A:F"
+      });
+
+    const siswaRows =
+      siswaResult.data.values || [];
+
+    const siswaAda =
+      siswaRows.some(
+        (row, index) =>
+          index > 0 &&
+          String(row[0] || "").trim() ===
+            String(siswaId).trim()
+      );
+
+    if (!siswaAda) {
+
+      return response(404, {
+        success: false,
+        message: "Siswa tidak ditemukan."
+      });
+
+    }
+
+
+    // =========================
+    // CARI POIN
+    // =========================
+
+    const pointResult =
+      await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "Poin!A:G"
+      });
+
+    const pointRows =
+      pointResult.data.values || [];
+
+    let rowNumber = -1;
+
+    for (
+      let i = 1;
+      i < pointRows.length;
+      i++
+    ) {
+
+      const rowId =
+        String(pointRows[i][0] || "").trim();
+
+      if (
+        rowId ===
+        String(id).trim()
+      ) {
+
+        rowNumber = i + 1;
+
+        break;
+
+      }
+
+    }
+
+
+    if (rowNumber === -1) {
+
+      return response(404, {
+        success: false,
+        message: "Data poin tidak ditemukan."
+      });
+
+    }
+
+
+    // =========================
+    // TANGGAL
+    // =========================
+
+    let tanggalFinal =
+      String(tanggal || "").trim();
+
+    if (!tanggalFinal) {
+
+      const sekarang =
+        new Date();
+
+      const hari =
+        String(
+          sekarang.getDate()
+        ).padStart(2, "0");
+
+      const bulan =
+        String(
+          sekarang.getMonth() + 1
+        ).padStart(2, "0");
+
+      const tahun =
+        sekarang.getFullYear();
+
+      tanggalFinal =
+        `${hari}/${bulan}/${tahun}`;
+
+    }
+
+
+    // =========================
+    // UPDATE
+    // =========================
+
+    await sheets.spreadsheets.values.update({
+
+      spreadsheetId,
+
+      range:
+        `Poin!A${rowNumber}:G${rowNumber}`,
+
+      valueInputOption:
+        "USER_ENTERED",
+
+      requestBody: {
+        values: [[
+          id,
+          siswaId,
+          jenis,
+          nilaiPoin,
+          keterangan,
+          tanggalFinal,
+          admin || ""
+        ]]
+      }
+
+    });
+
+
+    return response(200, {
+
+      success: true,
+
+      message:
+        "Poin berhasil diperbarui."
+
+    });
+
+
+  } catch (error) {
+
+    console.error(
+      "EDIT POINT ERROR:",
+      error
+    );
+
+    return response(500, {
+
+      success: false,
+
+      message:
+        "Poin gagal diperbarui."
+
+    });
+
+  }
+
+}
+    
     if (event.httpMethod === "DELETE") {
 
       const body =
