@@ -86,6 +86,50 @@
       document.getElementById("kelasSiswa").textContent =
   siswa.kelas || "-";
 
+      async function loadPoints() {
+  const session = sessionStorage.getItem("lentera_session");
+
+  if (!session) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  try {
+    const siswa = JSON.parse(session);
+
+    const response = await fetch(
+      "/.netlify/functions/student-dashboard",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          siswaId: siswa.id
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+      console.error(result.message);
+      return;
+    }
+
+    document.getElementById("poinPenghargaan").textContent =
+      result.poin.penghargaan;
+
+    document.getElementById("poinPelanggaran").textContent =
+      result.poin.pelanggaran;
+
+  } catch (error) {
+    console.error("Gagal mengambil poin:", error);
+  }
+}
+
+loadPoints();
+
     } catch (error) {
       sessionStorage.removeItem("lentera_session");
       window.location.href = "index.html";
