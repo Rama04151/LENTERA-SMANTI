@@ -148,19 +148,21 @@ for (
 
         kelas.push({
 
-          id,
+  id,
 
-          nama,
+  nama,
 
-          tingkat,
+  tingkat,
 
-          tahunAjaranId,
+  tahunAjaranId,
 
-          status,
+  status,
 
-          jumlahSiswa
+  jumlahSiswa,
 
-        });
+  siswa: siswaDalamKelas
+
+});
 
       }
 
