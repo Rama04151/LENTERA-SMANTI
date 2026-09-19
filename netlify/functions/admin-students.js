@@ -253,6 +253,137 @@ exports.handler = async (event) => {
       });
     }
 
+        // =========================
+    // PATCH — STATUS / PASSWORD
+    // =========================
+
+    if (event.httpMethod === "PATCH") {
+
+      const body =
+        JSON.parse(event.body || "{}");
+
+      const {
+        id,
+        action,
+        password
+      } = body;
+
+      if (!id) {
+        return response(400, {
+          success: false,
+          message: "ID siswa wajib diisi."
+        });
+      }
+
+      const result =
+        await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: "Siswa!A:F"
+        });
+
+      const rows =
+        result.data.values || [];
+
+      let rowNumber = null;
+
+      for (let i = 1; i < rows.length; i++) {
+
+        if (
+          String(rows[i][0] || "").trim() ===
+          String(id).trim()
+        ) {
+          rowNumber = i + 1;
+          break;
+        }
+      }
+
+      if (!rowNumber) {
+        return response(404, {
+          success: false,
+          message: "Siswa tidak ditemukan."
+        });
+      }
+
+      const oldRow =
+        rows[rowNumber - 1];
+
+      // =========================
+      // NONAKTIFKAN
+      // =========================
+
+      if (action === "toggle_status") {
+
+        const oldStatus =
+          String(oldRow[5] || "")
+            .trim()
+            .toLowerCase();
+
+        const newStatus =
+          oldStatus === "aktif"
+            ? "Nonaktif"
+            : "Aktif";
+
+        await sheets.spreadsheets.values.update({
+          spreadsheetId,
+
+          range:
+            `Siswa!F${rowNumber}`,
+
+          valueInputOption: "RAW",
+
+          requestBody: {
+            values: [[newStatus]]
+          }
+        });
+
+        return response(200, {
+          success: true,
+          message:
+            `Status siswa diubah menjadi ${newStatus}.`,
+          status: newStatus
+        });
+      }
+
+      // =========================
+      // RESET PASSWORD
+      // =========================
+
+      if (action === "reset_password") {
+
+        if (!password) {
+          return response(400, {
+            success: false,
+            message:
+              "Password baru wajib diisi."
+          });
+        }
+
+        await sheets.spreadsheets.values.update({
+          spreadsheetId,
+
+          range:
+            `Siswa!E${rowNumber}`,
+
+          valueInputOption: "RAW",
+
+          requestBody: {
+            values: [[password]]
+          }
+        });
+
+        return response(200, {
+          success: true,
+          message:
+            "Password berhasil direset."
+        });
+      }
+
+      return response(400, {
+        success: false,
+        message: "Action tidak dikenali."
+      });
+    }
+
     return response(405, {
       success: false,
       message: "Method tidak diizinkan."
