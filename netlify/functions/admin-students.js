@@ -28,24 +28,61 @@ exports.handler = async (event) => {
       auth
     });
 
-    const result = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: "Siswa!A:F"
-    });
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
 
-    const rows = result.data.values || [];
+    // Ambil siswa
+    const siswaResult =
+      await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "Siswa!A:F"
+      });
+
+    // Ambil kelas
+    const kelasResult =
+      await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "Kelas!A:E"
+      });
+
+    const siswaRows =
+      siswaResult.data.values || [];
+
+    const kelasRows =
+      kelasResult.data.values || [];
+
+    // Buat mapping Kelas ID → Nama Kelas
+    const kelasMap = {};
+
+    for (let i = 1; i < kelasRows.length; i++) {
+      const row = kelasRows[i];
+
+      const id = String(row[0] || "").trim();
+      const nama = String(row[1] || "").trim();
+
+      if (id) {
+        kelasMap[id] = nama;
+      }
+    }
 
     const siswa = [];
 
-    for (let i = 1; i < rows.length; i++) {
-      const row = rows[i];
+    for (let i = 1; i < siswaRows.length; i++) {
+
+      const row = siswaRows[i];
+
+      const id = String(row[0] || "").trim();
+      const nisn = String(row[1] || "").trim();
+      const nama = String(row[2] || "").trim();
+      const kelasId = String(row[3] || "").trim();
+      const status = String(row[5] || "").trim();
 
       siswa.push({
-        id: String(row[0] || "").trim(),
-        nisn: String(row[1] || "").trim(),
-        nama: String(row[2] || "").trim(),
-        kelasId: String(row[3] || "").trim(),
-        status: String(row[5] || "").trim()
+        id,
+        nisn,
+        nama,
+        kelasId,
+        kelas: kelasMap[kelasId] || "-",
+        status
       });
     }
 
@@ -55,7 +92,11 @@ exports.handler = async (event) => {
     });
 
   } catch (error) {
-    console.error("ADMIN STUDENTS ERROR:", error);
+
+    console.error(
+      "ADMIN STUDENTS ERROR:",
+      error
+    );
 
     return response(500, {
       success: false,
