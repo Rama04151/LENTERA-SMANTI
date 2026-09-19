@@ -1,12 +1,70 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Lentera SMANTI</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LENTERA SMANTI</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
+
+  <main class="login-container">
+    <div class="login-card">
+
+      <div class="logo">
+        <div class="logo-circle">L</div>
+      </div>
+
+      <h1>LENTERA SMANTI</h1>
+      <p class="subtitle">Sistem Poin Siswa</p>
+
+      <form id="loginForm">
+
+        <div class="input-group">
+          <label for="nisn">NISN</label>
+          <input
+            type="text"
+            id="nisn"
+            placeholder="Masukkan NISN"
+            inputmode="numeric"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+
+          <div class="password-wrapper">
+            <input
+              type="password"
+              id="password"
+              placeholder="Masukkan password"
+              autocomplete="current-password"
+              required
+            >
+
+            <button type="button" id="togglePassword" aria-label="Tampilkan password">
+              👁
+            </button>
+          </div>
+        </div>
+
+        <p id="message"></p>
+
+        <button type="submit" class="login-button">
+          MASUK
+        </button>
+
+      </form>
+
+      <footer>
+        © 2026 LENTERA SMANTI
+      </footer>
+
+    </div>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
