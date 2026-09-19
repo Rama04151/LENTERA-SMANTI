@@ -238,6 +238,24 @@
           ✏️ Edit
         </button>
 
+        <button
+  type="button"
+  class="logout-button"
+  onclick="toggleStudentStatus('${escapeHtml(siswa.id)}')"
+>
+  ${siswa.status.toLowerCase() === "aktif"
+    ? "⛔ Nonaktifkan"
+    : "✅ Aktifkan"}
+</button>
+
+<button
+  type="button"
+  class="logout-button"
+  onclick="resetStudentPassword('${escapeHtml(siswa.id)}')"
+>
+  🔑 Reset Password
+</button>
+
       </div>
 
     `).join("");
