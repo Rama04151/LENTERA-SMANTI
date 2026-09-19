@@ -116,18 +116,48 @@
 
         <!-- SISWA -->
 
-        <label>
-          Siswa
-        </label>
+<label>
+  Siswa
+</label>
 
-        <select
-          id="pointSiswa"
-          style="
-            width:100%;
-            padding:10px;
-            margin:8px 0 15px;
-          "
-        >
+<input
+  type="text"
+  id="searchStudentPoint"
+  placeholder="🔎 Cari nama atau NISN..."
+  oninput="searchStudentsForPoint()"
+  autocomplete="off"
+  style="
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    box-sizing:border-box;
+  "
+>
+
+<div
+  id="studentSearchResult"
+  style="
+    max-height:220px;
+    overflow-y:auto;
+    margin-bottom:10px;
+  "
+></div>
+
+<div
+  id="selectedStudent"
+  style="
+    display:none;
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:8px;
+    background:#eef6ff;
+  "
+></div>
+
+<input
+  type="hidden"
+  id="pointSiswa"
+>
 
           <option value="">
             -- Pilih Siswa --
