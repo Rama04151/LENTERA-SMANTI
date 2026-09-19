@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Data Siswa - LENTERA SMANTI</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+  <main class="dashboard-container">
+
+    <section class="dashboard-card">
+
+      <div class="dashboard-header">
+        <div class="logo-small">L</div>
+
+        <div>
+          <h1>LENTERA SMANTI</h1>
+          <p>Data Siswa</p>
+        </div>
+      </div>
+
+      <div class="welcome">
+        <p>Admin Panel</p>
+        <h2>Data Siswa</h2>
+      </div>
+
+      <div id="loading">
+        Memuat data siswa...
+      </div>
+
+      <div id="studentList"></div>
+
+      <button
+        type="button"
+        class="logout-button"
+        onclick="window.location.href='admin.html'"
+      >
+        ← Kembali
+      </button>
+
+    </section>
+
+  </main>
+
+  <script>
+    const adminSession =
+      sessionStorage.getItem("lentera_admin_session");
+
+    if (!adminSession) {
+      window.location.replace("admin-login.html");
+    }
+
+    async function loadStudents() {
+      const loading =
+        document.getElementById("loading");
+
+      const studentList =
+        document.getElementById("studentList");
+
+      try {
+
+        const response = await fetch(
+          "/.netlify/functions/admin-students"
+        );
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(
+            result.message || "Gagal memuat data"
+          );
+        }
+
+        loading.style.display = "none";
+
+        if (result.siswa.length === 0) {
+          studentList.innerHTML =
+            "<p>Belum ada data siswa.</p>";
+          return;
+        }
+
+        studentList.innerHTML =
+          result.siswa.map((siswa) => `
+            <div class="history-section">
+
+              <strong>${escapeHtml(siswa.nama)}</strong>
+
+              <p>
+                NISN: ${escapeHtml(siswa.nisn)}
+              </p>
+
+              <p>
+                Kelas ID: ${escapeHtml(siswa.kelasId)}
+              </p>
+
+              <p>
+                Status: ${escapeHtml(siswa.status)}
+              </p>
+
+            </div>
+          `).join("");
+
+      } catch (error) {
+
+        console.error(error);
+
+        loading.textContent =
+          "Data siswa gagal dimuat.";
+      }
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    loadStudents();
+  </script>
+
+</body>
+</html>
