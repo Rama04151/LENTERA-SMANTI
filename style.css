@@ -534,11 +534,4 @@ footer {
   }
 }
 
-  /* TEST DESKTOP */
-body {
-  background: red !important;
-}
-
-.dashboard-card {
-  background: yellow !important;
-}
+  
