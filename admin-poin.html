@@ -1098,6 +1098,320 @@ document.getElementById(
 
     }
 
+    function openEditPoint(id) {
+
+  const point =
+    points.find(
+      point => point.id === id
+    );
+
+  if (!point) {
+
+    alert(
+      "Data poin tidak ditemukan."
+    );
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    "editPointId"
+  ).value =
+    point.id;
+
+
+  // =========================
+  // SISWA
+  // =========================
+
+  const select =
+    document.getElementById(
+      "editPointSiswa"
+    );
+
+  select.innerHTML = `
+
+    <option value="">
+      -- Pilih Siswa --
+    </option>
+
+  `;
+
+  students.forEach(
+    siswa => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        siswa.id;
+
+      option.textContent =
+        `${siswa.nama} — ${siswa.nisn} — ${siswa.kelas}`;
+
+      if (
+        siswa.id ===
+        point.siswaId
+      ) {
+
+        option.selected = true;
+
+      }
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  // =========================
+  // DATA LAIN
+  // =========================
+
+  document.getElementById(
+    "editPointJenis"
+  ).value =
+    point.jenis;
+
+
+  document.getElementById(
+    "editPointNilai"
+  ).value =
+    point.poin;
+
+
+  document.getElementById(
+    "editPointKeterangan"
+  ).value =
+    point.keterangan;
+
+
+  // DD/MM/YYYY → YYYY-MM-DD
+
+  if (point.tanggal) {
+
+    const parts =
+      point.tanggal.split("/");
+
+    if (
+      parts.length === 3
+    ) {
+
+      document.getElementById(
+        "editPointTanggal"
+      ).value =
+        `${parts[2]}-${parts[1]}-${parts[0]}`;
+
+    }
+
+  }
+
+
+  document.getElementById(
+    "editPointMessage"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "editPointModal"
+  ).style.display =
+    "block";
+
+}
+
+
+function closeEditPoint() {
+
+  document.getElementById(
+    "editPointModal"
+  ).style.display =
+    "none";
+
+}
+
+
+async function saveEditPoint() {
+
+  const id =
+    document.getElementById(
+      "editPointId"
+    ).value;
+
+  const siswaId =
+    document.getElementById(
+      "editPointSiswa"
+    ).value;
+
+  const jenis =
+    document.getElementById(
+      "editPointJenis"
+    ).value;
+
+  const poin =
+    document.getElementById(
+      "editPointNilai"
+    ).value;
+
+  const keterangan =
+    document.getElementById(
+      "editPointKeterangan"
+    ).value.trim();
+
+  const tanggalInput =
+    document.getElementById(
+      "editPointTanggal"
+    ).value;
+
+  const message =
+    document.getElementById(
+      "editPointMessage"
+    );
+
+
+  if (
+    !id ||
+    !siswaId ||
+    !jenis ||
+    !poin ||
+    !keterangan
+  ) {
+
+    message.textContent =
+      "Semua data wajib diisi.";
+
+    return;
+
+  }
+
+
+  let tanggal = "";
+
+
+  if (tanggalInput) {
+
+    const parts =
+      tanggalInput.split("-");
+
+    tanggal =
+      `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+  }
+
+
+  let admin = "";
+
+
+  try {
+
+    const session =
+      JSON.parse(
+        adminSession
+      );
+
+    admin =
+      session.username || "";
+
+  } catch (error) {
+
+    console.error(
+      "ADMIN SESSION ERROR:",
+      error
+    );
+
+  }
+
+
+  message.textContent =
+    "Menyimpan perubahan...";
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/admin-points",
+        {
+
+          method: "PUT",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              id,
+
+              siswaId,
+
+              jenis,
+
+              poin:
+                Number(poin),
+
+              keterangan,
+
+              tanggal,
+
+              admin
+
+            })
+
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      message.textContent =
+        result.message ||
+        "Poin gagal diperbarui.";
+
+      return;
+
+    }
+
+
+    alert(
+      "Poin berhasil diperbarui."
+    );
+
+
+    closeEditPoint();
+
+    await loadPoints();
+
+
+  } catch (error) {
+
+    console.error(
+      "EDIT POINT ERROR:",
+      error
+    );
+
+    message.textContent =
+      "Terjadi kesalahan koneksi.";
+
+  }
+
+}
+
 
     // =========================
     // HAPUS POIN
