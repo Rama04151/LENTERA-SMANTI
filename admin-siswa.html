@@ -29,6 +29,13 @@
         <h2>Data Siswa</h2>
       </div>
 
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Cari nama atau NISN..."
+        style="width:100%; box-sizing:border-box; margin-bottom:20px;"
+      >
+
       <div id="loading">
         Memuat data siswa...
       </div>
@@ -48,62 +55,46 @@
   </main>
 
   <script>
+
     const adminSession =
-      sessionStorage.getItem("lentera_admin_session");
+      sessionStorage.getItem(
+        "lentera_admin_session"
+      );
 
     if (!adminSession) {
-      window.location.replace("admin-login.html");
+      window.location.replace(
+        "admin-login.html"
+      );
     }
 
+    let students = [];
+
     async function loadStudents() {
+
       const loading =
         document.getElementById("loading");
 
-      const studentList =
-        document.getElementById("studentList");
-
       try {
 
-        const response = await fetch(
-          "/.netlify/functions/admin-students"
-        );
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-students"
+          );
 
-        const result = await response.json();
+        const result =
+          await response.json();
 
         if (!result.success) {
           throw new Error(
-            result.message || "Gagal memuat data"
+            result.message
           );
         }
 
+        students = result.siswa;
+
         loading.style.display = "none";
 
-        if (result.siswa.length === 0) {
-          studentList.innerHTML =
-            "<p>Belum ada data siswa.</p>";
-          return;
-        }
-
-        studentList.innerHTML =
-          result.siswa.map((siswa) => `
-            <div class="history-section">
-
-              <strong>${escapeHtml(siswa.nama)}</strong>
-
-              <p>
-                NISN: ${escapeHtml(siswa.nisn)}
-              </p>
-
-              <p>
-                Kelas ID: ${escapeHtml(siswa.kelasId)}
-              </p>
-
-              <p>
-                Status: ${escapeHtml(siswa.status)}
-              </p>
-
-            </div>
-          `).join("");
+        renderStudents(students);
 
       } catch (error) {
 
@@ -114,7 +105,74 @@
       }
     }
 
+    function renderStudents(data) {
+
+      const studentList =
+        document.getElementById(
+          "studentList"
+        );
+
+      if (data.length === 0) {
+
+        studentList.innerHTML =
+          "<p>Siswa tidak ditemukan.</p>";
+
+        return;
+      }
+
+      studentList.innerHTML =
+        data.map((siswa) => `
+
+          <div class="history-section">
+
+            <h3>
+              ${escapeHtml(siswa.nama)}
+            </h3>
+
+            <p>
+              <strong>NISN:</strong>
+              ${escapeHtml(siswa.nisn)}
+            </p>
+
+            <p>
+              <strong>Kelas:</strong>
+              ${escapeHtml(siswa.kelas)}
+            </p>
+
+            <p>
+              <strong>Status:</strong>
+              ${escapeHtml(siswa.status)}
+            </p>
+
+          </div>
+
+        `).join("");
+    }
+
+    document
+      .getElementById("searchInput")
+      .addEventListener("input", function () {
+
+        const keyword =
+          this.value
+            .toLowerCase()
+            .trim();
+
+        const filtered =
+          students.filter((siswa) =>
+            siswa.nama
+              .toLowerCase()
+              .includes(keyword) ||
+            siswa.nisn
+              .toLowerCase()
+              .includes(keyword)
+          );
+
+        renderStudents(filtered);
+      });
+
     function escapeHtml(text) {
+
       return String(text)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -124,6 +182,7 @@
     }
 
     loadStudents();
+
   </script>
 
 </body>
