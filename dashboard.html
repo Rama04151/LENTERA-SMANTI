@@ -107,8 +107,18 @@
     return;
   }
 
+  const riwayatContainer =
+    document.getElementById("riwayatPoin");
+
   try {
     const siswa = JSON.parse(session);
+
+    // Timeout 10 detik
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 10000);
 
     const response = await fetch(
       "/.netlify/functions/student-dashboard",
@@ -119,15 +129,19 @@
         },
         body: JSON.stringify({
           siswaId: siswa.id
-        })
+        }),
+        signal: controller.signal
       }
     );
 
+    clearTimeout(timeout);
+
     const result = await response.json();
 
-    if (!result.success) {
-      console.error(result.message);
-      return;
+    if (!response.ok || !result.success) {
+      throw new Error(
+        result.message || "Gagal mengambil data."
+      );
     }
 
     // Total poin
@@ -137,10 +151,7 @@
     document.getElementById("poinPelanggaran").textContent =
       result.poin.pelanggaran;
 
-    // Riwayat poin
-    const riwayatContainer =
-      document.getElementById("riwayatPoin");
-
+    // Bersihkan loading
     riwayatContainer.innerHTML = "";
 
     if (!result.riwayat || result.riwayat.length === 0) {
@@ -149,11 +160,10 @@
           Belum ada riwayat poin.
         </div>
       `;
-
       return;
     }
 
-    // Terbaru ditampilkan terlebih dahulu
+    // Terbaru di atas
     const riwayat = [...result.riwayat].reverse();
 
     riwayat.forEach((item) => {
@@ -161,16 +171,18 @@
 
       div.className = "history-item";
 
-      const jenis =
-        String(item.jenis).toLowerCase();
+      const jenis = String(item.jenis).toLowerCase();
+
+      const isPenghargaan =
+        jenis === "penghargaan";
 
       const tanda =
-        jenis === "penghargaan" ? "+" : "-";
+        isPenghargaan ? "+" : "-";
 
       div.innerHTML = `
         <div class="history-top">
           <span class="history-type">
-            ${jenis === "penghargaan"
+            ${isPenghargaan
               ? "🏆 Penghargaan"
               : "⚠️ Pelanggaran"}
           </span>
@@ -193,32 +205,21 @@
     });
 
   } catch (error) {
-    console.error("Gagal mengambil poin:", error);
+    console.error("Gagal mengambil data:", error);
 
-    document.getElementById("riwayatPoin").innerHTML = `
-      <div class="history-empty">
-        Gagal memuat riwayat poin.
-      </div>
-    `;
-  }
-}
-    );
-
-    const result = await response.json();
-
-    if (!result.success) {
-      console.error(result.message);
-      return;
+    if (error.name === "AbortError") {
+      riwayatContainer.innerHTML = `
+        <div class="history-empty">
+          Waktu memuat habis. Silakan refresh halaman.
+        </div>
+      `;
+    } else {
+      riwayatContainer.innerHTML = `
+        <div class="history-empty">
+          Gagal memuat riwayat poin.
+        </div>
+      `;
     }
-
-    document.getElementById("poinPenghargaan").textContent =
-      result.poin.penghargaan;
-
-    document.getElementById("poinPelanggaran").textContent =
-      result.poin.pelanggaran;
-
-  } catch (error) {
-    console.error("Gagal mengambil poin:", error);
   }
 }
 
