@@ -1,1 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Admin Panel - LENTERA SMANTI</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+  <main class="dashboard-container">
+
+    <section class="dashboard-card">
+
+      <div class="dashboard-header">
+
+        <div class="logo-small">L</div>
+
+        <div>
+          <h1>LENTERA SMANTI</h1>
+          <p>Admin Panel</p>
+        </div>
+
+      </div>
+
+      <div class="welcome">
+
+        <p>Selamat datang,</p>
+
+        <h2 id="adminUsername">
+          Memuat...
+        </h2>
+
+      </div>
+
+      <div class="points-container">
+
+        <div class="point-card">
+          <span>👨‍🎓</span>
+          <p>Total Siswa</p>
+          <strong id="totalSiswa">0</strong>
+        </div>
+
+        <div class="point-card">
+          <span>🏫</span>
+          <p>Total Kelas</p>
+          <strong id="totalKelas">6</strong>
+        </div>
+
+      </div>
+
+      <section class="history-section">
+
+        <div class="section-title">
+
+          <h3>Menu Admin</h3>
+
+          <p>
+            Kelola data LENTERA SMANTI
+          </p>
+
+        </div>
+
+        <div class="points-container">
+
+          <button
+            type="button"
+            class="logout-button"
+            onclick="alert('Data Siswa segera dibuat')"
+          >
+            👨‍🎓 Data Siswa
+          </button>
+
+          <button
+            type="button"
+            class="logout-button"
+            onclick="alert('Fitur Penghargaan segera dibuat')"
+          >
+            🏆 Penghargaan
+          </button>
+
+          <button
+            type="button"
+            class="logout-button"
+            onclick="alert('Fitur Pelanggaran segera dibuat')"
+          >
+            ⚠️ Pelanggaran
+          </button>
+
+          <button
+            type="button"
+            class="logout-button"
+            onclick="alert('Fitur pindahkan siswa segera dibuat')"
+          >
+            🔄 Pindahkan Siswa
+          </button>
+
+        </div>
+
+      </section>
+
+      <button
+        type="button"
+        id="logoutAdmin"
+        class="logout-button"
+      >
+        Keluar
+      </button>
+
+    </section>
+
+  </main>
+
+  <script>
+
+    const session =
+      sessionStorage.getItem(
+        "lentera_admin_session"
+      );
+
+    if (!session) {
+
+      window.location.replace(
+        "admin-login.html"
+      );
+
+    }
+
+    try {
+
+      const admin =
+        JSON.parse(session);
+
+      document.getElementById(
+        "adminUsername"
+      ).textContent =
+        admin.username || "Admin";
+
+    } catch (error) {
+
+      sessionStorage.removeItem(
+        "lentera_admin_session"
+      );
+
+      window.location.replace(
+        "admin-login.html"
+      );
+
+    }
+
+    document.getElementById(
+      "logoutAdmin"
+    ).onclick = function () {
+
+      sessionStorage.removeItem(
+        "lentera_admin_session"
+      );
+
+      window.location.replace(
+        "admin-login.html"
+      );
+
+    };
+
+  </script>
+
+</body>
+</html>
