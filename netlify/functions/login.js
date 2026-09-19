@@ -247,16 +247,43 @@ exports.handler = async (event) => {
       });
     }
 
-    return response(200, {
-      success: true,
-      message: "Login berhasil",
-      siswa: {
-        id: siswa.id,
-        nisn: siswa.nisn,
-        nama: siswa.nama,
-        kelasId: siswa.kelasId
-      }
-    });
+    // Ambil data kelas
+const kelasResult = await sheets.spreadsheets.values.get({
+  spreadsheetId,
+  range: "Kelas!A:E"
+});
+
+const kelasRows = kelasResult.data.values || [];
+
+let namaKelas = "-";
+
+for (let i = 1; i < kelasRows.length; i++) {
+  const row = kelasRows[i];
+
+  const idKelas = row[0] || "";
+  const nama = row[1] || "";
+  const status = row[4] || "";
+
+  if (
+    String(idKelas) === String(siswa.kelasId) &&
+    String(status).toLowerCase() === "aktif"
+  ) {
+    namaKelas = nama;
+    break;
+  }
+}
+
+return response(200, {
+  success: true,
+  message: "Login berhasil",
+  siswa: {
+    id: siswa.id,
+    nisn: siswa.nisn,
+    nama: siswa.nama,
+    kelasId: siswa.kelasId,
+    kelas: namaKelas
+  }
+});
 
   } catch (error) {
     console.error("LOGIN ERROR:", error);
