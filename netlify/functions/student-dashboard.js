@@ -24,7 +24,7 @@ exports.handler = async (event) => {
     // TES: hanya membaca 1 baris header
     const result = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "Poin!A1:F1"
+      range: "Poin!A1:F20"
     });
 
     return {
