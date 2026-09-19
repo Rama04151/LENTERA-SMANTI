@@ -43,6 +43,11 @@
       style="margin-top:15px;"
     ></div>
 
+    <div
+  id="studentClassList"
+  style="margin-top:20px;"
+></div>
+
   </div>
 
 
@@ -103,9 +108,12 @@
 
         }
 
-        renderClasses(
-          result.kelas
-        );
+        window.classData =
+  result.kelas;
+
+renderClasses(
+  result.kelas
+);
 
       } catch (error) {
 
@@ -128,53 +136,57 @@
 
     function renderClasses(data) {
 
-      const classList =
-        document.getElementById(
-          "classList"
-        );
+  const classList =
+    document.getElementById(
+      "classList"
+    );
 
-      if (!data || data.length === 0) {
+  if (!data || data.length === 0) {
 
-        classList.innerHTML =
-          "<p>Belum ada data kelas.</p>";
+    classList.innerHTML =
+      "<p>Belum ada data kelas.</p>";
 
-        return;
+    return;
 
-      }
+  }
 
-      classList.innerHTML =
-        data.map((kelas) => `
+  classList.innerHTML =
+    data.map((kelas) => `
 
-          <div
-            class="history-section"
-            style="margin-bottom:15px;"
-          >
+      <div
+        class="history-section"
+        style="margin-bottom:15px; cursor:pointer;"
+        onclick="showStudents('${kelas.id}')"
+      >
 
-            <h2>
-              🏫 ${escapeHtml(kelas.nama)}
-            </h2>
+        <h2>
+          🏫 ${escapeHtml(kelas.nama)}
+        </h2>
 
-            <p>
-              <strong>Tingkat:</strong>
-              ${escapeHtml(kelas.tingkat)}
-            </p>
+        <p>
+          <strong>Tingkat:</strong>
+          ${escapeHtml(kelas.tingkat)}
+        </p>
 
-            <p>
-              <strong>Status:</strong>
-              ${escapeHtml(kelas.status)}
-            </p>
+        <p>
+          <strong>Status:</strong>
+          ${escapeHtml(kelas.status)}
+        </p>
 
-            <p>
-              <strong>Jumlah Siswa:</strong>
-              ${kelas.jumlahSiswa} siswa
-            </p>
+        <p>
+          <strong>Jumlah Siswa:</strong>
+          ${kelas.jumlahSiswa} siswa
+        </p>
 
-          </div>
+        <p>
+          👆 Klik untuk melihat siswa
+        </p>
 
-        `).join("");
+      </div>
 
-    }
+    `).join("");
 
+}
 
     // =========================
     // ESCAPE HTML
@@ -197,6 +209,111 @@
     // =========================
 
     loadClasses();
+
+    // =========================
+// TAMPILKAN SISWA DALAM KELAS
+// =========================
+
+function showStudents(kelasId) {
+
+  const kelas =
+    window.classData.find(
+      k => String(k.id) === String(kelasId)
+    );
+
+  const container =
+    document.getElementById(
+      "studentClassList"
+    );
+
+  if (!kelas) {
+
+    container.innerHTML =
+      "<p>Data kelas tidak ditemukan.</p>";
+
+    return;
+
+  }
+
+  let html = `
+
+    <div class="history-section">
+
+      <h2>
+        👨‍🎓 Siswa ${escapeHtml(kelas.nama)}
+      </h2>
+
+      <p>
+        Jumlah:
+        <strong>
+          ${kelas.jumlahSiswa} siswa
+        </strong>
+      </p>
+
+  `;
+
+  if (
+    !kelas.siswa ||
+    kelas.siswa.length === 0
+  ) {
+
+    html += `
+      <p>
+        Belum ada siswa aktif di kelas ini.
+      </p>
+    `;
+
+  } else {
+
+    html += `
+
+      <div style="margin-top:15px;">
+
+        ${kelas.siswa.map((siswa, index) => `
+
+          <div
+            style="
+              padding:12px;
+              border-bottom:1px solid #ddd;
+            "
+          >
+
+            <strong>
+              ${index + 1}.
+              ${escapeHtml(siswa.nama)}
+            </strong>
+
+            <br>
+
+            <small>
+              NISN:
+              ${escapeHtml(siswa.nisn)}
+            </small>
+
+          </div>
+
+        `).join("")}
+
+      </div>
+
+    `;
+
+  }
+
+  html += `
+
+    </div>
+
+  `;
+
+  container.innerHTML = html;
+
+  // Scroll ke daftar siswa
+  container.scrollIntoView({
+    behavior: "smooth"
+  });
+
+}
 
   </script>
 
