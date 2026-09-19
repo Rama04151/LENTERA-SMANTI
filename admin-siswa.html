@@ -321,19 +321,24 @@ async function saveStudent() {
     document.getElementById("editId").value;
 
   const nisn =
-    document.getElementById("formNisn").value.trim();
+    document.getElementById("formNisn")
+      .value.trim();
 
   const nama =
-    document.getElementById("formNama").value.trim();
+    document.getElementById("formNama")
+      .value.trim();
 
   const kelasId =
-    document.getElementById("formKelas").value;
+    document.getElementById("formKelas")
+      .value;
 
   const password =
-    document.getElementById("formPassword").value;
+    document.getElementById("formPassword")
+      .value;
 
   const status =
-    document.getElementById("formStatus").value;
+    document.getElementById("formStatus")
+      .value;
 
   const message =
     document.getElementById("formMessage");
@@ -351,27 +356,36 @@ async function saveStudent() {
 
   try {
 
-    const method = id ? "PUT" : "POST";
+    const method =
+      id ? "PUT" : "POST";
 
-    const response = await fetch(
-      "/.netlify/functions/admin-students",
-      {
-        method,
+    const body = {
+      id,
+      nisn,
+      nama,
+      kelasId,
+      status
+    };
 
-        headers: {
-          "Content-Type": "application/json"
-        },
+    // Password hanya dikirim jika diisi
+    if (password) {
+      body.password = password;
+    }
 
-        body: JSON.stringify({
-          id,
-          nisn,
-          nama,
-          kelasId,
-          password,
-          status
-        })
-      }
-    );
+    const response =
+      await fetch(
+        "/.netlify/functions/admin-students",
+        {
+          method,
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify(body)
+        }
+      );
 
     const result =
       await response.json();
