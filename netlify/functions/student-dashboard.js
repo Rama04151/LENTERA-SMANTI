@@ -9,7 +9,8 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { siswaId } = JSON.parse(event.body || "{}");
+    const body = JSON.parse(event.body || "{}");
+    const siswaId = String(body.siswaId || "").trim();
 
     if (!siswaId) {
       return response(400, {
@@ -18,15 +19,26 @@ exports.handler = async (event) => {
       });
     }
 
+    // Pastikan ENV tersedia
+    if (
+      !process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ||
+      !process.env.GOOGLE_PRIVATE_KEY ||
+      !process.env.GOOGLE_SHEET_ID
+    ) {
+      throw new Error("Environment variable Google belum lengkap");
+    }
+
+    const privateKey = process.env.GOOGLE_PRIVATE_KEY
+      .replace(/\\n/g, "\n")
+      .replace(/^"|"$/g, "");
+
     const auth = new google.auth.GoogleAuth({
       credentials: {
         client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY
-          .replace(/\\n/g, "\n")
-          .replace(/^"|"$/g, "")
+        private_key: privateKey
       },
       scopes: [
-        "https://www.googleapis.com/auth/spreadsheets"
+        "https://www.googleapis.com/auth/spreadsheets.readonly"
       ]
     });
 
@@ -37,39 +49,59 @@ exports.handler = async (event) => {
 
     const spreadsheetId = process.env.GOOGLE_SHEET_ID;
 
-    // Ambil data Poin
-    const poinResult = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "Poin!A:G"
-    });
+    /*
+     * Hanya ambil kolom yang diperlukan.
+     *
+     * A = ID
+     * B = Siswa_ID
+     * C = Jenis
+     * D = Poin
+     * E = Keterangan
+     * F = Tanggal
+     *
+     * Kolom G (Admin) tidak diperlukan untuk dashboard siswa.
+     */
+    const result = await Promise.race([
+      sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "Poin!A:F",
+        majorDimension: "ROWS"
+      }),
 
-    const poinRows = poinResult.data.values || [];
+      new Promise((_, reject) =>
+        setTimeout(() => {
+          reject(new Error("Google Sheets timeout"));
+        }, 8000)
+      )
+    ]);
+
+    const rows = result.data.values || [];
 
     let totalPenghargaan = 0;
     let totalPelanggaran = 0;
 
     const riwayatPoin = [];
 
-    for (let i = 1; i < poinRows.length; i++) {
-      const row = poinRows[i];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
 
-      const id = row[0] || "";
-      const rowSiswaId = row[1] || "";
-      const jenis = row[2] || "";
+      const id = String(row[0] || "");
+      const rowSiswaId = String(row[1] || "");
+      const jenis = String(row[2] || "").trim().toLowerCase();
       const poin = Number(row[3] || 0);
-      const keterangan = row[4] || "";
-      const tanggal = row[5] || "";
-      const admin = row[6] || "";
+      const keterangan = String(row[4] || "");
+      const tanggal = String(row[5] || "");
 
-      if (String(rowSiswaId) !== String(siswaId)) {
+      // Hanya proses data milik siswa yang sedang login
+      if (rowSiswaId !== siswaId) {
         continue;
       }
 
-      if (jenis.toLowerCase() === "penghargaan") {
+      if (jenis === "penghargaan") {
         totalPenghargaan += poin;
       }
 
-      if (jenis.toLowerCase() === "pelanggaran") {
+      if (jenis === "pelanggaran") {
         totalPelanggaran += poin;
       }
 
@@ -78,17 +110,18 @@ exports.handler = async (event) => {
         jenis,
         poin,
         keterangan,
-        tanggal,
-        admin
+        tanggal
       });
     }
 
     return response(200, {
       success: true,
+
       poin: {
         penghargaan: totalPenghargaan,
         pelanggaran: totalPelanggaran
       },
+
       riwayat: riwayatPoin
     });
 
@@ -97,7 +130,7 @@ exports.handler = async (event) => {
 
     return response(500, {
       success: false,
-      message: "Terjadi kesalahan pada server"
+      message: "Data poin gagal dimuat"
     });
   }
 };
