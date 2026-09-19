@@ -639,6 +639,14 @@
               </p>
 
               <button
+  type="button"
+  class="logout-button"
+  onclick="openEditPoint('${escapeHtml(point.id)}')"
+>
+  ✏️ Edit
+</button>
+
+              <button
                 type="button"
                 class="logout-button"
                 onclick="deletePoint('${escapeHtml(point.id)}')"
