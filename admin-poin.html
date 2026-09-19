@@ -285,6 +285,170 @@
 
   </div>
 
+  <!-- ========================= -->
+<!-- MODAL EDIT POIN -->
+<!-- ========================= -->
+
+<div
+  id="editPointModal"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    z-index:9999;
+    padding:20px;
+    box-sizing:border-box;
+    overflow:auto;
+  "
+>
+
+  <div
+    style="
+      background:white;
+      max-width:500px;
+      margin:40px auto;
+      padding:20px;
+      border-radius:12px;
+    "
+  >
+
+    <h2>
+      ✏️ Edit Poin
+    </h2>
+
+    <input
+      type="hidden"
+      id="editPointId"
+    >
+
+    <!-- SISWA -->
+
+    <label>
+      Siswa
+    </label>
+
+    <select
+      id="editPointSiswa"
+      style="
+        width:100%;
+        padding:10px;
+        margin:8px 0 15px;
+        box-sizing:border-box;
+      "
+    ></select>
+
+
+    <!-- JENIS -->
+
+    <label>
+      Jenis Poin
+    </label>
+
+    <select
+      id="editPointJenis"
+      style="
+        width:100%;
+        padding:10px;
+        margin:8px 0 15px;
+        box-sizing:border-box;
+      "
+    >
+
+      <option value="penghargaan">
+        🏆 Penghargaan
+      </option>
+
+      <option value="pelanggaran">
+        ⚠️ Pelanggaran
+      </option>
+
+    </select>
+
+
+    <!-- NILAI -->
+
+    <label>
+      Jumlah Poin
+    </label>
+
+    <input
+      type="number"
+      id="editPointNilai"
+      min="1"
+      style="
+        width:100%;
+        padding:10px;
+        margin:8px 0 15px;
+        box-sizing:border-box;
+      "
+    >
+
+
+    <!-- KETERANGAN -->
+
+    <label>
+      Keterangan
+    </label>
+
+    <textarea
+      id="editPointKeterangan"
+      style="
+        width:100%;
+        min-height:80px;
+        padding:10px;
+        margin:8px 0 15px;
+        box-sizing:border-box;
+      "
+    ></textarea>
+
+
+    <!-- TANGGAL -->
+
+    <label>
+      Tanggal
+    </label>
+
+    <input
+      type="date"
+      id="editPointTanggal"
+      style="
+        width:100%;
+        padding:10px;
+        margin:8px 0 15px;
+        box-sizing:border-box;
+      "
+    >
+
+
+    <div
+      id="editPointMessage"
+      style="
+        margin-bottom:15px;
+      "
+    ></div>
+
+
+    <button
+      type="button"
+      class="logout-button"
+      onclick="saveEditPoint()"
+    >
+      💾 Simpan Perubahan
+    </button>
+
+    <button
+      type="button"
+      class="logout-button"
+      onclick="closeEditPoint()"
+    >
+      Batal
+    </button>
+
+  </div>
+
+</div>
+
 
   <script>
 
