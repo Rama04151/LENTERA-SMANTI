@@ -130,6 +130,87 @@
       return;
     }
 
+    // Total poin
+    document.getElementById("poinPenghargaan").textContent =
+      result.poin.penghargaan;
+
+    document.getElementById("poinPelanggaran").textContent =
+      result.poin.pelanggaran;
+
+    // Riwayat poin
+    const riwayatContainer =
+      document.getElementById("riwayatPoin");
+
+    riwayatContainer.innerHTML = "";
+
+    if (!result.riwayat || result.riwayat.length === 0) {
+      riwayatContainer.innerHTML = `
+        <div class="history-empty">
+          Belum ada riwayat poin.
+        </div>
+      `;
+
+      return;
+    }
+
+    // Terbaru ditampilkan terlebih dahulu
+    const riwayat = [...result.riwayat].reverse();
+
+    riwayat.forEach((item) => {
+      const div = document.createElement("div");
+
+      div.className = "history-item";
+
+      const jenis =
+        String(item.jenis).toLowerCase();
+
+      const tanda =
+        jenis === "penghargaan" ? "+" : "-";
+
+      div.innerHTML = `
+        <div class="history-top">
+          <span class="history-type">
+            ${jenis === "penghargaan"
+              ? "🏆 Penghargaan"
+              : "⚠️ Pelanggaran"}
+          </span>
+
+          <span class="history-poin">
+            ${tanda}${item.poin}
+          </span>
+        </div>
+
+        <div class="history-description">
+          ${item.keterangan || "Tidak ada keterangan"}
+        </div>
+
+        <div class="history-date">
+          ${item.tanggal || "-"}
+        </div>
+      `;
+
+      riwayatContainer.appendChild(div);
+    });
+
+  } catch (error) {
+    console.error("Gagal mengambil poin:", error);
+
+    document.getElementById("riwayatPoin").innerHTML = `
+      <div class="history-empty">
+        Gagal memuat riwayat poin.
+      </div>
+    `;
+  }
+}
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+      console.error(result.message);
+      return;
+    }
+
     document.getElementById("poinPenghargaan").textContent =
       result.poin.penghargaan;
 
