@@ -548,6 +548,158 @@ async function saveStudent() {
   }
 }
 
+    async function toggleStudentStatus(id) {
+
+  const siswa =
+    students.find(
+      (item) => item.id === id
+    );
+
+  if (!siswa) {
+    return;
+  }
+
+  const aktif =
+    siswa.status.toLowerCase() === "aktif";
+
+  const actionText =
+    aktif
+      ? "menonaktifkan"
+      : "mengaktifkan";
+
+  const confirmed =
+    confirm(
+      `Yakin ingin ${actionText} siswa ${siswa.nama}?`
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/admin-students",
+        {
+          method: "PATCH",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            id,
+            action: "toggle_status"
+          })
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (!result.success) {
+
+      alert(
+        result.message ||
+        "Gagal mengubah status."
+      );
+
+      return;
+    }
+
+    alert(result.message);
+
+    await loadStudents();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Tidak dapat terhubung ke server."
+    );
+  }
+}
+
+    async function resetStudentPassword(id) {
+
+  const siswa =
+    students.find(
+      (item) => item.id === id
+    );
+
+  if (!siswa) {
+    return;
+  }
+
+  const newPassword =
+    prompt(
+      `Masukkan password baru untuk ${siswa.nama}:`
+    );
+
+  if (newPassword === null) {
+    return;
+  }
+
+  if (!newPassword.trim()) {
+
+    alert(
+      "Password tidak boleh kosong."
+    );
+
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/admin-students",
+        {
+          method: "PATCH",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            id,
+            action: "reset_password",
+            password: newPassword
+          })
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (!result.success) {
+
+      alert(
+        result.message ||
+        "Gagal reset password."
+      );
+
+      return;
+    }
+
+    alert(
+      "Password berhasil direset."
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Tidak dapat terhubung ke server."
+    );
+  }
+}
+
   </script>
 
 </body>
