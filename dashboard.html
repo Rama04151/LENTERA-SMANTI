@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Dashboard - LENTERA SMANTI</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="dashboard-container">
+
+    <section class="dashboard-card">
+
+      <div class="dashboard-header">
+        <div class="logo-small">L</div>
+
+        <div>
+          <h1>LENTERA SMANTI</h1>
+          <p>Dashboard Siswa</p>
+        </div>
+      </div>
+
+      <div class="welcome">
+        <p>Selamat datang,</p>
+        <h2 id="namaSiswa">Memuat...</h2>
+      </div>
+
+      <div class="student-info">
+
+        <div class="info-item">
+          <span>NISN</span>
+          <strong id="nisnSiswa">-</strong>
+        </div>
+
+        <div class="info-item">
+          <span>Kelas</span>
+          <strong id="kelasSiswa">-</strong>
+        </div>
+
+      </div>
+
+      <div class="points-container">
+
+        <div class="point-card penghargaan">
+          <span>🏆</span>
+          <p>Poin Penghargaan</p>
+          <strong id="poinPenghargaan">0</strong>
+        </div>
+
+        <div class="point-card pelanggaran">
+          <span>⚠️</span>
+          <p>Poin Pelanggaran</p>
+          <strong id="poinPelanggaran">0</strong>
+        </div>
+
+      </div>
+
+      <button id="logoutButton" class="logout-button">
+        Keluar
+      </button>
+
+    </section>
+
+  </main>
+
+  <script>
+    const session = sessionStorage.getItem("lentera_session");
+
+    if (!session) {
+      window.location.href = "index.html";
+    }
+
+    try {
+      const siswa = JSON.parse(session);
+
+      document.getElementById("namaSiswa").textContent =
+        siswa.nama || "-";
+
+      document.getElementById("nisnSiswa").textContent =
+        siswa.nisn || "-";
+
+      document.getElementById("kelasSiswa").textContent =
+        siswa.kelasId || "-";
+
+    } catch (error) {
+      sessionStorage.removeItem("lentera_session");
+      window.location.href = "index.html";
+    }
+
+    document
+      .getElementById("logoutButton")
+      .addEventListener("click", () => {
+
+        sessionStorage.removeItem("lentera_session");
+
+        window.location.href = "index.html";
+      });
+  </script>
+
+</body>
+</html>
