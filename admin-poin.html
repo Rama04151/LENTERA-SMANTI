@@ -67,6 +67,60 @@
 
     </div>
 
+    <div
+  style="
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:15px;
+  "
+>
+
+  <select
+    id="filterJenis"
+    onchange="filterPoints()"
+    style="
+      flex:1;
+      min-width:180px;
+      padding:10px;
+      box-sizing:border-box;
+    "
+  >
+
+    <option value="">
+      Semua Jenis Poin
+    </option>
+
+    <option value="penghargaan">
+      🏆 Penghargaan
+    </option>
+
+    <option value="pelanggaran">
+      ⚠️ Pelanggaran
+    </option>
+
+  </select>
+
+
+  <select
+    id="filterKelas"
+    onchange="filterPoints()"
+    style="
+      flex:1;
+      min-width:180px;
+      padding:10px;
+      box-sizing:border-box;
+    "
+  >
+
+    <option value="">
+      Semua Kelas
+    </option>
+
+  </select>
+
+</div>
+
 
     <!-- ========================= -->
     <!-- DAFTAR POIN -->
