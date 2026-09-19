@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Admin Login - LENTERA SMANTI</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+  <main class="dashboard-container">
+
+    <section class="dashboard-card">
+
+      <div class="dashboard-header">
+        <div class="logo-small">L</div>
+
+        <div>
+          <h1>LENTERA SMANTI</h1>
+          <p>Admin Panel</p>
+        </div>
+      </div>
+
+      <div class="welcome">
+        <p>Login sebagai</p>
+        <h2>Administrator</h2>
+      </div>
+
+      <form id="adminLoginForm">
+
+        <div class="form-group">
+          <label for="username">Username</label>
+
+          <input
+            type="text"
+            id="username"
+            placeholder="Masukkan username"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+
+          <input
+            type="password"
+            id="password"
+            placeholder="Masukkan password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button type="submit" class="logout-button">
+          Login Admin
+        </button>
+
+        <p id="adminMessage"></p>
+
+      </form>
+
+    </section>
+
+  </main>
+
+  <script src="./admin-login.js"></script>
+
+</body>
+</html>
