@@ -378,6 +378,196 @@ exports.handler = async (event) => {
         });
       }
 
+            // =========================
+      // PINDAHKAN SISWA
+      // =========================
+
+      if (action === "move_student") {
+
+        const {
+          kelasId,
+          alasan,
+          admin
+        } = body;
+
+        if (!kelasId) {
+          return response(400, {
+            success: false,
+            message: "Kelas tujuan wajib dipilih."
+          });
+        }
+
+        const siswaId =
+          String(id).trim();
+
+        const tujuanKelasId =
+          String(kelasId).trim();
+
+        const kelasSekarangId =
+          String(oldRow[3] || "").trim();
+
+        // Tidak boleh pindah ke kelas yang sama
+        if (
+          kelasSekarangId === tujuanKelasId
+        ) {
+          return response(400, {
+            success: false,
+            message:
+              "Siswa sudah berada di kelas tersebut."
+          });
+        }
+
+        // Ambil data kelas
+        const kelasResult =
+          await sheets.spreadsheets.values.get({
+            spreadsheetId,
+            range: "Kelas!A:E"
+          });
+
+        const kelasRows =
+          kelasResult.data.values || [];
+
+        let kelasSekarang = "-";
+        let kelasTujuan = "-";
+
+        for (
+          let i = 1;
+          i < kelasRows.length;
+          i++
+        ) {
+
+          const kelasRow =
+            kelasRows[i];
+
+          const kelasIdRow =
+            String(
+              kelasRow[0] || ""
+            ).trim();
+
+          const namaKelas =
+            String(
+              kelasRow[1] || ""
+            ).trim();
+
+          if (
+            kelasIdRow ===
+            kelasSekarangId
+          ) {
+            kelasSekarang =
+              namaKelas;
+          }
+
+          if (
+            kelasIdRow ===
+            tujuanKelasId
+          ) {
+            kelasTujuan =
+              namaKelas;
+          }
+        }
+
+        // Pastikan kelas tujuan valid
+        if (kelasTujuan === "-") {
+          return response(400, {
+            success: false,
+            message:
+              "Kelas tujuan tidak ditemukan."
+          });
+        }
+
+        // =========================
+        // 1. UBAH KELAS SISWA
+        // =========================
+
+        await sheets.spreadsheets.values.update({
+          spreadsheetId,
+
+          range:
+            `Siswa!D${rowNumber}`,
+
+          valueInputOption: "RAW",
+
+          requestBody: {
+            values: [[tujuanKelasId]]
+          }
+        });
+
+        // =========================
+        // 2. ID RIWAYAT
+        // =========================
+
+        const historyId =
+          "RK" +
+          String(Date.now()).slice(-8);
+
+        // =========================
+        // 3. TANGGAL
+        // =========================
+
+        const now =
+          new Date();
+
+        const tanggal =
+          String(
+            now.getDate()
+          ).padStart(2, "0") +
+          "/" +
+          String(
+            now.getMonth() + 1
+          ).padStart(2, "0") +
+          "/" +
+          now.getFullYear();
+
+        // =========================
+        // 4. SIMPAN RIWAYAT
+        // =========================
+
+        await sheets.spreadsheets.values.append({
+          spreadsheetId,
+
+          range:
+            "Riwayat_Kelas!A:G",
+
+          valueInputOption: "RAW",
+
+          requestBody: {
+            values: [[
+              historyId,
+              siswaId,
+              kelasSekarangId,
+              tujuanKelasId,
+              alasan || "",
+              tanggal,
+              admin || ""
+            ]]
+          }
+        });
+
+        return response(200, {
+          success: true,
+
+          message:
+            `Siswa berhasil dipindahkan dari ${kelasSekarang} ke ${kelasTujuan}.`,
+
+          siswa: {
+            id: siswaId,
+
+            dariKelasId:
+              kelasSekarangId,
+
+            dariKelas:
+              kelasSekarang,
+
+            keKelasId:
+              tujuanKelasId,
+
+            keKelas:
+              kelasTujuan
+          }
+        });
+      }
+
+
       return response(400, {
         success: false,
         message: "Action tidak dikenali."
