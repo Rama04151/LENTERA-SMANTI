@@ -533,3 +533,12 @@ footer {
     font-size: 28px;
   }
 }
+
+  /* TEST DESKTOP */
+body {
+  background: red !important;
+}
+
+.dashboard-card {
+  background: yellow !important;
+}
