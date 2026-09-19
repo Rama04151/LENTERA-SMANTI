@@ -98,32 +98,53 @@ exports.handler = async (event) => {
         // HITUNG JUMLAH SISWA
         // =========================
 
-        let jumlahSiswa = 0;
+        // =========================
+// DAFTAR SISWA DALAM KELAS
+// =========================
 
-        for (
-          let j = 1;
-          j < siswaRows.length;
-          j++
-        ) {
+let jumlahSiswa = 0;
+const siswaDalamKelas = [];
 
-          const siswaKelasId =
-            String(
-              siswaRows[j][3] || ""
-            ).trim();
+for (
+  let j = 1;
+  j < siswaRows.length;
+  j++
+) {
 
-          const siswaStatus =
-            String(
-              siswaRows[j][5] || ""
-            ).trim()
-              .toLowerCase();
+  const siswaId =
+    String(siswaRows[j][0] || "").trim();
 
-          if (
-            siswaKelasId === id &&
-            siswaStatus === "aktif"
-          ) {
-            jumlahSiswa++;
-          }
-        }
+  const siswaNisn =
+    String(siswaRows[j][1] || "").trim();
+
+  const siswaNama =
+    String(siswaRows[j][2] || "").trim();
+
+  const siswaKelasId =
+    String(siswaRows[j][3] || "").trim();
+
+  const siswaStatus =
+    String(siswaRows[j][5] || "")
+      .trim()
+      .toLowerCase();
+
+  if (
+    siswaKelasId === id &&
+    siswaStatus === "aktif"
+  ) {
+
+    jumlahSiswa++;
+
+    siswaDalamKelas.push({
+      id: siswaId,
+      nisn: siswaNisn,
+      nama: siswaNama,
+      status: "Aktif"
+    });
+
+  }
+
+}
 
         kelas.push({
 
