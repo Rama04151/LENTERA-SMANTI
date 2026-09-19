@@ -62,6 +62,86 @@
 
   </main>
 
+  <div id="studentModal" style="display:none;">
+
+  <div class="history-section">
+
+    <h3 id="modalTitle">
+      Tambah Siswa
+    </h3>
+
+    <input
+      type="hidden"
+      id="editId"
+    >
+
+    <input
+      type="text"
+      id="formNisn"
+      placeholder="NISN"
+    >
+
+    <input
+      type="text"
+      id="formNama"
+      placeholder="Nama siswa"
+    >
+
+    <select id="formKelas">
+
+      <option value="">
+        Pilih kelas
+      </option>
+
+      <option value="K001">X A</option>
+      <option value="K002">X B</option>
+      <option value="K003">XI A</option>
+      <option value="K004">XI B</option>
+      <option value="K005">XII A</option>
+      <option value="K006">XII B</option>
+
+    </select>
+
+    <input
+      type="text"
+      id="formPassword"
+      placeholder="Password"
+    >
+
+    <select id="formStatus">
+
+      <option value="Aktif">
+        Aktif
+      </option>
+
+      <option value="Nonaktif">
+        Nonaktif
+      </option>
+
+    </select>
+
+    <button
+      type="button"
+      class="logout-button"
+      onclick="saveStudent()"
+    >
+      Simpan
+    </button>
+
+    <button
+      type="button"
+      class="logout-button"
+      onclick="closeStudentModal()"
+    >
+      Batal
+    </button>
+
+    <p id="formMessage"></p>
+
+  </div>
+
+</div>
+
   <script>
 
     const adminSession =
