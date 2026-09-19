@@ -195,47 +195,53 @@
 
     function renderStudents(data) {
 
-      const studentList =
-        document.getElementById(
-          "studentList"
-        );
+  const studentList =
+    document.getElementById("studentList");
 
-      if (data.length === 0) {
+  if (data.length === 0) {
 
-        studentList.innerHTML =
-          "<p>Siswa tidak ditemukan.</p>";
+    studentList.innerHTML =
+      "<p>Siswa tidak ditemukan.</p>";
 
-        return;
-      }
+    return;
+  }
 
-      studentList.innerHTML =
-        data.map((siswa) => `
+  studentList.innerHTML =
+    data.map((siswa) => `
 
-          <div class="history-section">
+      <div class="history-section">
 
-            <h3>
-              ${escapeHtml(siswa.nama)}
-            </h3>
+        <h3>
+          ${escapeHtml(siswa.nama)}
+        </h3>
 
-            <p>
-              <strong>NISN:</strong>
-              ${escapeHtml(siswa.nisn)}
-            </p>
+        <p>
+          <strong>NISN:</strong>
+          ${escapeHtml(siswa.nisn)}
+        </p>
 
-            <p>
-              <strong>Kelas:</strong>
-              ${escapeHtml(siswa.kelas)}
-            </p>
+        <p>
+          <strong>Kelas:</strong>
+          ${escapeHtml(siswa.kelas)}
+        </p>
 
-            <p>
-              <strong>Status:</strong>
-              ${escapeHtml(siswa.status)}
-            </p>
+        <p>
+          <strong>Status:</strong>
+          ${escapeHtml(siswa.status)}
+        </p>
 
-          </div>
+        <button
+          type="button"
+          class="logout-button"
+          onclick="openEditStudent('${escapeHtml(siswa.id)}')"
+        >
+          ✏️ Edit
+        </button>
 
-        `).join("");
-    }
+      </div>
+
+    `).join("");
+}
 
     document
       .getElementById("searchInput")
