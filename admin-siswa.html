@@ -398,6 +398,49 @@ async function saveStudent() {
   }
 }
 
+    function openEditStudent(id) {
+
+  const siswa =
+    students.find(
+      (item) => item.id === id
+    );
+
+  if (!siswa) {
+    return;
+  }
+
+  document.getElementById("modalTitle")
+    .textContent = "Edit Siswa";
+
+  document.getElementById("editId")
+    .value = siswa.id;
+
+  document.getElementById("formNisn")
+    .value = siswa.nisn;
+
+  document.getElementById("formNama")
+    .value = siswa.nama;
+
+  document.getElementById("formKelas")
+    .value = siswa.kelasId;
+
+  document.getElementById("formPassword")
+    .value = "";
+
+  document.getElementById("formPassword")
+    .placeholder =
+      "Kosongkan jika tidak ingin mengubah password";
+
+  document.getElementById("formStatus")
+    .value = siswa.status;
+
+  document.getElementById("formMessage")
+    .textContent = "";
+
+  document.getElementById("studentModal")
+    .style.display = "block";
+}
+
   </script>
 
 </body>
