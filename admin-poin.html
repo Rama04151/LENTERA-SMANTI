@@ -416,41 +416,152 @@
 
     function renderStudentOptions() {
 
-      const select =
-        document.getElementById(
-          "pointSiswa"
-        );
+  const result =
+    document.getElementById(
+      "studentSearchResult"
+    );
 
-      select.innerHTML = `
+  result.innerHTML =
+    "<p>Ketik nama atau NISN untuk mencari siswa.</p>";
 
-        <option value="">
-          -- Pilih Siswa --
-        </option>
+}
 
-      `;
+    function searchStudentsForPoint() {
 
-      students.forEach(
-        siswa => {
+  const keyword =
+    document.getElementById(
+      "searchStudentPoint"
+    ).value
+      .trim()
+      .toLowerCase();
 
-          const option =
-            document.createElement(
-              "option"
-            );
+  const result =
+    document.getElementById(
+      "studentSearchResult"
+    );
 
-          option.value =
-            siswa.id;
+  if (!keyword) {
 
-          option.textContent =
-            `${siswa.nama} — ${siswa.nisn} — ${siswa.kelas}`;
+    result.innerHTML =
+      "<p>Ketik nama atau NISN untuk mencari siswa.</p>";
 
-          select.appendChild(
-            option
-          );
+    return;
 
-        }
-      );
+  }
 
-    }
+  const filtered =
+    students.filter(
+      siswa =>
+
+        siswa.nama
+          .toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        siswa.nisn
+          .toLowerCase()
+          .includes(keyword)
+
+    );
+
+  if (filtered.length === 0) {
+
+    result.innerHTML =
+      "<p>Siswa tidak ditemukan.</p>";
+
+    return;
+
+  }
+
+  result.innerHTML =
+    filtered.map(
+      siswa => `
+
+        <div
+          onclick="selectStudentForPoint('${escapeHtml(siswa.id)}')"
+          style="
+            padding:12px;
+            margin-bottom:6px;
+            border:1px solid #ddd;
+            border-radius:8px;
+            cursor:pointer;
+            background:white;
+          "
+        >
+
+          <strong>
+            ${escapeHtml(siswa.nama)}
+          </strong>
+
+          <br>
+
+          <small>
+            NISN: ${escapeHtml(siswa.nisn)}
+            —
+            Kelas: ${escapeHtml(siswa.kelas)}
+          </small>
+
+        </div>
+
+      `
+    ).join("");
+
+}
+
+    function selectStudentForPoint(id) {
+
+  const siswa =
+    students.find(
+      siswa => siswa.id === id
+    );
+
+  if (!siswa) {
+    return;
+  }
+
+  document.getElementById(
+    "pointSiswa"
+  ).value = siswa.id;
+
+  document.getElementById(
+    "searchStudentPoint"
+  ).value =
+    siswa.nama;
+
+  document.getElementById(
+    "studentSearchResult"
+  ).innerHTML = "";
+
+  const selected =
+    document.getElementById(
+      "selectedStudent"
+    );
+
+  selected.style.display =
+    "block";
+
+  selected.innerHTML = `
+
+    <strong>
+      ✅ Siswa terpilih
+    </strong>
+
+    <br>
+
+    ${escapeHtml(siswa.nama)}
+
+    <br>
+
+    <small>
+      NISN: ${escapeHtml(siswa.nisn)}
+      —
+      Kelas: ${escapeHtml(siswa.kelas)}
+    </small>
+
+  `;
+
+}
 
 
     // =========================
@@ -591,6 +702,20 @@
       document.getElementById(
         "pointSiswa"
       ).value = "";
+
+      document.getElementById(
+  "searchStudentPoint"
+).value = "";
+
+document.getElementById(
+  "studentSearchResult"
+).innerHTML =
+  "<p>Ketik nama atau NISN untuk mencari siswa.</p>";
+
+document.getElementById(
+  "selectedStudent"
+).style.display =
+  "none";
 
       document.getElementById(
         "pointJenis"
