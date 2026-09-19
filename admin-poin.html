@@ -615,6 +615,7 @@
             );
 
         renderStudentOptions();
+        renderClassFilter();
 
       } catch (error) {
 
@@ -626,6 +627,69 @@
       }
 
     }
+
+    function renderClassFilter() {
+
+  const select =
+    document.getElementById(
+      "filterKelas"
+    );
+
+  if (!select) {
+    return;
+  }
+
+  const kelasSet =
+    new Set();
+
+  students.forEach(
+    siswa => {
+
+      if (siswa.kelas) {
+
+        kelasSet.add(
+          siswa.kelas
+        );
+
+      }
+
+    }
+  );
+
+  const kelasList =
+    Array.from(kelasSet)
+      .sort();
+
+  select.innerHTML = `
+
+    <option value="">
+      Semua Kelas
+    </option>
+
+  `;
+
+  kelasList.forEach(
+    kelas => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        kelas;
+
+      option.textContent =
+        kelas;
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
 
 
     // =========================
@@ -886,32 +950,80 @@
 
     function filterPoints() {
 
-      const keyword =
-        document.getElementById(
-          "searchPoint"
-        ).value
-          .trim()
-          .toLowerCase();
+  const keyword =
+    document.getElementById(
+      "searchPoint"
+    ).value
+      .trim()
+      .toLowerCase();
 
-      const filtered =
-        points.filter(
-          point =>
 
-            point.nama
-              .toLowerCase()
-              .includes(keyword)
+  const jenis =
+    document.getElementById(
+      "filterJenis"
+    ).value
+      .toLowerCase();
 
-            ||
 
-            point.nisn
-              .toLowerCase()
-              .includes(keyword)
+  const kelas =
+    document.getElementById(
+      "filterKelas"
+    ).value;
 
+
+  const filtered =
+    points.filter(
+      point => {
+
+        const cocokNama =
+          point.nama
+            .toLowerCase()
+            .includes(keyword);
+
+
+        const cocokNisn =
+          point.nisn
+            .toLowerCase()
+            .includes(keyword);
+
+
+        const cocokJenis =
+          !jenis ||
+          point.jenis
+            .toLowerCase() ===
+            jenis;
+
+
+        const siswa =
+          students.find(
+            siswa =>
+              siswa.id ===
+              point.siswaId
+          );
+
+
+        const cocokKelas =
+          !kelas ||
+          (
+            siswa &&
+            siswa.kelas ===
+            kelas
+          );
+
+
+        return (
+          (cocokNama || cocokNisn) &&
+          cocokJenis &&
+          cocokKelas
         );
 
-      renderPoints(filtered);
+      }
+    );
 
-    }
+
+  renderPoints(filtered);
+
+}
 
 
     // =========================
