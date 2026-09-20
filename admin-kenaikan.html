@@ -253,54 +253,95 @@
   // LOAD TAHUN AJARAN
   // =========================
 
-  async function loadTahunAjaran() {
+ async function loadTahunAjaran() {
 
-    try {
+  try {
 
-      const response =
-        await fetch(
-          "/.netlify/functions/admin-promotion"
-        );
-
-      /*
-       * Function promotion hanya menerima POST.
-       * Jadi endpoint ini belum bisa digunakan
-       * untuk mengambil daftar tahun ajaran.
-       */
-
-      /*
-       * Untuk sementara kita ambil data
-       * langsung melalui function admin-classes
-       * tidak bisa karena endpoint tersebut
-       * hanya mengembalikan kelas.
-       *
-       * Maka daftar tahun ajaran akan dibuat
-       * dari pilihan yang kita sudah siapkan.
-       */
-
-      tahunSelect.innerHTML = `
-        <option value="TA02">
-          2027/2028
-        </option>
-      `;
-
-    } catch (error) {
-
-      console.error(
-        "LOAD TAHUN ERROR:",
-        error
+    const response =
+      await fetch(
+        "/.netlify/functions/admin-promotion"
       );
 
-      tahunSelect.innerHTML = `
-        <option value="">
-          Gagal memuat
-        </option>
-      `;
+    const result =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengambil tahun ajaran."
+      );
 
     }
 
+
+    const data =
+      Array.isArray(
+        result.tahunAjaran
+      )
+        ? result.tahunAjaran
+        : [];
+
+
+    // Hanya tahun yang belum aktif
+    const tersedia =
+      data.filter(
+        item => !item.aktif
+      );
+
+
+    if (tersedia.length === 0) {
+
+      tahunSelect.innerHTML = `
+        <option value="">
+          Tidak ada tahun ajaran baru
+        </option>
+      `;
+
+      return;
+
+    }
+
+
+    tahunSelect.innerHTML = `
+
+      <option value="">
+        Pilih tahun ajaran
+      </option>
+
+      ${
+        tersedia.map(
+          item => `
+            <option value="${item.id}">
+              ${item.tahun}
+            </option>
+          `
+        ).join("")
+      }
+
+    `;
+
+
+  } catch (error) {
+
+    console.error(
+      "LOAD TAHUN ERROR:",
+      error
+    );
+
+
+    tahunSelect.innerHTML = `
+      <option value="">
+        Gagal memuat tahun ajaran
+      </option>
+    `;
+
   }
 
+}
 
   // =========================
   // PREVIEW
