@@ -1,6 +1,5 @@
 const { google } = require("googleapis");
 
-
 // =========================
 // GOOGLE SHEETS AUTH
 // =========================
@@ -16,32 +15,26 @@ async function getSheets() {
     new google.auth.GoogleAuth({
 
       credentials: {
-
         client_email:
           process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
 
         private_key:
           privateKey
-
       },
 
       scopes: [
         "https://www.googleapis.com/auth/spreadsheets"
       ]
-
     });
 
   return google.sheets({
     version: "v4",
     auth
   });
-
 }
 
-
 // =========================
-// GET
-// AMBIL TAHUN AJARAN
+// HANDLER
 // =========================
 
 exports.handler = async (event) => {
@@ -54,10 +47,9 @@ exports.handler = async (event) => {
     const spreadsheetId =
       process.env.GOOGLE_SHEET_ID;
 
-
-    // =========================
-    // GET TAHUN AJARAN
-    // =========================
+    // =====================================================
+    // GET — TAHUN AJARAN
+    // =====================================================
 
     if (event.httpMethod === "GET") {
 
@@ -68,16 +60,12 @@ exports.handler = async (event) => {
 
           range:
             "Tahun_Ajaran!A:C"
-
         });
-
 
       const rows =
         result.data.values || [];
 
-
       const tahunAjaran = [];
-
 
       for (
         let i = 1;
@@ -98,13 +86,13 @@ exports.handler = async (event) => {
         const aktif =
           String(
             rows[i][2] || ""
-          ).trim().toLowerCase();
-
+          )
+            .trim()
+            .toLowerCase();
 
         if (!id || !tahun) {
           continue;
         }
-
 
         tahunAjaran.push({
 
@@ -114,27 +102,20 @@ exports.handler = async (event) => {
 
           aktif:
             aktif === "true"
-
         });
-
       }
-
 
       return response(200, {
 
         success: true,
 
         tahunAjaran
-
       });
-
     }
 
-
-    // =========================
-    // POST
-    // PROSES KENAIKAN
-    // =========================
+    // =====================================================
+    // POST — PROSES KENAIKAN
+    // =====================================================
 
     if (event.httpMethod === "POST") {
 
@@ -143,18 +124,15 @@ exports.handler = async (event) => {
           event.body || "{}"
         );
 
-
       const tahunAjaranBaruId =
         String(
           body.tahunAjaranBaruId || ""
         ).trim();
 
-
       const admin =
         String(
           body.admin || "Admin"
         ).trim();
-
 
       if (!tahunAjaranBaruId) {
 
@@ -164,15 +142,12 @@ exports.handler = async (event) => {
 
           message:
             "ID tahun ajaran baru wajib diisi."
-
         });
-
       }
 
-
-      // =========================
-      // BACA TAHUN AJARAN
-      // =========================
+      // ===================================================
+      // 1. BACA TAHUN AJARAN
+      // ===================================================
 
       const tahunResult =
         await sheets.spreadsheets.values.get({
@@ -181,17 +156,13 @@ exports.handler = async (event) => {
 
           range:
             "Tahun_Ajaran!A:C"
-
         });
-
 
       const tahunRows =
         tahunResult.data.values || [];
 
-
       let tahunAktif = null;
       let tahunBaru = null;
-
 
       for (
         let i = 1;
@@ -212,38 +183,31 @@ exports.handler = async (event) => {
         const aktif =
           String(
             tahunRows[i][2] || ""
-          ).trim().toLowerCase();
+          )
+            .trim()
+            .toLowerCase();
 
-
-        if (aktif === "true") {
+        if (
+          aktif === "true" ||
+          aktif === "aktif"
+        ) {
 
           tahunAktif = {
-
             id,
-
             tahun
-
           };
-
         }
-
 
         if (
           id === tahunAjaranBaruId
         ) {
 
           tahunBaru = {
-
             id,
-
             tahun
-
           };
-
         }
-
       }
-
 
       if (!tahunAktif) {
 
@@ -253,11 +217,8 @@ exports.handler = async (event) => {
 
           message:
             "Tidak ada tahun ajaran aktif."
-
         });
-
       }
-
 
       if (!tahunBaru) {
 
@@ -267,15 +228,8 @@ exports.handler = async (event) => {
 
           message:
             "Tahun ajaran baru tidak ditemukan."
-
         });
-
       }
-
-
-      // =========================
-      // CEGAH PROSES TAHUN YANG SAMA
-      // =========================
 
       if (
         tahunAktif.id ===
@@ -288,15 +242,12 @@ exports.handler = async (event) => {
 
           message:
             "Tahun ajaran tersebut sudah aktif."
-
         });
-
       }
 
-
-      // =========================
-      // BACA KELAS
-      // =========================
+      // ===================================================
+      // 2. BACA KELAS
+      // ===================================================
 
       const kelasResult =
         await sheets.spreadsheets.values.get({
@@ -305,17 +256,13 @@ exports.handler = async (event) => {
 
           range:
             "Kelas!A:E"
-
         });
-
 
       const kelasRows =
         kelasResult.data.values || [];
 
-
       const kelasAktif = {};
       const kelasBaru = {};
-
 
       for (
         let i = 1;
@@ -346,52 +293,41 @@ exports.handler = async (event) => {
         const status =
           String(
             kelasRows[i][4] || ""
-          ).trim();
-
+          )
+            .trim()
+            .toLowerCase();
 
         if (
           tahunId === tahunAktif.id &&
-          status.toLowerCase() === "aktif"
+          status === "aktif"
         ) {
 
           kelasAktif[nama] = {
-
             id,
-
             nama,
-
             tingkat
-
           };
-
         }
-
 
         if (
           tahunId === tahunBaru.id &&
-          status.toLowerCase() === "aktif"
+          status === "aktif"
         ) {
 
           kelasBaru[nama] = {
-
             id,
-
             nama,
-
             tingkat
-
           };
-
         }
-
       }
 
+      // ===================================================
+      // 3. VALIDASI KELAS YANG BENAR-BENAR DIPERLUKAN
+      // ===================================================
 
-      // =========================
-      // VALIDASI KELAS
-      // =========================
-
-      const namaKelasWajib = [
+      // Kelas lama yang harus ada
+      const kelasLamaWajib = [
 
         "X A",
         "X B",
@@ -402,9 +338,8 @@ exports.handler = async (event) => {
 
       ];
 
-
       for (
-        const nama of namaKelasWajib
+        const nama of kelasLamaWajib
       ) {
 
         if (!kelasAktif[nama]) {
@@ -415,11 +350,23 @@ exports.handler = async (event) => {
 
             message:
               `Kelas aktif "${nama}" tidak ditemukan.`
-
           });
-
         }
+      }
 
+      // Hanya kelas tujuan kenaikan yang wajib ada
+      const kelasTujuanWajib = [
+
+        "XI A",
+        "XI B",
+        "XII A",
+        "XII B"
+
+      ];
+
+      for (
+        const nama of kelasTujuanWajib
+      ) {
 
         if (!kelasBaru[nama]) {
 
@@ -428,18 +375,14 @@ exports.handler = async (event) => {
             success: false,
 
             message:
-              `Kelas baru "${nama}" tidak ditemukan.`
-
+              `Kelas tujuan "${nama}" pada tahun ajaran ${tahunBaru.tahun} tidak ditemukan.`
           });
-
         }
-
       }
 
-
-      // =========================
-      // BACA SISWA
-      // =========================
+      // ===================================================
+      // 4. BACA SISWA
+      // ===================================================
 
       const siswaResult =
         await sheets.spreadsheets.values.get({
@@ -448,21 +391,17 @@ exports.handler = async (event) => {
 
           range:
             "Siswa!A:F"
-
         });
-
 
       const siswaRows =
         siswaResult.data.values || [];
 
-
       const perpindahan = [];
       const lulus = [];
 
-
-      // =========================
-      // PROSES SISWA
-      // =========================
+      // ===================================================
+      // 5. PROSES SISWA
+      // ===================================================
 
       for (
         let i = 1;
@@ -472,7 +411,6 @@ exports.handler = async (event) => {
 
         const row =
           siswaRows[i];
-
 
         const siswaId =
           String(
@@ -494,11 +432,9 @@ exports.handler = async (event) => {
             row[5] || ""
           ).trim();
 
-
         if (!siswaId) {
           continue;
         }
-
 
         if (
           status.toLowerCase() !==
@@ -506,17 +442,14 @@ exports.handler = async (event) => {
         ) {
 
           continue;
-
         }
-
 
         let namaKelasLama =
           null;
 
-
         for (
           const namaKelas of
-          namaKelasWajib
+          kelasLamaWajib
         ) {
 
           if (
@@ -528,20 +461,16 @@ exports.handler = async (event) => {
               namaKelas;
 
             break;
-
           }
-
         }
-
 
         if (!namaKelasLama) {
           continue;
         }
 
-
-        // =========================
+        // =================================================
         // XII → LULUS
-        // =========================
+        // =================================================
 
         if (
           namaKelasLama === "XII A" ||
@@ -563,11 +492,8 @@ exports.handler = async (event) => {
               values: [
                 ["Lulus"]
               ]
-
             }
-
           });
-
 
           lulus.push({
 
@@ -578,22 +504,17 @@ exports.handler = async (event) => {
 
             dari:
               namaKelasLama
-
           });
 
-
           continue;
-
         }
 
-
-        // =========================
-        // TENTUKAN KELAS BARU
-        // =========================
+        // =================================================
+        // TENTUKAN KELAS TUJUAN
+        // =================================================
 
         let namaKelasBaru =
           null;
-
 
         if (
           namaKelasLama === "X A"
@@ -601,52 +522,53 @@ exports.handler = async (event) => {
 
           namaKelasBaru =
             "XI A";
-
         }
 
-
-        if (
+        else if (
           namaKelasLama === "X B"
         ) {
 
           namaKelasBaru =
             "XI B";
-
         }
 
-
-        if (
+        else if (
           namaKelasLama === "XI A"
         ) {
 
           namaKelasBaru =
             "XII A";
-
         }
 
-
-        if (
+        else if (
           namaKelasLama === "XI B"
         ) {
 
           namaKelasBaru =
             "XII B";
-
         }
-
 
         if (!namaKelasBaru) {
           continue;
         }
 
-
         const kelasTujuan =
           kelasBaru[namaKelasBaru];
 
+        if (!kelasTujuan) {
 
-        // =========================
-        // UPDATE KELAS
-        // =========================
+          return response(400, {
+
+            success: false,
+
+            message:
+              `Kelas tujuan "${namaKelasBaru}" tidak ditemukan.`
+          });
+        }
+
+        // =================================================
+        // UPDATE KELAS SISWA
+        // =================================================
 
         await sheets.spreadsheets.values.update({
 
@@ -663,11 +585,8 @@ exports.handler = async (event) => {
             values: [
               [kelasTujuan.id]
             ]
-
           }
-
         });
-
 
         perpindahan.push({
 
@@ -687,18 +606,14 @@ exports.handler = async (event) => {
 
           keId:
             kelasTujuan.id
-
         });
-
       }
 
-
-      // =========================
-      // RIWAYAT KELAS
-      // =========================
+      // ===================================================
+      // 6. SIMPAN RIWAYAT
+      // ===================================================
 
       const riwayatValues = [];
-
 
       for (
         const item of perpindahan
@@ -710,7 +625,6 @@ exports.handler = async (event) => {
           Math.floor(
             Math.random() * 1000
           );
-
 
         riwayatValues.push([
 
@@ -730,11 +644,8 @@ exports.handler = async (event) => {
             ),
 
           admin
-
         ]);
-
       }
-
 
       if (
         riwayatValues.length > 0
@@ -757,24 +668,19 @@ exports.handler = async (event) => {
 
             values:
               riwayatValues
-
           }
-
         });
-
       }
 
-
-      // =========================
-      // AKTIFKAN TAHUN BARU
-      // =========================
+      // ===================================================
+      // 7. AKTIFKAN TAHUN AJARAN BARU
+      // ===================================================
 
       let tahunAktifRow =
         -1;
 
       let tahunBaruRow =
         -1;
-
 
       for (
         let i = 1;
@@ -787,16 +693,13 @@ exports.handler = async (event) => {
             tahunRows[i][0] || ""
           ).trim();
 
-
         if (
           id === tahunAktif.id
         ) {
 
           tahunAktifRow =
             i + 1;
-
         }
-
 
         if (
           id === tahunBaru.id
@@ -804,11 +707,22 @@ exports.handler = async (event) => {
 
           tahunBaruRow =
             i + 1;
-
         }
-
       }
 
+      if (
+        tahunAktifRow === -1 ||
+        tahunBaruRow === -1
+      ) {
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            "Baris tahun ajaran tidak ditemukan."
+        });
+      }
 
       await sheets.spreadsheets.values.update({
 
@@ -825,11 +739,8 @@ exports.handler = async (event) => {
           values: [
             ["FALSE"]
           ]
-
         }
-
       });
-
 
       await sheets.spreadsheets.values.update({
 
@@ -846,11 +757,12 @@ exports.handler = async (event) => {
           values: [
             ["TRUE"]
           ]
-
         }
-
       });
 
+      // ===================================================
+      // 8. SELESAI
+      // ===================================================
 
       return response(200, {
 
@@ -874,15 +786,8 @@ exports.handler = async (event) => {
         perpindahan,
 
         lulus
-
       });
-
     }
-
-
-    // =========================
-    // METHOD LAIN
-    // =========================
 
     return response(405, {
 
@@ -890,9 +795,7 @@ exports.handler = async (event) => {
 
       message:
         "Method tidak diizinkan."
-
     });
-
 
   } catch (error) {
 
@@ -901,24 +804,20 @@ exports.handler = async (event) => {
       error
     );
 
-
     return response(500, {
 
       success: false,
 
       message:
+        error.message ||
         "Gagal memproses kenaikan kelas."
-
     });
-
   }
-
 };
 
-
-// =========================
+// =======================================================
 // RESPONSE
-// =========================
+// =======================================================
 
 function response(
   statusCode,
@@ -936,12 +835,9 @@ function response(
 
       "Cache-Control":
         "no-store"
-
     },
 
     body:
       JSON.stringify(body)
-
   };
-
 }
