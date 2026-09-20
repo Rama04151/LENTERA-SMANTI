@@ -3,10 +3,188 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Admin Login - LENTERA SMANTI</title>
 
-  <link rel="stylesheet" href="./style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0b132b;
+      --card-bg: #1c2541;
+      --accent-gold: #fbc02d;
+      --accent-gold-hover: #f57f17;
+      --gold-glow: rgba(251, 192, 45, 0.25);
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(11, 19, 43, 0.7);
+      --danger-color: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(251, 192, 45, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(28, 37, 65, 0.6) 0%, transparent 50%);
+    }
+
+    .dashboard-container {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .dashboard-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 32px 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Header */
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .logo-small {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      color: #0b132b;
+      font-weight: 800;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px var(--gold-glow);
+    }
+
+    .dashboard-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+    }
+
+    .dashboard-header p {
+      font-size: 13px;
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+
+    /* Welcome Banner */
+    .welcome {
+      margin-top: 20px;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, rgba(251, 192, 45, 0.08), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(251, 192, 45, 0.2);
+      padding: 16px 20px;
+      border-radius: 16px;
+    }
+
+    .welcome p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .welcome h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-top: 2px;
+    }
+
+    /* Form & Inputs */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px var(--gold-glow);
+    }
+
+    .form-group input::placeholder {
+      color: #64748b;
+    }
+
+    /* Submit Button */
+    .logout-button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      color: #0b132b;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px var(--gold-glow);
+    }
+
+    .logout-button:hover {
+      background: linear-gradient(135deg, #ffd54f, var(--accent-gold));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(251, 192, 45, 0.4);
+    }
+
+    .logout-button:active {
+      transform: translateY(0);
+    }
+
+    /* Admin Message */
+    #adminMessage {
+      font-size: 13px;
+      color: var(--danger-color);
+      margin-top: 14px;
+      text-align: center;
+      min-height: 18px;
+    }
+  </style>
 </head>
 
 <body>
