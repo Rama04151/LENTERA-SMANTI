@@ -105,6 +105,380 @@ exports.handler = async (event) => {
         password
       } = body;
 
+      const action =
+  body.action || "";
+
+      // =========================
+// IMPORT SISWA MASSAL
+// =========================
+
+if (action === "import_students") {
+
+  try {
+
+    const siswaList =
+      Array.isArray(body.siswa)
+        ? body.siswa
+        : [];
+
+
+    if (siswaList.length === 0) {
+
+      return response(400, {
+        success: false,
+        message:
+          "Data siswa untuk import kosong."
+      });
+
+    }
+
+
+    // =========================
+    // BACA SISWA LAMA
+    // =========================
+
+    const siswaResult =
+      await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "Siswa!A:F"
+      });
+
+    const siswaRows =
+      siswaResult.data.values || [];
+
+
+    const nisnLama =
+      new Set();
+
+    for (
+      let i = 1;
+      i < siswaRows.length;
+      i++
+    ) {
+
+      const nisn =
+        String(
+          siswaRows[i][1] || ""
+        ).trim();
+
+      if (nisn) {
+        nisnLama.add(nisn);
+      }
+
+    }
+
+
+    // =========================
+    // BACA KELAS
+    // =========================
+
+    const kelasResult =
+      await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "Kelas!A:E"
+      });
+
+    const kelasRows =
+      kelasResult.data.values || [];
+
+
+    const kelasMap =
+      new Map();
+
+    for (
+      let i = 1;
+      i < kelasRows.length;
+      i++
+    ) {
+
+      const id =
+        String(
+          kelasRows[i][0] || ""
+        ).trim();
+
+      const namaKelas =
+        String(
+          kelasRows[i][1] || ""
+        ).trim();
+
+      const status =
+        String(
+          kelasRows[i][4] || ""
+        ).trim()
+          .toLowerCase();
+
+
+      if (
+        id &&
+        namaKelas &&
+        status === "aktif"
+      ) {
+
+        kelasMap.set(
+          id,
+          namaKelas
+        );
+
+      }
+
+    }
+
+
+    // =========================
+    // VALIDASI
+    // =========================
+
+    const berhasil = [];
+
+    const gagal = [];
+
+    const nisnDalamImport =
+      new Set();
+
+
+    for (
+      let i = 0;
+      i < siswaList.length;
+      i++
+    ) {
+
+      const data =
+        siswaList[i] || {};
+
+
+      const nisn =
+        String(
+          data.nisn || ""
+        ).trim();
+
+      const nama =
+        String(
+          data.nama || ""
+        ).trim();
+
+      const kelasId =
+        String(
+          data.kelasId || ""
+        ).trim();
+
+      const password =
+        String(
+          data.password || ""
+        ).trim();
+
+
+      // =========================
+      // DATA KOSONG
+      // =========================
+
+      if (
+        !nisn ||
+        !nama ||
+        !kelasId ||
+        !password
+      ) {
+
+        gagal.push({
+
+          baris: i + 2,
+
+          nisn,
+
+          nama,
+
+          alasan:
+            "NISN, nama, kelas, dan password wajib diisi."
+
+        });
+
+        continue;
+
+      }
+
+
+      // =========================
+      // NISN DUPLIKAT DATABASE
+      // =========================
+
+      if (
+        nisnLama.has(nisn)
+      ) {
+
+        gagal.push({
+
+          baris: i + 2,
+
+          nisn,
+
+          nama,
+
+          alasan:
+            "NISN sudah terdaftar."
+
+        });
+
+        continue;
+
+      }
+
+
+      // =========================
+      // NISN DUPLIKAT FILE
+      // =========================
+
+      if (
+        nisnDalamImport.has(nisn)
+      ) {
+
+        gagal.push({
+
+          baris: i + 2,
+
+          nisn,
+
+          nama,
+
+          alasan:
+            "NISN duplikat di file import."
+
+        });
+
+        continue;
+
+      }
+
+
+      // =========================
+      // KELAS TIDAK VALID
+      // =========================
+
+      if (
+        !kelasMap.has(kelasId)
+      ) {
+
+        gagal.push({
+
+          baris: i + 2,
+
+          nisn,
+
+          nama,
+
+          alasan:
+            "Kelas tidak ditemukan atau tidak aktif."
+
+        });
+
+        continue;
+
+      }
+
+
+      nisnDalamImport.add(
+        nisn
+      );
+
+
+      const id =
+        "S" +
+        String(
+          Date.now()
+        ).slice(-6) +
+        String(
+          i
+        ).padStart(2, "0");
+
+
+      berhasil.push([
+
+        id,
+
+        nisn,
+
+        nama,
+
+        kelasId,
+
+        password,
+
+        "Aktif"
+
+      ]);
+
+    }
+
+
+    // =========================
+    // SIMPAN MASSAL
+    // =========================
+
+    if (
+      berhasil.length > 0
+    ) {
+
+      await sheets.spreadsheets.values.append({
+
+        spreadsheetId,
+
+        range: "Siswa!A:F",
+
+        valueInputOption:
+          "USER_ENTERED",
+
+        insertDataOption:
+          "INSERT_ROWS",
+
+        requestBody: {
+
+          values:
+            berhasil
+
+        }
+
+      });
+
+    }
+
+
+    return response(200, {
+
+      success: true,
+
+      message:
+        `${berhasil.length} siswa berhasil diimport.`,
+
+      berhasil:
+        berhasil.length,
+
+      gagal:
+        gagal.length,
+
+      detailGagal:
+        gagal
+
+    });
+
+
+  } catch (error) {
+
+    console.error(
+      "IMPORT STUDENTS ERROR:",
+      error
+    );
+
+    return response(500, {
+
+      success: false,
+
+      message:
+        "Import siswa gagal."
+
+    });
+
+  }
+
+}
+
       if (
         !nisn ||
         !nama ||
