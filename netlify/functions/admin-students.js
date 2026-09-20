@@ -631,6 +631,61 @@ if (action === "import_students") {
     // PATCH — STATUS / PASSWORD
     // =========================
 
+    if (event.httpMethod === "DELETE") {
+  try {
+    const body = JSON.parse(event.body || "{}");
+    const id = String(body.id || "").trim();
+
+    if (!id) {
+      return response(400, {
+        success: false,
+        message: "ID siswa wajib diisi"
+      });
+    }
+
+    const result = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "Siswa!A:F"
+    });
+
+    const rows = result.data.values || [];
+
+    let rowNumber = -1;
+
+    for (let i = 1; i < rows.length; i++) {
+      if (String(rows[i][0] || "").trim() === id) {
+        rowNumber = i + 1;
+        break;
+      }
+    }
+
+    if (rowNumber === -1) {
+      return response(404, {
+        success: false,
+        message: "Siswa tidak ditemukan"
+      });
+    }
+
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId,
+      range: `Siswa!A${rowNumber}:F${rowNumber}`
+    });
+
+    return response(200, {
+      success: true,
+      message: "Siswa berhasil dihapus"
+    });
+
+  } catch (error) {
+    console.error("DELETE STUDENT ERROR:", error);
+
+    return response(500, {
+      success: false,
+      message: "Gagal menghapus siswa"
+    });
+  }
+}
+
     if (event.httpMethod === "PATCH") {
 
       const body =
