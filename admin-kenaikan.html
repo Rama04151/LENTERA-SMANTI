@@ -451,8 +451,13 @@
         jumlahLulus.textContent =
           lulus;
 
-        previewInfo.textContent =
-          `Tahun ajaran baru: 2027/2028`;
+        const tahunTerpilih =
+  tahunSelect.options[
+    tahunSelect.selectedIndex
+  ].textContent.trim();
+
+previewInfo.textContent =
+  `Tahun ajaran baru: ${tahunTerpilih}`;
 
 
         mappingKelas.innerHTML = `
