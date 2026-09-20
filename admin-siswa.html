@@ -6,7 +6,352 @@
 
   <title>Data Siswa - LENTERA SMANTI</title>
 
-  <link rel="stylesheet" href="./style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0b132b;
+      --card-bg: #1c2541;
+      --accent-gold: #fbc02d;
+      --accent-gold-hover: #f57f17;
+      --gold-glow: rgba(251, 192, 45, 0.25);
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(11, 19, 43, 0.7);
+      --danger-color: #ef4444;
+      --success-color: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(251, 192, 45, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(28, 37, 65, 0.6) 0%, transparent 50%);
+    }
+
+    .dashboard-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .dashboard-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Header */
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .logo-small {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      color: #0b132b;
+      font-weight: 800;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px var(--gold-glow);
+    }
+
+    .dashboard-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+    }
+
+    .dashboard-header p {
+      font-size: 13px;
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+
+    /* Top Action Buttons Grid */
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    /* Welcome Banner */
+    .welcome {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, rgba(251, 192, 45, 0.08), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(251, 192, 45, 0.2);
+      padding: 16px 20px;
+      border-radius: 16px;
+    }
+
+    .welcome p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .welcome h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-top: 2px;
+    }
+
+    /* Search & Inputs */
+    input[type="text"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s ease;
+      margin-bottom: 12px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px var(--gold-glow);
+    }
+
+    select option {
+      background-color: var(--card-bg);
+      color: var(--text-main);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Loading Indicator */
+    #loading {
+      text-align: center;
+      padding: 20px;
+      color: var(--accent-gold);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Student Item Cards */
+    #studentList {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .history-section {
+      background: rgba(11, 19, 43, 0.5);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid var(--border-color);
+    }
+
+    .history-section h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-bottom: 8px;
+    }
+
+    .history-section p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .history-section strong {
+      color: var(--text-main);
+    }
+
+    /* Student Actions Dropdown / Details */
+    .student-actions {
+      margin-top: 10px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+    }
+
+    .student-actions summary {
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-gold);
+      user-select: none;
+      outline: none;
+    }
+
+    .student-actions summary:hover {
+      text-decoration: underline;
+    }
+
+    .student-actions div {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Buttons */
+    .logout-button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      color: #0b132b;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px var(--gold-glow);
+    }
+
+    .logout-button:hover {
+      background: linear-gradient(135deg, #ffd54f, var(--accent-gold));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(251, 192, 45, 0.4);
+    }
+
+    .logout-button:active {
+      transform: translateY(0);
+    }
+
+    .logout-button.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      box-shadow: none;
+      border: 1px solid var(--border-color);
+    }
+
+    .logout-button.secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .logout-button.danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      box-shadow: none;
+    }
+
+    .logout-button.danger:hover {
+      background: rgba(239, 68, 68, 0.35);
+      color: #ffffff;
+    }
+
+    /* Modal Overlay & Card Styling */
+    #studentModal, .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    #studentModal .history-section,
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-content h2, #studentModal h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-bottom: 16px;
+    }
+
+    .modal-content label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .modal-actions button {
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .modal-actions button:first-child {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-actions button:last-child {
+      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      color: #0b132b;
+      box-shadow: 0 4px 15px var(--gold-glow);
+    }
+
+    #formMessage, #moveMessage {
+      font-size: 12px;
+      color: var(--danger-color);
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
@@ -24,32 +369,33 @@
         </div>
       </div>
 
-      <button
-  type="button"
-  class="logout-button"
-  onclick="openAddStudent()"
->
-  ➕ Tambah Siswa
-</button>
+      <div class="action-grid">
+        <button
+          type="button"
+          class="logout-button"
+          onclick="openAddStudent()"
+        >
+          ➕ Tambah Siswa
+        </button>
 
-      <button
-  type="button"
-  class="logout-button"
-  onclick="window.location.href='admin-import.html'"
->
-  📥 Import Massal
-</button>
+        <button
+          type="button"
+          class="logout-button secondary"
+          onclick="window.location.href='admin-import.html'"
+        >
+          📥 Import Massal
+        </button>
+      </div>
 
       <div class="welcome">
         <p>Admin Panel</p>
-        <h2>Data Siswa</h2>
+        <h2>Kelola Data Siswa</h2>
       </div>
 
       <input
         type="text"
         id="searchInput"
         placeholder="Cari nama atau NISN..."
-        style="width:100%; box-sizing:border-box; margin-bottom:20px;"
       >
 
       <div id="loading">
@@ -60,8 +406,9 @@
 
       <button
         type="button"
-        class="logout-button"
+        class="logout-button secondary"
         onclick="window.location.href='admin.html'"
+        style="margin-top: 10px;"
       >
         ← Kembali
       </button>
@@ -70,177 +417,147 @@
 
   </main>
 
+  <!-- MODAL TAMBAH / EDIT SISWA -->
   <div id="studentModal" style="display:none;">
 
-  <div class="history-section">
+    <div class="history-section">
 
-    <h3 id="modalTitle">
-      Tambah Siswa
-    </h3>
+      <h3 id="modalTitle">
+        Tambah Siswa
+      </h3>
 
-    <input
-      type="hidden"
-      id="editId"
-    >
-
-    <input
-      type="text"
-      id="formNisn"
-      placeholder="NISN"
-    >
-
-    <input
-      type="text"
-      id="formNama"
-      placeholder="Nama siswa"
-    >
-
-    <select id="formKelas">
-
-      <option value="">
-        Pilih kelas
-      </option>
-
-      <option value="K001">X A</option>
-      <option value="K002">X B</option>
-      <option value="K003">XI A</option>
-      <option value="K004">XI B</option>
-      <option value="K005">XII A</option>
-      <option value="K006">XII B</option>
-
-    </select>
-
-    <input
-      type="text"
-      id="formPassword"
-      placeholder="Password"
-    >
-
-    <select id="formStatus">
-
-      <option value="Aktif">
-        Aktif
-      </option>
-
-      <option value="Nonaktif">
-        Nonaktif
-      </option>
-
-    </select>
-
-    <button
-      type="button"
-      class="logout-button"
-      onclick="saveStudent()"
-    >
-      Simpan
-    </button>
-
-    <button
-      type="button"
-      class="logout-button"
-      onclick="closeStudentModal()"
-    >
-      Batal
-    </button>
-
-    <p id="formMessage"></p>
-
-  </div>
-
-</div>
-
-  <!-- MODAL PINDAHKAN SISWA -->
-
-<div
-  id="moveModal"
-  class="modal"
-  style="display:none;"
->
-
-  <div class="modal-content">
-
-    <h2>🔄 Pindahkan Siswa</h2>
-
-    <p id="moveStudentName">
-      -
-    </p>
-
-    <input
-      type="hidden"
-      id="moveStudentId"
-    >
-
-    <label>
-      Kelas Tujuan
-    </label>
-
-    <select id="moveKelas">
-      <option value="">
-        -- Pilih Kelas --
-      </option>
-
-      <option value="K001">
-        X A
-      </option>
-
-      <option value="K002">
-        X B
-      </option>
-
-      <option value="K003">
-        XI A
-      </option>
-
-      <option value="K004">
-        XI B
-      </option>
-
-      <option value="K005">
-        XII A
-      </option>
-
-      <option value="K006">
-        XII B
-      </option>
-
-    </select>
-
-    <label>
-      Alasan Pemindahan
-    </label>
-
-    <textarea
-      id="moveAlasan"
-      placeholder="Contoh: Naik kelas, pindah rombel, dll."
-    ></textarea>
-
-    <div
-      id="moveMessage"
-      style="margin-top:10px;"
-    ></div>
-
-    <div class="modal-actions">
-
-      <button
-        type="button"
-        onclick="closeMoveStudent()"
+      <input
+        type="hidden"
+        id="editId"
       >
-        Batal
-      </button>
 
-      <button
-        type="button"
-        onclick="moveStudent()"
+      <input
+        type="text"
+        id="formNisn"
+        placeholder="NISN"
       >
-        🔄 Pindahkan
-      </button>
+
+      <input
+        type="text"
+        id="formNama"
+        placeholder="Nama siswa"
+      >
+
+      <select id="formKelas">
+        <option value="">
+          Pilih kelas
+        </option>
+        <option value="K001">X A</option>
+        <option value="K002">X B</option>
+        <option value="K003">XI A</option>
+        <option value="K004">XI B</option>
+        <option value="K005">XII A</option>
+        <option value="K006">XII B</option>
+      </select>
+
+      <input
+        type="text"
+        id="formPassword"
+        placeholder="Password"
+      >
+
+      <select id="formStatus">
+        <option value="Aktif">
+          Aktif
+        </option>
+        <option value="Nonaktif">
+          Nonaktif
+        </option>
+      </select>
+
+      <div class="modal-actions">
+        <button
+          type="button"
+          onclick="closeStudentModal()"
+        >
+          Batal
+        </button>
+
+        <button
+          type="button"
+          onclick="saveStudent()"
+        >
+          Simpan
+        </button>
+      </div>
+
+      <p id="formMessage"></p>
 
     </div>
 
   </div>
 
-</div>
+  <!-- MODAL PINDAHKAN SISWA -->
+  <div
+    id="moveModal"
+    class="modal"
+    style="display:none;"
+  >
+
+    <div class="modal-content">
+
+      <h2>🔄 Pindahkan Siswa</h2>
+
+      <p id="moveStudentName" style="color: var(--accent-gold); font-weight: 600; margin-bottom: 12px;">
+        -
+      </p>
+
+      <input
+        type="hidden"
+        id="moveStudentId"
+      >
+
+      <label>
+        Kelas Tujuan
+      </label>
+
+      <select id="moveKelas">
+        <option value="">
+          -- Pilih Kelas --
+        </option>
+        <option value="K001">X A</option>
+        <option value="K002">X B</option>
+        <option value="K003">XI A</option>
+        <option value="K004">XI B</option>
+        <option value="K005">XII A</option>
+        <option value="K006">XII B</option>
+      </select>
+
+      <label>
+        Alasan Pemindahan
+      </label>
+
+      <textarea
+        id="moveAlasan"
+        placeholder="Contoh: Naik kelas, pindah rombel, dll."
+      ></textarea>
+
+      <div id="moveMessage"></div>
+
+      <div class="modal-actions">
+        <button
+          type="button"
+          onclick="closeMoveStudent()"
+        >
+          Batal
+        </button>
+
+        <button
+          type="button"
+          onclick="moveStudent()"
+        >
+          🔄 Pindahkan
+        </button>
+      </div>
+
+    </div>
+
+  </div>
 
   <script>
 
@@ -295,97 +612,99 @@
 
     function renderStudents(data) {
 
-  const studentList =
-    document.getElementById("studentList");
+      const studentList =
+        document.getElementById("studentList");
 
-  if (data.length === 0) {
+      if (data.length === 0) {
 
-    studentList.innerHTML =
-      "<p>Siswa tidak ditemukan.</p>";
+        studentList.innerHTML =
+          "<p style='text-align:center; color: var(--text-muted); padding: 20px;'>Siswa tidak ditemukan.</p>";
 
-    return;
-  }
+        return;
+      }
 
-  studentList.innerHTML =
-    data.map((siswa) => `
+      studentList.innerHTML =
+        data.map((siswa) => `
 
-      <div class="history-section">
+          <div class="history-section">
 
-        <h3>
-          ${escapeHtml(siswa.nama)}
-        </h3>
+            <h3>
+              ${escapeHtml(siswa.nama)}
+            </h3>
 
-        <p>
-          <strong>NISN:</strong>
-          ${escapeHtml(siswa.nisn)}
-        </p>
+            <p>
+              <strong>NISN:</strong>
+              ${escapeHtml(siswa.nisn)}
+            </p>
 
-        <p>
-          <strong>Kelas:</strong>
-          ${escapeHtml(siswa.kelas)}
-        </p>
+            <p>
+              <strong>Kelas:</strong>
+              ${escapeHtml(siswa.kelas)}
+            </p>
 
-        <p>
-          <strong>Status:</strong>
-          ${escapeHtml(siswa.status)}
-        </p>
+            <p>
+              <strong>Status:</strong>
+              <span style="color: ${siswa.status.toLowerCase() === 'aktif' ? 'var(--success-color)' : 'var(--danger-color)'}; font-weight: 600;">
+                ${escapeHtml(siswa.status)}
+              </span>
+            </p>
 
-       <details class="student-actions">
-  <summary>
-    ⚙️ Aksi Siswa
-  </summary>
+            <details class="student-actions">
+              <summary>
+                ⚙️ Aksi Siswa
+              </summary>
 
-  <div style="margin-top:10px;">
+              <div style="margin-top:10px;">
 
-    <button
-      type="button"
-      class="logout-button"
-      onclick="openEditStudent('${escapeHtml(siswa.id)}')"
-    >
-      ✏️ Edit
-    </button>
+                <button
+                  type="button"
+                  class="logout-button secondary"
+                  onclick="openEditStudent('${escapeHtml(siswa.id)}')"
+                >
+                  ✏️ Edit
+                </button>
 
-    <button
-      type="button"
-      class="logout-button"
-      onclick="openMoveStudent('${escapeHtml(siswa.id)}')"
-    >
-      🔄 Pindahkan
-    </button>
+                <button
+                  type="button"
+                  class="logout-button secondary"
+                  onclick="openMoveStudent('${escapeHtml(siswa.id)}')"
+                >
+                  🔄 Pindahkan
+                </button>
 
-    <button
-      type="button"
-      class="logout-button"
-      onclick="resetStudentPassword('${escapeHtml(siswa.id)}')"
-    >
-      🔑 Reset Password
-    </button>
+                <button
+                  type="button"
+                  class="logout-button secondary"
+                  onclick="resetStudentPassword('${escapeHtml(siswa.id)}')"
+                >
+                  🔑 Reset Password
+                </button>
 
-    <button
-      type="button"
-      class="logout-button"
-      onclick="toggleStudentStatus('${escapeHtml(siswa.id)}')"
-    >
-      ${siswa.status.toLowerCase() === "aktif"
-        ? "⛔ Nonaktifkan"
-        : "✅ Aktifkan"}
-    </button>
+                <button
+                  type="button"
+                  class="logout-button secondary"
+                  onclick="toggleStudentStatus('${escapeHtml(siswa.id)}')"
+                >
+                  ${siswa.status.toLowerCase() === "aktif"
+                    ? "⛔ Nonaktifkan"
+                    : "✅ Aktifkan"}
+                </button>
 
-    <button
-      type="button"
-      class="logout-button"
-      onclick="deleteStudent('${escapeHtml(siswa.id)}')"
-    >
-      🗑️ Hapus Siswa
-    </button>
+                <button
+                  type="button"
+                  class="logout-button danger"
+                  onclick="deleteStudent('${escapeHtml(siswa.id)}')"
+                >
+                  🗑️ Hapus Siswa
+                </button>
 
-  </div>
-</details>
+              </div>
+            </details>
 
-      </div>
+          </div>
 
-    `).join("");
-}
+        `).join("");
+    }
 
     document
       .getElementById("searchInput")
@@ -423,651 +742,573 @@
 
     function openAddStudent() {
 
-  document.getElementById("modalTitle")
-    .textContent = "Tambah Siswa";
+      document.getElementById("modalTitle")
+        .textContent = "Tambah Siswa";
 
-  document.getElementById("editId")
-    .value = "";
+      document.getElementById("editId")
+        .value = "";
 
-  document.getElementById("formNisn")
-    .value = "";
+      document.getElementById("formNisn")
+        .value = "";
 
-  document.getElementById("formNama")
-    .value = "";
+      document.getElementById("formNama")
+        .value = "";
 
-  document.getElementById("formKelas")
-    .value = "";
+      document.getElementById("formKelas")
+        .value = "";
 
-  document.getElementById("formPassword")
-    .value = "";
+      document.getElementById("formPassword")
+        .value = "";
 
-  document.getElementById("formStatus")
-    .value = "Aktif";
+      document.getElementById("formPassword")
+        .placeholder = "Password";
 
-  document.getElementById("formMessage")
-    .textContent = "";
+      document.getElementById("formStatus")
+        .value = "Aktif";
 
-  document.getElementById("studentModal")
-    .style.display = "block";
-}
+      document.getElementById("formMessage")
+        .textContent = "";
 
-
-function closeStudentModal() {
-
-  document.getElementById("studentModal")
-    .style.display = "none";
-}
-
-
-async function saveStudent() {
-
-  const id =
-    document.getElementById("editId").value;
-
-  const nisn =
-    document.getElementById("formNisn")
-      .value.trim();
-
-  const nama =
-    document.getElementById("formNama")
-      .value.trim();
-
-  const kelasId =
-    document.getElementById("formKelas")
-      .value;
-
-  const password =
-    document.getElementById("formPassword")
-      .value;
-
-  const status =
-    document.getElementById("formStatus")
-      .value;
-
-  const message =
-    document.getElementById("formMessage");
-
-  if (!nisn || !nama || !kelasId) {
-
-    message.textContent =
-      "NISN, nama, dan kelas wajib diisi.";
-
-    return;
-  }
-
-  message.textContent =
-    "Menyimpan...";
-
-  try {
-
-    const method =
-      id ? "PUT" : "POST";
-
-    const body = {
-      id,
-      nisn,
-      nama,
-      kelasId,
-      status
-    };
-
-    // Password hanya dikirim jika diisi
-    if (password) {
-      body.password = password;
+      document.getElementById("studentModal")
+        .style.display = "flex";
     }
 
-    const response =
-      await fetch(
-        "/.netlify/functions/admin-students",
-        {
-          method,
+    function closeStudentModal() {
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+      document.getElementById("studentModal")
+        .style.display = "none";
+    }
 
-          body: JSON.stringify(body)
-        }
-      );
+    async function saveStudent() {
 
-    const result =
-      await response.json();
+      const id =
+        document.getElementById("editId").value;
 
-    if (!result.success) {
+      const nisn =
+        document.getElementById("formNisn")
+          .value.trim();
+
+      const nama =
+        document.getElementById("formNama")
+          .value.trim();
+
+      const kelasId =
+        document.getElementById("formKelas")
+          .value;
+
+      const password =
+        document.getElementById("formPassword")
+          .value;
+
+      const status =
+        document.getElementById("formStatus")
+          .value;
+
+      const message =
+        document.getElementById("formMessage");
+
+      if (!nisn || !nama || !kelasId) {
+
+        message.textContent =
+          "NISN, nama, dan kelas wajib diisi.";
+
+        return;
+      }
 
       message.textContent =
-        result.message ||
-        "Gagal menyimpan data.";
+        "Menyimpan...";
 
-      return;
+      try {
+
+        const method =
+          id ? "PUT" : "POST";
+
+        const body = {
+          id,
+          nisn,
+          nama,
+          kelasId,
+          status
+        };
+
+        if (password) {
+          body.password = password;
+        }
+
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-students",
+            {
+              method,
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify(body)
+            }
+          );
+
+        const result =
+          await response.json();
+
+        if (!result.success) {
+
+          message.textContent =
+            result.message ||
+            "Gagal menyimpan data.";
+
+          return;
+        }
+
+        closeStudentModal();
+
+        await loadStudents();
+
+      } catch (error) {
+
+        console.error(error);
+
+        message.textContent =
+          "Tidak dapat terhubung ke server.";
+      }
     }
-
-    closeStudentModal();
-
-    await loadStudents();
-
-  } catch (error) {
-
-    console.error(error);
-
-    message.textContent =
-      "Tidak dapat terhubung ke server.";
-  }
-}
 
     function openEditStudent(id) {
 
-  const siswa =
-    students.find(
-      (item) => item.id === id
-    );
+      const siswa =
+        students.find(
+          (item) => item.id === id
+        );
 
-  if (!siswa) {
-    return;
-  }
+      if (!siswa) {
+        return;
+      }
 
-  document.getElementById("modalTitle")
-    .textContent = "Edit Siswa";
+      document.getElementById("modalTitle")
+        .textContent = "Edit Siswa";
 
-  document.getElementById("editId")
-    .value = siswa.id;
+      document.getElementById("editId")
+        .value = siswa.id;
 
-  document.getElementById("formNisn")
-    .value = siswa.nisn;
+      document.getElementById("formNisn")
+        .value = siswa.nisn;
 
-  document.getElementById("formNama")
-    .value = siswa.nama;
+      document.getElementById("formNama")
+        .value = siswa.nama;
 
-  document.getElementById("formKelas")
-    .value = siswa.kelasId;
+      document.getElementById("formKelas")
+        .value = siswa.kelasId;
 
-  document.getElementById("formPassword")
-    .value = "";
+      document.getElementById("formPassword")
+        .value = "";
 
-  document.getElementById("formPassword")
-    .placeholder =
-      "Kosongkan jika tidak ingin mengubah password";
+      document.getElementById("formPassword")
+        .placeholder =
+          "Kosongkan jika tidak ubah password";
 
-  document.getElementById("formStatus")
-    .value = siswa.status;
+      document.getElementById("formStatus")
+        .value = siswa.status;
 
-  document.getElementById("formMessage")
-    .textContent = "";
+      document.getElementById("formMessage")
+        .textContent = "";
 
-  document.getElementById("studentModal")
-    .style.display = "block";
-}
+      document.getElementById("studentModal")
+        .style.display = "flex";
+    }
 
     async function toggleStudentStatus(id) {
 
-  const siswa =
-    students.find(
-      (item) => item.id === id
-    );
+      const siswa =
+        students.find(
+          (item) => item.id === id
+        );
 
-  if (!siswa) {
-    return;
-  }
+      if (!siswa) {
+        return;
+      }
 
-  const aktif =
-    siswa.status.toLowerCase() === "aktif";
+      const aktif =
+        siswa.status.toLowerCase() === "aktif";
 
-  const actionText =
-    aktif
-      ? "menonaktifkan"
-      : "mengaktifkan";
+      const actionText =
+        aktif
+          ? "menonaktifkan"
+          : "mengaktifkan";
 
-  const confirmed =
-    confirm(
-      `Yakin ingin ${actionText} siswa ${siswa.nama}?`
-    );
+      const confirmed =
+        confirm(
+          `Yakin ingin ${actionText} siswa ${siswa.nama}?`
+        );
 
-  if (!confirmed) {
-    return;
-  }
+      if (!confirmed) {
+        return;
+      }
 
-  try {
+      try {
 
-    const response =
-      await fetch(
-        "/.netlify/functions/admin-students",
-        {
-          method: "PATCH",
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-students",
+            {
+              method: "PATCH",
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
 
-          body: JSON.stringify({
-            id,
-            action: "toggle_status"
-          })
+              body: JSON.stringify({
+                id,
+                action: "toggle_status"
+              })
+            }
+          );
+
+        const result =
+          await response.json();
+
+        if (!result.success) {
+
+          alert(
+            result.message ||
+            "Gagal mengubah status."
+          );
+
+          return;
         }
-      );
 
-    const result =
-      await response.json();
+        alert(result.message);
 
-    if (!result.success) {
+        await loadStudents();
 
-      alert(
-        result.message ||
-        "Gagal mengubah status."
-      );
+      } catch (error) {
 
-      return;
+        console.error(error);
+
+        alert(
+          "Tidak dapat terhubung ke server."
+        );
+      }
     }
-
-    alert(result.message);
-
-    await loadStudents();
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Tidak dapat terhubung ke server."
-    );
-  }
-}
-
-    async function toggleStudentStatus(id) {
-
-  const siswa =
-    students.find(
-      (item) => item.id === id
-    );
-
-  if (!siswa) {
-    return;
-  }
-
-  const aktif =
-    siswa.status.toLowerCase() === "aktif";
-
-  const actionText =
-    aktif
-      ? "menonaktifkan"
-      : "mengaktifkan";
-
-  const confirmed =
-    confirm(
-      `Yakin ingin ${actionText} siswa ${siswa.nama}?`
-    );
-
-  if (!confirmed) {
-    return;
-  }
-
-  try {
-
-    const response =
-      await fetch(
-        "/.netlify/functions/admin-students",
-        {
-          method: "PATCH",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-            id,
-            action: "toggle_status"
-          })
-        }
-      );
-
-    const result =
-      await response.json();
-
-    if (!result.success) {
-
-      alert(
-        result.message ||
-        "Gagal mengubah status."
-      );
-
-      return;
-    }
-
-    alert(result.message);
-
-    await loadStudents();
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Tidak dapat terhubung ke server."
-    );
-  }
-}
 
     async function resetStudentPassword(id) {
 
-  const siswa =
-    students.find(
-      (item) => item.id === id
-    );
+      const siswa =
+        students.find(
+          (item) => item.id === id
+        );
 
-  if (!siswa) {
-    return;
-  }
+      if (!siswa) {
+        return;
+      }
 
-  const newPassword =
-    prompt(
-      `Masukkan password baru untuk ${siswa.nama}:`
-    );
+      const newPassword =
+        prompt(
+          `Masukkan password baru untuk ${siswa.nama}:`
+        );
 
-  if (newPassword === null) {
-    return;
-  }
+      if (newPassword === null) {
+        return;
+      }
 
-  if (!newPassword.trim()) {
+      if (!newPassword.trim()) {
 
-    alert(
-      "Password tidak boleh kosong."
-    );
+        alert(
+          "Password tidak boleh kosong."
+        );
 
-    return;
-  }
+        return;
+      }
 
-  try {
+      try {
 
-    const response =
-      await fetch(
-        "/.netlify/functions/admin-students",
-        {
-          method: "PATCH",
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-students",
+            {
+              method: "PATCH",
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
 
-          body: JSON.stringify({
-            id,
-            action: "reset_password",
-            password: newPassword
-          })
+              body: JSON.stringify({
+                id,
+                action: "reset_password",
+                password: newPassword
+              })
+            }
+          );
+
+        const result =
+          await response.json();
+
+        if (!result.success) {
+
+          alert(
+            result.message ||
+            "Gagal reset password."
+          );
+
+          return;
         }
-      );
 
-    const result =
-      await response.json();
+        alert(
+          "Password berhasil direset."
+        );
 
-    if (!result.success) {
+      } catch (error) {
 
-      alert(
-        result.message ||
-        "Gagal reset password."
-      );
+        console.error(error);
 
-      return;
+        alert(
+          "Tidak dapat terhubung ke server."
+        );
+      }
     }
-
-    alert(
-      "Password berhasil direset."
-    );
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Tidak dapat terhubung ke server."
-    );
-  }
-}
 
     // =========================
-// PINDAHKAN SISWA
-// =========================
+    // PINDAHKAN SISWA
+    // =========================
 
-function openMoveStudent(id) {
+    function openMoveStudent(id) {
 
-  const student =
-    students.find(
-      s => String(s.id) === String(id)
-    );
+      const student =
+        students.find(
+          s => String(s.id) === String(id)
+        );
 
-  if (!student) {
-    alert("Data siswa tidak ditemukan.");
-    return;
-  }
+      if (!student) {
+        alert("Data siswa tidak ditemukan.");
+        return;
+      }
 
-  document.getElementById(
-    "moveStudentId"
-  ).value = student.id;
+      document.getElementById(
+        "moveStudentId"
+      ).value = student.id;
 
-  document.getElementById(
-    "moveStudentName"
-  ).textContent =
-    `${student.nama} — ${student.kelas}`;
+      document.getElementById(
+        "moveStudentName"
+      ).textContent =
+        `${student.nama} — ${student.kelas}`;
 
-  document.getElementById(
-    "moveKelas"
-  ).value = "";
+      document.getElementById(
+        "moveKelas"
+      ).value = "";
 
-  document.getElementById(
-    "moveAlasan"
-  ).value = "";
+      document.getElementById(
+        "moveAlasan"
+      ).value = "";
 
-  document.getElementById(
-    "moveMessage"
-  ).textContent = "";
+      document.getElementById(
+        "moveMessage"
+      ).textContent = "";
 
-  document.getElementById(
-    "moveModal"
-  ).style.display = "flex";
-}
-
-
-function closeMoveStudent() {
-
-  document.getElementById(
-    "moveModal"
-  ).style.display = "none";
-}
-
-
-async function moveStudent() {
-
-  const id =
-    document.getElementById(
-      "moveStudentId"
-    ).value;
-
-  const kelasId =
-    document.getElementById(
-      "moveKelas"
-    ).value;
-
-  const alasan =
-    document.getElementById(
-      "moveAlasan"
-    ).value.trim();
-
-  const message =
-    document.getElementById(
-      "moveMessage"
-    );
-
-  if (!kelasId) {
-
-    message.textContent =
-      "Pilih kelas tujuan terlebih dahulu.";
-
-    return;
-  }
-
-  const adminSession =
-    sessionStorage.getItem(
-      "lentera_admin_session"
-    );
-
-  let admin = "";
-
-  if (adminSession) {
-
-    try {
-
-      const session =
-        JSON.parse(adminSession);
-
-      admin =
-        session.username || "";
-
-    } catch (error) {
-
-      console.error(
-        "ADMIN SESSION ERROR:",
-        error
-      );
+      document.getElementById(
+        "moveModal"
+      ).style.display = "flex";
     }
-  }
 
-  message.textContent =
-    "Memproses pemindahan...";
+    function closeMoveStudent() {
 
-  try {
+      document.getElementById(
+        "moveModal"
+      ).style.display = "none";
+    }
 
-    const response =
-      await fetch(
-        "/.netlify/functions/admin-students",
-        {
-          method: "PATCH",
+    async function moveStudent() {
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+      const id =
+        document.getElementById(
+          "moveStudentId"
+        ).value;
 
-          body: JSON.stringify({
-            id,
-            action: "move_student",
-            kelasId,
-            alasan,
-            admin
-          })
+      const kelasId =
+        document.getElementById(
+          "moveKelas"
+        ).value;
+
+      const alasan =
+        document.getElementById(
+          "moveAlasan"
+        ).value.trim();
+
+      const message =
+        document.getElementById(
+          "moveMessage"
+        );
+
+      if (!kelasId) {
+
+        message.textContent =
+          "Pilih kelas tujuan terlebih dahulu.";
+
+        return;
+      }
+
+      const adminSession =
+        sessionStorage.getItem(
+          "lentera_admin_session"
+        );
+
+      let admin = "";
+
+      if (adminSession) {
+
+        try {
+
+          const session =
+            JSON.parse(adminSession);
+
+          admin =
+            session.username || "";
+
+        } catch (error) {
+
+          console.error(
+            "ADMIN SESSION ERROR:",
+            error
+          );
         }
-      );
-
-    const result =
-      await response.json();
-
-    if (!response.ok || !result.success) {
+      }
 
       message.textContent =
-        result.message ||
-        "Gagal memindahkan siswa.";
+        "Memproses pemindahan...";
 
-      return;
+      try {
+
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-students",
+            {
+              method: "PATCH",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+                id,
+                action: "move_student",
+                kelasId,
+                alasan,
+                admin
+              })
+            }
+          );
+
+        const result =
+          await response.json();
+
+        if (!response.ok || !result.success) {
+
+          message.textContent =
+            result.message ||
+            "Gagal memindahkan siswa.";
+
+          return;
+        }
+
+        alert(result.message);
+
+        closeMoveStudent();
+
+        await loadStudents();
+
+      } catch (error) {
+
+        console.error(
+          "MOVE STUDENT ERROR:",
+          error
+        );
+
+        message.textContent =
+          "Terjadi kesalahan koneksi.";
+      }
     }
-
-    alert(result.message);
-
-    closeMoveStudent();
-
-    // Muat ulang data siswa
-    await loadStudents();
-
-  } catch (error) {
-
-    console.error(
-      "MOVE STUDENT ERROR:",
-      error
-    );
-
-    message.textContent =
-      "Terjadi kesalahan koneksi.";
-  }
-}
 
     // =========================
-// HAPUS SISWA
-// =========================
+    // HAPUS SISWA
+    // =========================
 
-async function deleteStudent(id) {
+    async function deleteStudent(id) {
 
-  const siswa =
-    students.find(
-      s => String(s.id) === String(id)
-    );
+      const siswa =
+        students.find(
+          s => String(s.id) === String(id)
+        );
 
-  if (!siswa) {
-    alert("Data siswa tidak ditemukan.");
-    return;
-  }
+      if (!siswa) {
+        alert("Data siswa tidak ditemukan.");
+        return;
+      }
 
-  const yakin = confirm(
-    `Yakin ingin menghapus siswa?\n\n` +
-    `Nama: ${siswa.nama}\n` +
-    `NISN: ${siswa.nisn}\n` +
-    `Kelas: ${siswa.kelas}\n\n` +
-    `Tindakan ini akan menghapus data siswa dari daftar siswa.`
-  );
+      const yakin = confirm(
+        `Yakin ingin menghapus siswa?\n\n` +
+        `Nama: ${siswa.nama}\n` +
+        `NISN: ${siswa.nisn}\n` +
+        `Kelas: ${siswa.kelas}\n\n` +
+        `Tindakan ini akan menghapus data siswa dari daftar siswa.`
+      );
 
-  if (!yakin) {
-    return;
-  }
+      if (!yakin) {
+        return;
+      }
 
-  try {
+      try {
 
-    const response =
-      await fetch(
-        "/.netlify/functions/admin-students",
-        {
-          method: "DELETE",
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-students",
+            {
+              method: "DELETE",
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
 
-          body: JSON.stringify({
-            id: siswa.id
-          })
+              body: JSON.stringify({
+                id: siswa.id
+              })
+            }
+          );
+
+        const result =
+          await response.json();
+
+        if (!response.ok || !result.success) {
+
+          alert(
+            result.message ||
+            "Gagal menghapus siswa."
+          );
+
+          return;
         }
-      );
 
-    const result =
-      await response.json();
+        alert(
+          "Siswa berhasil dihapus."
+        );
 
-    if (!response.ok || !result.success) {
+        await loadStudents();
 
-      alert(
-        result.message ||
-        "Gagal menghapus siswa."
-      );
+      } catch (error) {
 
-      return;
+        console.error(
+          "DELETE STUDENT ERROR:",
+          error
+        );
+
+        alert(
+          "Tidak dapat terhubung ke server."
+        );
+      }
     }
-
-    alert(
-      "Siswa berhasil dihapus."
-    );
-
-    await loadStudents();
-
-  } catch (error) {
-
-    console.error(
-      "DELETE STUDENT ERROR:",
-      error
-    );
-
-    alert(
-      "Tidak dapat terhubung ke server."
-    );
-  }
-}
 
   </script>
 
