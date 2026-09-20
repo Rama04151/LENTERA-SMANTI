@@ -108,164 +108,423 @@ exports.handler = async (event) => {
       const action =
   body.action || "";
 
-      // =========================
+     // =========================
 // IMPORT SISWA MASSAL
 // =========================
 
 if (action === "import_students") {
 
-  try {
+  const siswaList =
+    Array.isArray(body.siswa)
+      ? body.siswa
+      : [];
 
-    const siswaList =
-      Array.isArray(body.siswa)
-        ? body.siswa
-        : [];
+  if (siswaList.length === 0) {
 
+    return response(400, {
+      success: false,
+      message:
+        "Data siswa untuk import kosong."
+    });
 
-    if (siswaList.length === 0) {
+  }
 
-      return response(400, {
-        success: false,
-        message:
-          "Data siswa untuk import kosong."
-      });
+  // =========================
+  // 1. CARI TAHUN AJARAN AKTIF
+  // =========================
+
+  const tahunResult =
+    await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "Tahun_Ajaran!A:C"
+    });
+
+  const tahunRows =
+    tahunResult.data.values || [];
+
+  let tahunAktifId = "";
+  let tahunAktif = "";
+
+  for (
+    let i = 1;
+    i < tahunRows.length;
+    i++
+  ) {
+
+    const id =
+      String(
+        tahunRows[i][0] || ""
+      ).trim();
+
+    const tahun =
+      String(
+        tahunRows[i][1] || ""
+      ).trim();
+
+    const aktif =
+      String(
+        tahunRows[i][2] || ""
+      )
+        .trim()
+        .toLowerCase();
+
+    if (
+      aktif === "true" ||
+      aktif === "aktif"
+    ) {
+
+      tahunAktifId = id;
+      tahunAktif = tahun;
+
+      break;
 
     }
 
+  }
 
-    // =========================
-    // BACA SISWA LAMA
-    // =========================
+  if (!tahunAktifId) {
 
-    const siswaResult =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "Siswa!A:F"
-      });
+    return response(400, {
+      success: false,
+      message:
+        "Tidak ada tahun ajaran yang aktif."
+    });
 
-    const siswaRows =
-      siswaResult.data.values || [];
+  }
 
+  // =========================
+  // 2. BACA KELAS
+  // =========================
 
-    const nisnLama =
-      new Set();
+  const kelasResult =
+    await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "Kelas!A:E"
+    });
 
-    for (
-      let i = 1;
-      i < siswaRows.length;
-      i++
+  const kelasRows =
+    kelasResult.data.values || [];
+
+  const kelasMap = {};
+
+  for (
+    let i = 1;
+    i < kelasRows.length;
+    i++
+  ) {
+
+    const id =
+      String(
+        kelasRows[i][0] || ""
+      ).trim();
+
+    const nama =
+      String(
+        kelasRows[i][1] || ""
+      ).trim();
+
+    const tahunId =
+      String(
+        kelasRows[i][3] || ""
+      ).trim();
+
+    const status =
+      String(
+        kelasRows[i][4] || ""
+      )
+        .trim()
+        .toLowerCase();
+
+    // HANYA kelas pada tahun aktif
+    if (
+      tahunId === tahunAktifId &&
+      status === "aktif"
     ) {
 
-      const nisn =
-        String(
-          siswaRows[i][1] || ""
-        ).trim();
+      kelasMap[
+        nama.toLowerCase()
+      ] = id;
 
-      if (nisn) {
-        nisnLama.add(nisn);
+    }
+
+  }
+
+  // =========================
+  // 3. BACA NISN LAMA
+  // =========================
+
+  const siswaResult =
+    await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "Siswa!A:F"
+    });
+
+  const siswaRows =
+    siswaResult.data.values || [];
+
+  const nisnLama =
+    new Set();
+
+  for (
+    let i = 1;
+    i < siswaRows.length;
+    i++
+  ) {
+
+    const nisn =
+      String(
+        siswaRows[i][1] || ""
+      ).trim();
+
+    if (nisn) {
+
+      nisnLama.add(nisn);
+
+    }
+
+  }
+
+  // =========================
+  // 4. VALIDASI IMPORT
+  // =========================
+
+  const berhasil = [];
+  const gagal = [];
+
+  const nisnDalamImport =
+    new Set();
+
+  for (
+    let i = 0;
+    i < siswaList.length;
+    i++
+  ) {
+
+    const data =
+      siswaList[i] || {};
+
+    const nisn =
+      String(
+        data.nisn || ""
+      ).trim();
+
+    const nama =
+      String(
+        data.nama || ""
+      ).trim();
+
+    // CSV tetap menggunakan nama kelas
+    // contoh: X A / XI B
+    const namaKelas =
+      String(
+        data.kelas || ""
+      ).trim();
+
+    const password =
+      String(
+        data.password || ""
+      ).trim();
+
+    // =========================
+    // DATA KOSONG
+    // =========================
+
+    if (
+      !nisn ||
+      !nama ||
+      !namaKelas ||
+      !password
+    ) {
+
+      gagal.push({
+
+        baris: i + 2,
+
+        nisn,
+
+        nama,
+
+        alasan:
+          "NISN, nama, kelas, dan password wajib diisi."
+
+      });
+
+      continue;
+
+    }
+
+    // =========================
+    // NISN SUDAH ADA
+    // =========================
+
+    if (
+      nisnLama.has(nisn)
+    ) {
+
+      gagal.push({
+
+        baris: i + 2,
+
+        nisn,
+
+        nama,
+
+        alasan:
+          "NISN sudah terdaftar."
+
+      });
+
+      continue;
+
+    }
+
+    // =========================
+    // NISN DUPLIKAT CSV
+    // =========================
+
+    if (
+      nisnDalamImport.has(nisn)
+    ) {
+
+      gagal.push({
+
+        baris: i + 2,
+
+        nisn,
+
+        nama,
+
+        alasan:
+          "NISN duplikat di file import."
+
+      });
+
+      continue;
+
+    }
+
+    // =========================
+    // CARI KELAS
+    // =========================
+
+    const kelasId =
+      kelasMap[
+        namaKelas.toLowerCase()
+      ];
+
+    if (!kelasId) {
+
+      gagal.push({
+
+        baris: i + 2,
+
+        nisn,
+
+        nama,
+
+        alasan:
+          `Kelas "${namaKelas}" tidak tersedia ` +
+          `pada tahun ajaran ${tahunAktif}.`
+
+      });
+
+      continue;
+
+    }
+
+    // =========================
+    // BUAT ID SISWA
+    // =========================
+
+    const id =
+      "S" +
+      String(
+        Date.now()
+      ).slice(-6) +
+      String(i)
+        .padStart(2, "0");
+
+    berhasil.push([
+
+      id,
+
+      nisn,
+
+      nama,
+
+      kelasId,
+
+      password,
+
+      "Aktif"
+
+    ]);
+
+    nisnDalamImport.add(nisn);
+
+  }
+
+  // =========================
+  // 5. SIMPAN KE GOOGLE SHEETS
+  // =========================
+
+  if (
+    berhasil.length > 0
+  ) {
+
+    await sheets.spreadsheets.values.append({
+
+      spreadsheetId,
+
+      range:
+        "Siswa!A:F",
+
+      valueInputOption:
+        "RAW",
+
+      insertDataOption:
+        "INSERT_ROWS",
+
+      requestBody: {
+
+        values:
+          berhasil
+
       }
 
-    }
+    });
 
+  }
 
-    // =========================
-    // BACA KELAS
-    // =========================
+  // =========================
+  // 6. HASIL
+  // =========================
 
-    const kelasResult =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "Kelas!A:E"
-      });
+  return response(200, {
 
-    const kelasRows =
-      kelasResult.data.values || [];
+    success: true,
 
+    message:
+      `${berhasil.length} siswa berhasil diimport.`,
 
-    const kelasMap =
-      new Map();
+    tahunAjaran:
+      tahunAktif,
 
-    for (
-      let i = 1;
-      i < kelasRows.length;
-      i++
-    ) {
+    tahunAjaranId:
+      tahunAktifId,
 
-      const id =
-        String(
-          kelasRows[i][0] || ""
-        ).trim();
+    berhasil:
+      berhasil.length,
 
-      const namaKelas =
-        String(
-          kelasRows[i][1] || ""
-        ).trim();
+    gagal:
+      gagal.length,
 
-      const status =
-        String(
-          kelasRows[i][4] || ""
-        ).trim()
-          .toLowerCase();
+    detailGagal:
+      gagal
 
+  });
 
-      if (
-        id &&
-        namaKelas &&
-        status === "aktif"
-      ) {
-
-        kelasMap.set(
-          id,
-          namaKelas
-        );
-
-      }
-
-    }
-
-
-    // =========================
-    // VALIDASI
-    // =========================
-
-    const berhasil = [];
-
-    const gagal = [];
-
-    const nisnDalamImport =
-      new Set();
-
-
-    for (
-      let i = 0;
-      i < siswaList.length;
-      i++
-    ) {
-
-      const data =
-        siswaList[i] || {};
-
-
-      const nisn =
-        String(
-          data.nisn || ""
-        ).trim();
-
-      const nama =
-        String(
-          data.nama || ""
-        ).trim();
-
-      const kelasId =
-        String(
-          data.kelasId || ""
-        ).trim();
-
-      const password =
-        String(
-          data.password || ""
-        ).trim();
-
+}
 
       // =========================
       // DATA KOSONG
