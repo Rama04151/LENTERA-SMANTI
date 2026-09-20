@@ -534,4 +534,22 @@ footer {
   }
 }
 
+  .history-list {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+}
+
+.history-item {
+  width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.history-description {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
   
