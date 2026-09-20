@@ -330,39 +330,57 @@
           ${escapeHtml(siswa.status)}
         </p>
 
-        <button
-          type="button"
-          class="logout-button"
-          onclick="openEditStudent('${escapeHtml(siswa.id)}')"
-        >
-          ✏️ Edit
-        </button>
+       <details class="student-actions">
+  <summary>
+    ⚙️ Aksi Siswa
+  </summary>
 
-        <button
-  type="button"
-  class="logout-button"
-  onclick="toggleStudentStatus('${escapeHtml(siswa.id)}')"
->
-  ${siswa.status.toLowerCase() === "aktif"
-    ? "⛔ Nonaktifkan"
-    : "✅ Aktifkan"}
-</button>
+  <div style="margin-top:10px;">
 
-<button
-  type="button"
-  class="logout-button"
-  onclick="resetStudentPassword('${escapeHtml(siswa.id)}')"
->
-  🔑 Reset Password
-</button>
+    <button
+      type="button"
+      class="logout-button"
+      onclick="openEditStudent('${escapeHtml(siswa.id)}')"
+    >
+      ✏️ Edit
+    </button>
 
-<button
-  type="button"
-  class="logout-button"
-  onclick="openMoveStudent('${escapeHtml(siswa.id)}')"
->
-  🔄 Pindahkan
-</button>
+    <button
+      type="button"
+      class="logout-button"
+      onclick="openMoveStudent('${escapeHtml(siswa.id)}')"
+    >
+      🔄 Pindahkan
+    </button>
+
+    <button
+      type="button"
+      class="logout-button"
+      onclick="resetStudentPassword('${escapeHtml(siswa.id)}')"
+    >
+      🔑 Reset Password
+    </button>
+
+    <button
+      type="button"
+      class="logout-button"
+      onclick="toggleStudentStatus('${escapeHtml(siswa.id)}')"
+    >
+      ${siswa.status.toLowerCase() === "aktif"
+        ? "⛔ Nonaktifkan"
+        : "✅ Aktifkan"}
+    </button>
+
+    <button
+      type="button"
+      class="logout-button"
+      onclick="deleteStudent('${escapeHtml(siswa.id)}')"
+    >
+      🗑️ Hapus Siswa
+    </button>
+
+  </div>
+</details>
 
       </div>
 
@@ -969,6 +987,85 @@ async function moveStudent() {
 
     message.textContent =
       "Terjadi kesalahan koneksi.";
+  }
+}
+
+    // =========================
+// HAPUS SISWA
+// =========================
+
+async function deleteStudent(id) {
+
+  const siswa =
+    students.find(
+      s => String(s.id) === String(id)
+    );
+
+  if (!siswa) {
+    alert("Data siswa tidak ditemukan.");
+    return;
+  }
+
+  const yakin = confirm(
+    `Yakin ingin menghapus siswa?\n\n` +
+    `Nama: ${siswa.nama}\n` +
+    `NISN: ${siswa.nisn}\n` +
+    `Kelas: ${siswa.kelas}\n\n` +
+    `Tindakan ini akan menghapus data siswa dari daftar siswa.`
+  );
+
+  if (!yakin) {
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/admin-students",
+        {
+          method: "DELETE",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            id: siswa.id
+          })
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (!response.ok || !result.success) {
+
+      alert(
+        result.message ||
+        "Gagal menghapus siswa."
+      );
+
+      return;
+    }
+
+    alert(
+      "Siswa berhasil dihapus."
+    );
+
+    await loadStudents();
+
+  } catch (error) {
+
+    console.error(
+      "DELETE STUDENT ERROR:",
+      error
+    );
+
+    alert(
+      "Tidak dapat terhubung ke server."
+    );
   }
 }
 
