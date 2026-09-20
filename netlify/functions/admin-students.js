@@ -78,27 +78,30 @@ exports.handler = async (event) => {
 
         siswa.push({
 
-          id:
-            String(row[0] || "").trim(),
+  id:
+    String(row[0] || "").trim(),
 
-          nisn:
-            String(row[1] || "").trim(),
+  nisn:
+    String(row[1] || "").trim(),
 
-          nama:
-            String(row[2] || "").trim(),
+  nama:
+    String(row[2] || "").trim(),
 
-          kelasId:
-            String(row[3] || "").trim(),
+  kelasId:
+    String(row[3] || "").trim(),
 
-          kelas:
-            kelasMap[
-              String(row[3] || "").trim()
-            ] || "-",
+  kelas:
+    kelasMap[
+      String(row[3] || "").trim()
+    ] || "-",
 
-          status:
-            String(row[5] || "").trim()
+  password:
+    String(row[4] || "").trim(),
 
-        });
+  status:
+    String(row[5] || "").trim()
+
+});
       }
 
       return response(200, {
