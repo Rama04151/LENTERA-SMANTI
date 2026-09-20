@@ -1,1 +1,954 @@
+<!DOCTYPE html>
+<html lang="id">
 
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Import Siswa - LENTERA SMANTI</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+</head>
+
+
+<body>
+
+  <div class="container">
+
+    <h1>
+      📥 Import Siswa Massal
+    </h1>
+
+    <p>
+      Tambahkan banyak siswa sekaligus menggunakan file CSV.
+    </p>
+
+
+    <!-- ========================= -->
+    <!-- KEMBALI -->
+    <!-- ========================= -->
+
+    <button
+      type="button"
+      class="logout-button"
+      onclick="window.location.href='admin-siswa.html'"
+    >
+      ← Kembali
+    </button>
+
+
+    <!-- ========================= -->
+    <!-- TEMPLATE -->
+    <!-- ========================= -->
+
+    <div
+      class="history-section"
+      style="margin-top:20px;"
+    >
+
+      <h2>
+        1. Download Template
+      </h2>
+
+      <p>
+        Gunakan template berikut agar format data sesuai.
+      </p>
+
+      <button
+        type="button"
+        class="logout-button"
+        onclick="downloadTemplate()"
+      >
+        📄 Download Template CSV
+      </button>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- UPLOAD -->
+    <!-- ========================= -->
+
+    <div
+      class="history-section"
+      style="margin-top:20px;"
+    >
+
+      <h2>
+        2. Pilih File CSV
+      </h2>
+
+      <p>
+        Format:
+        <strong>
+          NISN, Nama, Kelas, Password
+        </strong>
+      </p>
+
+      <input
+        type="file"
+        id="csvFile"
+        accept=".csv,text/csv"
+        style="
+          width:100%;
+          padding:10px;
+          box-sizing:border-box;
+        "
+      >
+
+      <button
+        type="button"
+        class="logout-button"
+        onclick="readCSV()"
+        style="margin-top:10px;"
+      >
+        👀 Preview Data
+      </button>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- PREVIEW -->
+    <!-- ========================= -->
+
+    <div
+      id="previewSection"
+      class="history-section"
+      style="
+        display:none;
+        margin-top:20px;
+      "
+    >
+
+      <h2>
+        3. Preview Data
+      </h2>
+
+      <p id="previewInfo"></p>
+
+      <div
+        id="previewTable"
+        style="
+          overflow-x:auto;
+        "
+      ></div>
+
+
+      <div
+        id="importMessage"
+        style="
+          margin-top:15px;
+          margin-bottom:15px;
+        "
+      ></div>
+
+
+      <button
+        type="button"
+        class="logout-button"
+        onclick="importStudents()"
+      >
+        🚀 Import Semua Siswa
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    // =========================
+    // CEK ADMIN
+    // =========================
+
+    const adminSession =
+      sessionStorage.getItem(
+        "lentera_admin_session"
+      );
+
+    if (!adminSession) {
+
+      window.location.href =
+        "admin-login.html";
+
+    }
+
+
+    let importData = [];
+
+
+    // =========================
+    // DOWNLOAD TEMPLATE
+    // =========================
+
+    function downloadTemplate() {
+
+      const csv =
+        "NISN,Nama,Kelas,Password\n" +
+        "0012345678,Ahmad,K001,ahmad123\n" +
+        "0012345679,Budi,K001,budi123\n" +
+        "0012345680,Citra,K002,citra123\n";
+
+
+      const blob =
+        new Blob(
+          [csv],
+          {
+            type:
+              "text/csv;charset=utf-8;"
+          }
+        );
+
+
+      const url =
+        URL.createObjectURL(
+          blob
+        );
+
+
+      const link =
+        document.createElement(
+          "a"
+        );
+
+      link.href =
+        url;
+
+      link.download =
+        "template-siswa-lentera-smanti.csv";
+
+      link.click();
+
+
+      URL.revokeObjectURL(
+        url
+      );
+
+    }
+
+
+    // =========================
+    // BACA CSV
+    // =========================
+
+    function readCSV() {
+
+      const fileInput =
+        document.getElementById(
+          "csvFile"
+        );
+
+      const file =
+        fileInput.files[0];
+
+
+      if (!file) {
+
+        alert(
+          "Silakan pilih file CSV terlebih dahulu."
+        );
+
+        return;
+
+      }
+
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function(event) {
+
+          const text =
+            event.target.result;
+
+
+          parseCSV(text);
+
+        };
+
+
+      reader.onerror =
+        function() {
+
+          alert(
+            "File gagal dibaca."
+          );
+
+        };
+
+
+      reader.readAsText(
+        file,
+        "UTF-8"
+      );
+
+    }
+
+
+    // =========================
+    // PARSE CSV
+    // =========================
+
+    function parseCSV(text) {
+
+      const lines =
+        text
+          .split(/\r?\n/)
+          .filter(
+            line =>
+              line.trim() !== ""
+          );
+
+
+      if (lines.length < 2) {
+
+        alert(
+          "File CSV tidak memiliki data siswa."
+        );
+
+        return;
+
+      }
+
+
+      const header =
+        lines[0]
+          .split(",")
+          .map(
+            value =>
+              value
+                .trim()
+                .toLowerCase()
+          );
+
+
+      const nisnIndex =
+        header.indexOf(
+          "nisn"
+        );
+
+      const namaIndex =
+        header.indexOf(
+          "nama"
+        );
+
+      const kelasIndex =
+        header.indexOf(
+          "kelas"
+        );
+
+      const passwordIndex =
+        header.indexOf(
+          "password"
+        );
+
+
+      if (
+        nisnIndex === -1 ||
+        namaIndex === -1 ||
+        kelasIndex === -1 ||
+        passwordIndex === -1
+      ) {
+
+        alert(
+          "Header CSV harus memiliki: NISN, Nama, Kelas, Password."
+        );
+
+        return;
+
+      }
+
+
+      importData = [];
+
+
+      for (
+        let i = 1;
+        i < lines.length;
+        i++
+      ) {
+
+        const columns =
+          parseCSVLine(
+            lines[i]
+          );
+
+
+        const nisn =
+          String(
+            columns[nisnIndex] || ""
+          ).trim();
+
+        const nama =
+          String(
+            columns[namaIndex] || ""
+          ).trim();
+
+        const kelas =
+          String(
+            columns[kelasIndex] || ""
+          ).trim();
+
+        const password =
+          String(
+            columns[passwordIndex] || ""
+          ).trim();
+
+
+        if (
+          !nisn &&
+          !nama &&
+          !kelas &&
+          !password
+        ) {
+
+          continue;
+
+        }
+
+
+        importData.push({
+
+          baris:
+            i + 1,
+
+          nisn,
+
+          nama,
+
+          kelas,
+
+          password
+
+        });
+
+      }
+
+
+      if (
+        importData.length === 0
+      ) {
+
+        alert(
+          "Tidak ada data siswa yang ditemukan."
+        );
+
+        return;
+
+      }
+
+
+      renderPreview();
+
+    }
+
+
+    // =========================
+    // CSV LINE
+    // =========================
+
+    function parseCSVLine(line) {
+
+      const result = [];
+
+      let current = "";
+
+      let insideQuotes = false;
+
+
+      for (
+        let i = 0;
+        i < line.length;
+        i++
+      ) {
+
+        const char =
+          line[i];
+
+
+        if (
+          char === '"'
+        ) {
+
+          if (
+            insideQuotes &&
+            line[i + 1] === '"'
+          ) {
+
+            current += '"';
+
+            i++;
+
+          } else {
+
+            insideQuotes =
+              !insideQuotes;
+
+          }
+
+        }
+
+        else if (
+          char === "," &&
+          !insideQuotes
+        ) {
+
+          result.push(
+            current
+          );
+
+          current = "";
+
+        }
+
+        else {
+
+          current += char;
+
+        }
+
+      }
+
+
+      result.push(
+        current
+      );
+
+
+      return result;
+
+    }
+
+
+    // =========================
+    // PREVIEW
+    // =========================
+
+    function renderPreview() {
+
+      const section =
+        document.getElementById(
+          "previewSection"
+        );
+
+      const table =
+        document.getElementById(
+          "previewTable"
+        );
+
+      const info =
+        document.getElementById(
+          "previewInfo"
+        );
+
+
+      section.style.display =
+        "block";
+
+
+      info.textContent =
+        `${importData.length} siswa ditemukan.`;
+
+
+      let html = `
+
+        <table
+          style="
+            width:100%;
+            border-collapse:collapse;
+          "
+        >
+
+          <thead>
+
+            <tr>
+
+              <th
+                style="
+                  border:1px solid #ddd;
+                  padding:8px;
+                "
+              >
+                No
+              </th>
+
+              <th
+                style="
+                  border:1px solid #ddd;
+                  padding:8px;
+                "
+              >
+                NISN
+              </th>
+
+              <th
+                style="
+                  border:1px solid #ddd;
+                  padding:8px;
+                "
+              >
+                Nama
+              </th>
+
+              <th
+                style="
+                  border:1px solid #ddd;
+                  padding:8px;
+                "
+              >
+                Kelas
+              </th>
+
+              <th
+                style="
+                  border:1px solid #ddd;
+                  padding:8px;
+                "
+              >
+                Password
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+      `;
+
+
+      importData.forEach(
+        (siswa, index) => {
+
+          html += `
+
+            <tr>
+
+              <td
+                style="
+                  border:1px solid #ddd;
+                  padding:8px;
+                "
+              >
+                ${index + 1}
+              </td>
+
+              <td
+                style="
+                  border:1px solid #ddd;
+                  padding:8px;
+                "
+              >
+                ${escapeHtml(siswa.nisn)}
+              </td>
+
+              <td
+                style="
+                  border:1px solid #ddd;
+                  padding:8px;
+                "
+              >
+                ${escapeHtml(siswa.nama)}
+              </td>
+
+              <td
+                style="
+                  border:1px solid #ddd;
+                  padding:8px;
+                "
+              >
+                ${escapeHtml(siswa.kelas)}
+              </td>
+
+              <td
+                style="
+                  border:1px solid #ddd;
+                  padding:8px;
+                "
+              >
+                ${escapeHtml(siswa.password)}
+              </td>
+
+            </tr>
+
+          `;
+
+        }
+      );
+
+
+      html += `
+
+          </tbody>
+
+        </table>
+
+      `;
+
+
+      table.innerHTML =
+        html;
+
+    }
+
+
+    // =========================
+    // IMPORT
+    // =========================
+
+    async function importStudents() {
+
+      if (
+        importData.length === 0
+      ) {
+
+        alert(
+          "Tidak ada data untuk diimport."
+        );
+
+        return;
+
+      }
+
+
+      const yakin =
+        confirm(
+          `Import ${importData.length} siswa sekarang?`
+        );
+
+
+      if (!yakin) {
+        return;
+      }
+
+
+      const message =
+        document.getElementById(
+          "importMessage"
+        );
+
+
+      message.textContent =
+        "Sedang mengimport data...";
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-students",
+            {
+
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body:
+                JSON.stringify({
+
+                  action:
+                    "import_students",
+
+                  siswa:
+                    importData.map(
+                      siswa => ({
+
+                        nisn:
+                          siswa.nisn,
+
+                        nama:
+                          siswa.nama,
+
+                        kelasId:
+                          convertClassToId(
+                            siswa.kelas
+                          ),
+
+                        password:
+                          siswa.password
+
+                      })
+                    )
+
+                })
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          message.textContent =
+            result.message ||
+            "Import gagal.";
+
+          return;
+
+        }
+
+
+        let detail =
+          `✅ ${result.berhasil} siswa berhasil diimport.`;
+
+        if (
+          result.gagal > 0
+        ) {
+
+          detail +=
+            `<br>❌ ${result.gagal} siswa gagal.`;
+
+          if (
+            Array.isArray(
+              result.detailGagal
+            )
+          ) {
+
+            detail +=
+              "<br><br>";
+
+            result.detailGagal.forEach(
+              item => {
+
+                detail +=
+                  `Baris ${item.baris}: ${escapeHtml(item.alasan)}<br>`;
+
+              }
+            );
+
+          }
+
+        }
+
+
+        message.innerHTML =
+          detail;
+
+
+        if (
+          result.berhasil > 0
+        ) {
+
+          importData = [];
+
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "IMPORT ERROR:",
+          error
+        );
+
+        message.textContent =
+          "Terjadi kesalahan koneksi.";
+
+      }
+
+    }
+
+
+    // =========================
+    // KONVERSI KELAS
+    // =========================
+
+    function convertClassToId(
+      kelas
+    ) {
+
+      const map = {
+
+        "X A":
+          "K001",
+
+        "X B":
+          "K002",
+
+        "XI A":
+          "K003",
+
+        "XI B":
+          "K004",
+
+        "XII A":
+          "K005",
+
+        "XII B":
+          "K006"
+
+      };
+
+
+      return map[
+        kelas
+      ] || kelas;
+
+    }
+
+
+    // =========================
+    // ESCAPE HTML
+    // =========================
+
+    function escapeHtml(
+      value
+    ) {
+
+      return String(
+        value ?? ""
+      )
+
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+
+        .replace(
+          /</g,
+          "&lt;"
+        )
+
+        .replace(
+          />/g,
+          "&gt;"
+        )
+
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+  </script>
+
+</body>
+
+</html>
