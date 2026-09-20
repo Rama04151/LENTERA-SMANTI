@@ -165,6 +165,66 @@
 
     };
 
+    // =========================
+// HITUNG TOTAL SISWA
+// =========================
+
+async function loadTotalSiswa() {
+
+  const totalSiswaElement =
+    document.getElementById("totalSiswa");
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/admin-students"
+      );
+
+    const result =
+      await response.json();
+
+    if (!response.ok || !result.success) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengambil data siswa."
+      );
+
+    }
+
+    const siswa =
+      Array.isArray(result.siswa)
+        ? result.siswa
+        : [];
+
+    // Hanya menghitung siswa aktif
+    const totalAktif =
+      siswa.filter(
+        siswa =>
+          String(siswa.status || "")
+            .trim()
+            .toLowerCase() === "aktif"
+      ).length;
+
+    totalSiswaElement.textContent =
+      totalAktif;
+
+  } catch (error) {
+
+    console.error(
+      "TOTAL SISWA ERROR:",
+      error
+    );
+
+    totalSiswaElement.textContent =
+      "—";
+
+  }
+}
+
+loadTotalSiswa();
+
   </script>
 
 </body>
