@@ -1,12 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Kenaikan Kelas - LENTERA SMANTI</title>
 
@@ -15,658 +11,202 @@
 
 <body>
 
-  <main class="dashboard-container">
+  <div class="container">
 
-    <section class="dashboard-card">
+    <h1>Kenaikan Kelas</h1>
 
-      <!-- HEADER -->
-      <div class="dashboard-header">
+    <p>
+      Sistem akan memindahkan seluruh siswa aktif
+      secara otomatis sesuai tingkat kelas.
+    </p>
 
-        <div class="logo-small">
-          L
+    <div class="card">
+
+      <h2>Alur Kenaikan</h2>
+
+      <div class="promotion-list">
+
+        <div class="promotion-item">
+          <span>X A</span>
+          <strong>→</strong>
+          <span>XI A</span>
         </div>
 
-        <div>
-          <h1>LENTERA SMANTI</h1>
-          <p>Kenaikan Kelas</p>
+        <div class="promotion-item">
+          <span>X B</span>
+          <strong>→</strong>
+          <span>XI B</span>
+        </div>
+
+        <div class="promotion-item">
+          <span>XI A</span>
+          <strong>→</strong>
+          <span>XII A</span>
+        </div>
+
+        <div class="promotion-item">
+          <span>XI B</span>
+          <strong>→</strong>
+          <span>XII B</span>
+        </div>
+
+        <div class="promotion-item">
+          <span>XII A</span>
+          <strong>→</strong>
+          <span>LULUS</span>
+        </div>
+
+        <div class="promotion-item">
+          <span>XII B</span>
+          <strong>→</strong>
+          <span>LULUS</span>
         </div>
 
       </div>
 
+    </div>
 
-      <!-- INFO -->
-      <section class="history-section">
+    <div class="card">
 
-        <div class="section-title">
+      <h2>Perhatian</h2>
 
-          <h3>
-            📈 Kenaikan Kelas
-          </h3>
+      <p>
+        Proses ini akan memindahkan semua siswa aktif.
+      </p>
 
-          <p>
-            Proses kenaikan siswa ke tahun ajaran berikutnya.
-          </p>
+      <p>
+        Siswa kelas XII akan otomatis berstatus
+        <strong>Lulus</strong>.
+      </p>
 
-        </div>
-
-        <div>
-
-          <label>
-            Tahun Ajaran Baru
-          </label>
-
-          <select
-            id="tahunAjaranBaru"
-            class="search-input"
-          >
-
-            <option value="">
-              Memuat...
-            </option>
-
-          </select>
-
-        </div>
-
-        <br>
-
-        <button
-          type="button"
-          class="logout-button"
-          id="previewButton"
-        >
-          🔍 Preview Kenaikan
-        </button>
-
-      </section>
-
-
-      <!-- PREVIEW -->
-      <section
-        class="history-section"
-        id="previewSection"
-        style="display:none;"
-      >
-
-        <div class="section-title">
-
-          <h3>
-            📋 Preview
-          </h3>
-
-          <p id="previewInfo">
-            -
-          </p>
-
-        </div>
-
-
-        <div class="points-container">
-
-          <div class="point-card">
-
-            <span>📈</span>
-
-            <p>
-              Siswa Naik
-            </p>
-
-            <strong id="jumlahNaik">
-              0
-            </strong>
-
-          </div>
-
-
-          <div class="point-card">
-
-            <span>🎓</span>
-
-            <p>
-              Siswa Lulus
-            </p>
-
-            <strong id="jumlahLulus">
-              0
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <!-- MAPPING -->
-        <div class="history-section">
-
-          <h3>
-            Perubahan Kelas
-          </h3>
-
-          <div id="mappingKelas">
-          </div>
-
-        </div>
-
-
-        <!-- WARNING -->
-        <div class="history-section">
-
-          <p>
-            ⚠️ <strong>Perhatian</strong>
-          </p>
-
-          <p>
-            Proses ini akan mengubah kelas seluruh siswa aktif
-            dan mengubah siswa kelas XII menjadi status
-            <strong>Lulus</strong>.
-          </p>
-
-          <p>
-            Data poin siswa tidak akan dihapus.
-          </p>
-
-        </div>
-
-
-        <!-- PROCESS BUTTON -->
-        <button
-          type="button"
-          class="logout-button"
-          id="processButton"
-        >
-          🚀 Proses Kenaikan Kelas
-        </button>
-
-      </section>
-
-
-      <!-- BACK -->
       <button
-        type="button"
+        id="btnProcess"
+        class="primary-button"
+        onclick="processPromotion()"
+      >
+        🔄 Proses Kenaikan Kelas
+      </button>
+
+      <button
         class="logout-button"
         onclick="window.location.href='admin.html'"
       >
-        ← Kembali ke Admin Panel
+        ← Kembali
       </button>
 
-    </section>
+      <div id="result"></div>
 
-  </main>
+    </div>
 
+  </div>
 
-<script>
+  <script>
 
-  // =========================
-  // CEK ADMIN LOGIN
-  // =========================
+    const adminSession =
+      sessionStorage.getItem("lentera_admin_session");
 
-  const session =
-    sessionStorage.getItem(
-      "lentera_admin_session"
-    );
-
-  if (!session) {
-
-    window.location.replace(
-      "admin-login.html"
-    );
-
-  }
-
-
-  // =========================
-  // ELEMENT
-  // =========================
-
-  const tahunSelect =
-    document.getElementById(
-      "tahunAjaranBaru"
-    );
-
-  const previewSection =
-    document.getElementById(
-      "previewSection"
-    );
-
-  const jumlahNaik =
-    document.getElementById(
-      "jumlahNaik"
-    );
-
-  const jumlahLulus =
-    document.getElementById(
-      "jumlahLulus"
-    );
-
-  const previewInfo =
-    document.getElementById(
-      "previewInfo"
-    );
-
-  const mappingKelas =
-    document.getElementById(
-      "mappingKelas"
-    );
-
-
-  // =========================
-  // LOAD TAHUN AJARAN
-  // =========================
-
- async function loadTahunAjaran() {
-
-  try {
-
-    const response =
-      await fetch(
-        "/.netlify/functions/admin-promotion"
-      );
-
-    const result =
-      await response.json();
-
-    if (
-      !response.ok ||
-      !result.success
-    ) {
-
-      throw new Error(
-        result.message ||
-        "Gagal mengambil tahun ajaran."
-      );
-
+    if (!adminSession) {
+      window.location.href = "admin-login.html";
     }
 
+    async function processPromotion() {
 
-    const data =
-      Array.isArray(
-        result.tahunAjaran
-      )
-        ? result.tahunAjaran
-        : [];
-
-
-    // Hanya tahun yang belum aktif
-    const tersedia =
-      data.filter(
-        item => !item.aktif
+      const confirmation = confirm(
+        "Yakin ingin memproses kenaikan kelas?\n\n" +
+        "X A → XI A\n" +
+        "X B → XI B\n" +
+        "XI A → XII A\n" +
+        "XI B → XII B\n" +
+        "XII A → Lulus\n" +
+        "XII B → Lulus\n\n" +
+        "Proses ini tidak dapat dibatalkan otomatis."
       );
 
-
-    if (tersedia.length === 0) {
-
-      tahunSelect.innerHTML = `
-        <option value="">
-          Tidak ada tahun ajaran baru
-        </option>
-      `;
-
-      return;
-
-    }
-
-
-    tahunSelect.innerHTML = `
-
-      <option value="">
-        Pilih tahun ajaran
-      </option>
-
-      ${
-        tersedia.map(
-          item => `
-            <option value="${item.id}">
-              ${item.tahun}
-            </option>
-          `
-        ).join("")
-      }
-
-    `;
-
-
-  } catch (error) {
-
-    console.error(
-      "LOAD TAHUN ERROR:",
-      error
-    );
-
-
-    tahunSelect.innerHTML = `
-      <option value="">
-        Gagal memuat tahun ajaran
-      </option>
-    `;
-
-  }
-
-}
-
-  // =========================
-  // PREVIEW
-  // =========================
-
-  document
-    .getElementById("previewButton")
-    .onclick = async function () {
-
-      const tahunId =
-        tahunSelect.value;
-
-      if (!tahunId) {
-
-        alert(
-          "Pilih tahun ajaran baru terlebih dahulu."
-        );
-
+      if (!confirmation) {
         return;
-
       }
 
-      /*
-       * Preview dibuat berdasarkan
-       * struktur kelas yang sudah ditentukan.
-       *
-       * Jumlah siswa diambil dari admin-students.
-       */
+      const button =
+        document.getElementById("btnProcess");
+
+      const result =
+        document.getElementById("result");
+
+      button.disabled = true;
+      button.textContent = "⏳ Memproses...";
+
+      result.innerHTML = "";
 
       try {
 
-        const response =
-          await fetch(
-            "/.netlify/functions/admin-students"
-          );
+        const admin =
+          JSON.parse(adminSession);
 
-        const result =
-          await response.json();
+        const response = await fetch(
+          "/.netlify/functions/admin-promotion",
+          {
+            method: "POST",
 
-        if (
-          !response.ok ||
-          !result.success
-        ) {
+            headers: {
+              "Content-Type": "application/json"
+            },
 
-          throw new Error(
-            result.message ||
-            "Gagal mengambil data siswa."
-          );
-
-        }
-
-        const siswa =
-          Array.isArray(result.siswa)
-            ? result.siswa
-            : [];
-
-
-        // Hanya siswa aktif
-        const aktif =
-          siswa.filter(
-            s =>
-              String(s.status || "")
-                .trim()
-                .toLowerCase() === "aktif"
-          );
-
-
-        let naik = 0;
-        let lulus = 0;
-
-
-        aktif.forEach(
-          siswa => {
-
-            const kelas =
-              String(
-                siswa.kelas || ""
-              ).trim();
-
-            if (
-              kelas === "X A" ||
-              kelas === "X B" ||
-              kelas === "XI A" ||
-              kelas === "XI B"
-            ) {
-
-              naik++;
-
-            }
-
-            if (
-              kelas === "XII A" ||
-              kelas === "XII B"
-            ) {
-
-              lulus++;
-
-            }
-
+            body: JSON.stringify({
+              admin: admin.username || "admin"
+            })
           }
         );
 
-
-        jumlahNaik.textContent =
-          naik;
-
-        jumlahLulus.textContent =
-          lulus;
-
-        const tahunTerpilih =
-  tahunSelect.options[
-    tahunSelect.selectedIndex
-  ].textContent.trim();
-
-previewInfo.textContent =
-  `Tahun ajaran baru: ${tahunTerpilih}`;
-
-
-        mappingKelas.innerHTML = `
-
-          <p>
-            <strong>X A</strong>
-            → XI A
-          </p>
-
-          <p>
-            <strong>X B</strong>
-            → XI B
-          </p>
-
-          <p>
-            <strong>XI A</strong>
-            → XII A
-          </p>
-
-          <p>
-            <strong>XI B</strong>
-            → XII B
-          </p>
-
-          <p>
-            <strong>XII A</strong>
-            → 🎓 Lulus
-          </p>
-
-          <p>
-            <strong>XII B</strong>
-            → 🎓 Lulus
-          </p>
-
-        `;
-
-
-        previewSection.style.display =
-          "block";
-
-
-      } catch (error) {
-
-        console.error(
-          "PREVIEW ERROR:",
-          error
-        );
-
-        alert(
-          "Gagal memuat preview."
-        );
-
-      }
-
-    };
-
-
-  // =========================
-  // PROSES KENAIKAN
-  // =========================
-
-  document
-    .getElementById("processButton")
-    .onclick = async function () {
-
-      const tahunId =
-        tahunSelect.value;
-
-      if (!tahunId) {
-
-        alert(
-          "Tahun ajaran belum dipilih."
-        );
-
-        return;
-
-      }
-
-
-      const yakin =
-        confirm(
-
-          "⚠️ PERINGATAN\n\n" +
-
-          "Semua siswa aktif akan diproses " +
-          "untuk kenaikan kelas.\n\n" +
-
-          "Siswa kelas XII akan menjadi Lulus.\n\n" +
-
-          "Data poin tidak akan dihapus.\n\n" +
-
-          "Apakah Anda yakin ingin melanjutkan?"
-
-        );
-
-
-      if (!yakin) {
-        return;
-      }
-
-
-      try {
-
-        const adminSession =
-          JSON.parse(
-            sessionStorage.getItem(
-              "lentera_admin_session"
-            )
-          );
-
-
-        this.disabled = true;
-
-        this.textContent =
-          "⏳ Memproses...";
-
-
-        const response =
-          await fetch(
-            "/.netlify/functions/admin-promotion",
-            {
-
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-
-              body: JSON.stringify({
-
-                tahunAjaranBaruId:
-                  tahunId,
-
-                admin:
-                  adminSession?.username ||
-                  "Admin"
-
-              })
-
-            }
-          );
-
-
-        const result =
+        const data =
           await response.json();
 
-
-        if (
-          !response.ok ||
-          !result.success
-        ) {
-
+        if (!response.ok || !data.success) {
           throw new Error(
-            result.message ||
-            "Proses kenaikan gagal."
+            data.message ||
+            "Gagal memproses kenaikan kelas."
           );
-
         }
 
+        result.innerHTML = `
+          <div class="success-message">
+            <h3>✅ Berhasil</h3>
 
-        alert(
+            <p>
+              Total siswa diproses:
+              <strong>${data.diproses}</strong>
+            </p>
 
-          "✅ Kenaikan kelas berhasil!\n\n" +
+            <p>
+              Siswa naik kelas:
+              <strong>${data.naik}</strong>
+            </p>
 
-          `Siswa naik: ${result.jumlahNaik}\n` +
+            <p>
+              Siswa lulus:
+              <strong>${data.lulus}</strong>
+            </p>
+          </div>
+        `;
 
-          `Siswa lulus: ${result.jumlahLulus}\n\n` +
-
-          `Tahun ajaran aktif sekarang: ` +
-          `${result.tahunBaru}`
-
-        );
-
-
-        window.location.href =
-          "admin.html";
-
+        button.textContent = "✅ Berhasil";
 
       } catch (error) {
 
-        console.error(
-          "PROMOTION ERROR:",
-          error
-        );
+        console.error(error);
 
-        alert(
-          error.message ||
-          "Gagal memproses kenaikan kelas."
-        );
+        result.innerHTML = `
+          <div class="error-message">
+            ❌ ${error.message}
+          </div>
+        `;
 
-
-        this.disabled = false;
-
-        this.textContent =
-          "🚀 Proses Kenaikan Kelas";
-
+        button.disabled = false;
+        button.textContent =
+          "🔄 Proses Kenaikan Kelas";
       }
+    }
 
-    };
-
-
-  // =========================
-  // START
-  // =========================
-
-  loadTahunAjaran();
-
-</script>
+  </script>
 
 </body>
 </html>
