@@ -22,7 +22,9 @@ async function getSheets() {
 }
 
 exports.handler = async (event) => {
+
   try {
+
     const sheets = await getSheets();
     const spreadsheetId = process.env.GOOGLE_SHEET_ID;
 
@@ -34,6 +36,7 @@ exports.handler = async (event) => {
 
       const [siswaResult, kelasResult] =
         await Promise.all([
+
           sheets.spreadsheets.values.get({
             spreadsheetId,
             range: "Siswa!A:F"
@@ -43,6 +46,7 @@ exports.handler = async (event) => {
             spreadsheetId,
             range: "Kelas!A:E"
           })
+
         ]);
 
       const siswaRows =
@@ -73,10 +77,18 @@ exports.handler = async (event) => {
         const row = siswaRows[i];
 
         siswa.push({
-          id: String(row[0] || "").trim(),
-          nisn: String(row[1] || "").trim(),
-          nama: String(row[2] || "").trim(),
-          kelasId: String(row[3] || "").trim(),
+
+          id:
+            String(row[0] || "").trim(),
+
+          nisn:
+            String(row[1] || "").trim(),
+
+          nama:
+            String(row[2] || "").trim(),
+
+          kelasId:
+            String(row[3] || "").trim(),
 
           kelas:
             kelasMap[
@@ -85,6 +97,7 @@ exports.handler = async (event) => {
 
           status:
             String(row[5] || "").trim()
+
         });
       }
 
@@ -102,13 +115,6 @@ exports.handler = async (event) => {
 
       const body =
         JSON.parse(event.body || "{}");
-
-      const {
-        nisn,
-        nama,
-        kelasId,
-        password
-      } = body;
 
       const action =
         body.action || "";
@@ -134,67 +140,7 @@ exports.handler = async (event) => {
         }
 
         // ===============================================
-        // 1. CARI TAHUN AJARAN AKTIF
-        // ===============================================
-
-        const tahunResult =
-          await sheets.spreadsheets.values.get({
-            spreadsheetId,
-            range: "Tahun_Ajaran!A:C"
-          });
-
-        const tahunRows =
-          tahunResult.data.values || [];
-
-        let tahunAktifId = "";
-        let tahunAktif = "";
-
-        for (
-          let i = 1;
-          i < tahunRows.length;
-          i++
-        ) {
-
-          const id =
-            String(
-              tahunRows[i][0] || ""
-            ).trim();
-
-          const tahun =
-            String(
-              tahunRows[i][1] || ""
-            ).trim();
-
-          const aktif =
-            String(
-              tahunRows[i][2] || ""
-            )
-              .trim()
-              .toLowerCase();
-
-          if (
-            aktif === "true" ||
-            aktif === "aktif"
-          ) {
-
-            tahunAktifId = id;
-            tahunAktif = tahun;
-
-            break;
-          }
-        }
-
-        if (!tahunAktifId) {
-
-          return response(400, {
-            success: false,
-            message:
-              "Tidak ada tahun ajaran yang aktif."
-          });
-        }
-
-        // ===============================================
-        // 2. BACA KELAS
+        // BACA KELAS
         // ===============================================
 
         const kelasResult =
@@ -224,32 +170,18 @@ exports.handler = async (event) => {
               kelasRows[i][1] || ""
             ).trim();
 
-          const tahunId =
-            String(
-              kelasRows[i][3] || ""
-            ).trim();
-
-          const status =
-            String(
-              kelasRows[i][4] || ""
-            )
-              .trim()
-              .toLowerCase();
-
-          // Hanya kelas tahun ajaran aktif
-          if (
-            tahunId === tahunAktifId &&
-            status === "aktif"
-          ) {
-
-            kelasMap[
-              nama.toLowerCase()
-            ] = id;
+          if (!id || !nama) {
+            continue;
           }
+
+          // Nama kelas → ID
+          kelasMap[
+            nama.toLowerCase()
+          ] = id;
         }
 
         // ===============================================
-        // 3. BACA SISWA LAMA
+        // BACA SISWA LAMA
         // ===============================================
 
         const siswaResult =
@@ -270,20 +202,18 @@ exports.handler = async (event) => {
           i++
         ) {
 
-          const nisnLamaValue =
+          const nisn =
             String(
               siswaRows[i][1] || ""
             ).trim();
 
-          if (nisnLamaValue) {
-            nisnLama.add(
-              nisnLamaValue
-            );
+          if (nisn) {
+            nisnLama.add(nisn);
           }
         }
 
         // ===============================================
-        // 4. VALIDASI IMPORT
+        // VALIDASI IMPORT
         // ===============================================
 
         const berhasil = [];
@@ -301,128 +231,224 @@ exports.handler = async (event) => {
           const data =
             siswaList[i] || {};
 
+          // =============================================
+          // AMBIL DATA
+          // =============================================
+
           const nisnValue =
             String(
-              data.nisn || ""
+              data.nisn ||
+              data.NISN ||
+              ""
             ).trim();
 
           const namaValue =
             String(
-              data.nama || ""
+              data.nama ||
+              data.Nama ||
+              ""
             ).trim();
 
-          // CSV menggunakan nama kelas
-          // Contoh: X A / XI B
-          const namaKelas =
+          /*
+           * Bisa menerima:
+           *
+           * kelas: "X A"
+           *
+           * ATAU
+           *
+           * kelasId: "K001"
+           */
+
+          const kelasValue =
             String(
-              data.kelas || ""
+              data.kelas ||
+              data.Kelas ||
+              ""
+            ).trim();
+
+          const kelasIdValue =
+            String(
+              data.kelasId ||
+              data.Kelas_ID ||
+              ""
             ).trim();
 
           const passwordValue =
             String(
-              data.password || ""
+              data.password ||
+              data.Password ||
+              ""
             ).trim();
 
-          // ===========================================
-          // DATA KOSONG
-          // ===========================================
+          // =============================================
+          // VALIDASI DATA KOSONG
+          // =============================================
 
           if (
             !nisnValue ||
             !namaValue ||
-            !namaKelas ||
+            (!kelasValue && !kelasIdValue) ||
             !passwordValue
           ) {
 
             gagal.push({
-              baris: i + 2,
-              nisn: nisnValue,
-              nama: namaValue,
+
+              baris:
+                i + 2,
+
+              nisn:
+                nisnValue,
+
+              nama:
+                namaValue,
+
               alasan:
                 "NISN, nama, kelas, dan password wajib diisi."
+
             });
 
             continue;
           }
 
-          // ===========================================
-          // NISN SUDAH ADA
-          // ===========================================
+          // =============================================
+          // CEK NISN LAMA
+          // =============================================
 
           if (
             nisnLama.has(nisnValue)
           ) {
 
             gagal.push({
-              baris: i + 2,
-              nisn: nisnValue,
-              nama: namaValue,
+
+              baris:
+                i + 2,
+
+              nisn:
+                nisnValue,
+
+              nama:
+                namaValue,
+
               alasan:
                 "NISN sudah terdaftar."
+
             });
 
             continue;
           }
 
-          // ===========================================
-          // NISN DUPLIKAT CSV
-          // ===========================================
+          // =============================================
+          // CEK DUPLIKAT DALAM FILE
+          // =============================================
 
           if (
             nisnDalamImport.has(nisnValue)
           ) {
 
             gagal.push({
-              baris: i + 2,
-              nisn: nisnValue,
-              nama: namaValue,
+
+              baris:
+                i + 2,
+
+              nisn:
+                nisnValue,
+
+              nama:
+                namaValue,
+
               alasan:
                 "NISN duplikat di file import."
+
             });
 
             continue;
           }
 
-          // ===========================================
-          // CARI KELAS
-          // ===========================================
+          // =============================================
+          // TENTUKAN KELAS ID
+          // =============================================
 
-          const kelasTujuanId =
-            kelasMap[
-              namaKelas.toLowerCase()
-            ];
+          let kelasTujuanId = "";
+
+          // Jika CSV memberikan kelasId
+          if (kelasIdValue) {
+
+            const kelasIdDitemukan =
+              Object.values(kelasMap)
+                .includes(kelasIdValue);
+
+            if (kelasIdDitemukan) {
+              kelasTujuanId =
+                kelasIdValue;
+            }
+
+          }
+
+          // Jika belum ditemukan,
+          // cari berdasarkan nama kelas
+          if (
+            !kelasTujuanId &&
+            kelasValue
+          ) {
+
+            kelasTujuanId =
+              kelasMap[
+                kelasValue.toLowerCase()
+              ] || "";
+          }
+
+          // =============================================
+          // KELAS TIDAK DITEMUKAN
+          // =============================================
 
           if (!kelasTujuanId) {
 
             gagal.push({
-              baris: i + 2,
-              nisn: nisnValue,
-              nama: namaValue,
+
+              baris:
+                i + 2,
+
+              nisn:
+                nisnValue,
+
+              nama:
+                namaValue,
+
               alasan:
-                `Kelas "${namaKelas}" tidak tersedia pada tahun ajaran ${tahunAktif}.`
+                `Kelas "${kelasValue || kelasIdValue}" tidak ditemukan.`
+
             });
 
             continue;
           }
 
-          // ===========================================
+          // =============================================
           // BUAT ID SISWA
-          // ===========================================
+          // =============================================
 
           const id =
             "S" +
-            String(
-              Date.now()
-            ).slice(-6) +
+            Date.now().toString().slice(-7) +
             String(i).padStart(2, "0");
 
+          // =============================================
+          // MASUKKAN KE DATA BERHASIL
+          // =============================================
+
           berhasil.push([
+
             id,
+
             nisnValue,
+
             namaValue,
+
             kelasTujuanId,
+
             passwordValue,
+
             "Aktif"
+
           ]);
 
           nisnDalamImport.add(
@@ -431,7 +457,7 @@ exports.handler = async (event) => {
         }
 
         // ===============================================
-        // 5. SIMPAN
+        // SIMPAN KE GOOGLE SHEETS
         // ===============================================
 
         if (
@@ -439,6 +465,7 @@ exports.handler = async (event) => {
         ) {
 
           await sheets.spreadsheets.values.append({
+
             spreadsheetId,
 
             range:
@@ -451,28 +478,26 @@ exports.handler = async (event) => {
               "INSERT_ROWS",
 
             requestBody: {
+
               values:
                 berhasil
+
             }
+
           });
         }
 
         // ===============================================
-        // 6. HASIL
+        // HASIL IMPORT
         // ===============================================
 
         return response(200, {
 
-          success: true,
+          success:
+            true,
 
           message:
             `${berhasil.length} siswa berhasil diimport.`,
-
-          tahunAjaran:
-            tahunAktif,
-
-          tahunAjaranId:
-            tahunAktifId,
 
           berhasil:
             berhasil.length,
@@ -482,12 +507,20 @@ exports.handler = async (event) => {
 
           detailGagal:
             gagal
+
         });
       }
 
       // =================================================
       // TAMBAH SISWA BIASA
       // =================================================
+
+      const {
+        nisn,
+        nama,
+        kelasId,
+        password
+      } = body;
 
       if (
         !nisn ||
@@ -497,17 +530,28 @@ exports.handler = async (event) => {
       ) {
 
         return response(400, {
-          success: false,
+
+          success:
+            false,
+
           message:
             "NISN, nama, kelas, dan password wajib diisi."
+
         });
       }
 
-      // Cek NISN
+      // ===============================================
+      // CEK NISN
+      // ===============================================
+
       const existing =
         await sheets.spreadsheets.values.get({
+
           spreadsheetId,
-          range: "Siswa!A:F"
+
+          range:
+            "Siswa!A:F"
+
         });
 
       const rows =
@@ -527,21 +571,27 @@ exports.handler = async (event) => {
         ) {
 
           return response(409, {
-            success: false,
+
+            success:
+              false,
+
             message:
               "NISN sudah terdaftar."
+
           });
         }
       }
 
-      // Buat ID
+      // ===============================================
+      // BUAT ID
+      // ===============================================
+
       const id =
         "S" +
-        String(
-          Date.now()
-        ).slice(-6);
+        Date.now().toString().slice(-7);
 
       await sheets.spreadsheets.values.append({
+
         spreadsheetId,
 
         range:
@@ -551,32 +601,50 @@ exports.handler = async (event) => {
           "RAW",
 
         requestBody: {
+
           values: [[
+
             id,
+
             nisn,
+
             nama,
+
             kelasId,
+
             password,
+
             "Aktif"
+
           ]]
+
         }
+
       });
 
       return response(201, {
 
-        success: true,
+        success:
+          true,
 
         message:
           "Siswa berhasil ditambahkan.",
 
         siswa: {
+
           id,
+
           nisn,
+
           nama,
+
           kelasId,
+
           status:
             "Aktif"
+
         }
+
       });
     }
 
@@ -601,16 +669,24 @@ exports.handler = async (event) => {
       if (!id) {
 
         return response(400, {
-          success: false,
+
+          success:
+            false,
+
           message:
             "ID siswa wajib diisi."
+
         });
       }
 
       const result =
         await sheets.spreadsheets.values.get({
+
           spreadsheetId,
-          range: "Siswa!A:F"
+
+          range:
+            "Siswa!A:F"
+
         });
 
       const rows =
@@ -641,9 +717,13 @@ exports.handler = async (event) => {
       if (!rowNumber) {
 
         return response(404, {
-          success: false,
+
+          success:
+            false,
+
           message:
             "Siswa tidak ditemukan."
+
         });
       }
 
@@ -663,32 +743,43 @@ exports.handler = async (event) => {
         requestBody: {
 
           values: [[
+
             id,
+
             nisn ??
               oldRow[1] ??
               "",
+
             nama ??
               oldRow[2] ??
               "",
+
             kelasId ??
               oldRow[3] ??
               "",
+
             password ??
               oldRow[4] ??
               "",
+
             status ??
               oldRow[5] ??
               "Aktif"
+
           ]]
+
         }
+
       });
 
       return response(200, {
 
-        success: true,
+        success:
+          true,
 
         message:
           "Data siswa berhasil diperbarui."
+
       });
     }
 
@@ -698,171 +789,171 @@ exports.handler = async (event) => {
 
     if (event.httpMethod === "DELETE") {
 
-      try {
+      const body =
+        JSON.parse(event.body || "{}");
 
-        const body =
-          JSON.parse(event.body || "{}");
+      const id =
+        String(
+          body.id || ""
+        ).trim();
 
-        const id =
+      if (!id) {
+
+        return response(400, {
+
+          success:
+            false,
+
+          message:
+            "ID siswa wajib diisi."
+
+        });
+      }
+
+      // ===============================================
+      // CARI SISWA
+      // ===============================================
+
+      const siswaResult =
+        await sheets.spreadsheets.values.get({
+
+          spreadsheetId,
+
+          range:
+            "Siswa!A:F"
+
+        });
+
+      const siswaRows =
+        siswaResult.data.values || [];
+
+      let siswaRowNumber = -1;
+
+      for (
+        let i = 1;
+        i < siswaRows.length;
+        i++
+      ) {
+
+        const siswaId =
           String(
-            body.id || ""
+            siswaRows[i][0] || ""
           ).trim();
 
-        if (!id) {
-
-          return response(400, {
-            success: false,
-            message:
-              "ID siswa wajib diisi."
-          });
-        }
-
-        // ===============================================
-        // 1. CARI SISWA
-        // ===============================================
-
-        const siswaResult =
-          await sheets.spreadsheets.values.get({
-            spreadsheetId,
-            range: "Siswa!A:F"
-          });
-
-        const siswaRows =
-          siswaResult.data.values || [];
-
-        let siswaRowNumber = -1;
-
-        for (
-          let i = 1;
-          i < siswaRows.length;
-          i++
+        if (
+          siswaId === id
         ) {
 
-          const siswaId =
-            String(
-              siswaRows[i][0] || ""
-            ).trim();
+          siswaRowNumber =
+            i + 1;
 
-          if (
-            siswaId === id
-          ) {
-
-            siswaRowNumber =
-              i + 1;
-
-            break;
-          }
+          break;
         }
+      }
+
+      if (
+        siswaRowNumber === -1
+      ) {
+
+        return response(404, {
+
+          success:
+            false,
+
+          message:
+            "Siswa tidak ditemukan."
+
+        });
+      }
+
+      // ===============================================
+      // BACA POIN
+      // ===============================================
+
+      const poinResult =
+        await sheets.spreadsheets.values.get({
+
+          spreadsheetId,
+
+          range:
+            "Poin!A:G"
+
+        });
+
+      const poinRows =
+        poinResult.data.values || [];
+
+      const poinRowsToDelete =
+        [];
+
+      for (
+        let i = 1;
+        i < poinRows.length;
+        i++
+      ) {
+
+        const siswaIdPoin =
+          String(
+            poinRows[i][1] || ""
+          ).trim();
 
         if (
-          siswaRowNumber === -1
+          siswaIdPoin === id
         ) {
 
-          return response(404, {
-            success: false,
-            message:
-              "Siswa tidak ditemukan."
-          });
+          poinRowsToDelete.push(
+            i + 1
+          );
+
         }
+      }
 
-        // ===============================================
-        // 2. BACA POIN
-        // ===============================================
+      // ===============================================
+      // HAPUS POIN
+      // ===============================================
 
-        const poinResult =
-          await sheets.spreadsheets.values.get({
-            spreadsheetId,
-            range: "Poin!A:G"
-          });
-
-        const poinRows =
-          poinResult.data.values || [];
-
-        const poinRowsToDelete =
-          [];
-
-        for (
-          let i = 1;
-          i < poinRows.length;
-          i++
-        ) {
-
-          const siswaIdPoin =
-            String(
-              poinRows[i][1] || ""
-            ).trim();
-
-          if (
-            siswaIdPoin === id
-          ) {
-
-            poinRowsToDelete.push(
-              i + 1
-            );
-          }
-        }
-
-        // ===============================================
-        // 3. HAPUS POIN
-        // ===============================================
-
-        for (
-          let i =
-            poinRowsToDelete.length - 1;
-          i >= 0;
-          i--
-        ) {
-
-          const rowNumber =
-            poinRowsToDelete[i];
-
-          await sheets.spreadsheets.values.clear({
-
-            spreadsheetId,
-
-            range:
-              `Poin!A${rowNumber}:G${rowNumber}`
-          });
-        }
-
-        // ===============================================
-        // 4. HAPUS SISWA
-        // ===============================================
+      for (
+        let i =
+          poinRowsToDelete.length - 1;
+        i >= 0;
+        i--
+      ) {
 
         await sheets.spreadsheets.values.clear({
 
           spreadsheetId,
 
           range:
-            `Siswa!A${siswaRowNumber}:F${siswaRowNumber}`
-        });
+            `Poin!A${poinRowsToDelete[i]}:G${poinRowsToDelete[i]}`
 
-        return response(200, {
-
-          success: true,
-
-          message:
-            "Siswa dan seluruh poin siswa berhasil dihapus.",
-
-          poinTerhapus:
-            poinRowsToDelete.length
-        });
-
-      } catch (error) {
-
-        console.error(
-          "DELETE STUDENT ERROR:",
-          error
-        );
-
-        return response(500, {
-
-          success: false,
-
-          message:
-            "Gagal menghapus siswa dan poin."
         });
       }
+
+      // ===============================================
+      // HAPUS SISWA
+      // ===============================================
+
+      await sheets.spreadsheets.values.clear({
+
+        spreadsheetId,
+
+        range:
+          `Siswa!A${siswaRowNumber}:F${siswaRowNumber}`
+
+      });
+
+      return response(200, {
+
+        success:
+          true,
+
+        message:
+          "Siswa dan seluruh poin siswa berhasil dihapus.",
+
+        poinTerhapus:
+          poinRowsToDelete.length
+
+      });
     }
 
     // =====================================================
@@ -883,16 +974,24 @@ exports.handler = async (event) => {
       if (!id) {
 
         return response(400, {
-          success: false,
+
+          success:
+            false,
+
           message:
             "ID siswa wajib diisi."
+
         });
       }
 
       const result =
         await sheets.spreadsheets.values.get({
+
           spreadsheetId,
-          range: "Siswa!A:F"
+
+          range:
+            "Siswa!A:F"
+
         });
 
       const rows =
@@ -923,9 +1022,13 @@ exports.handler = async (event) => {
       if (!rowNumber) {
 
         return response(404, {
-          success: false,
+
+          success:
+            false,
+
           message:
             "Siswa tidak ditemukan."
+
         });
       }
 
@@ -933,7 +1036,7 @@ exports.handler = async (event) => {
         rows[rowNumber - 1];
 
       // ===============================================
-      // NONAKTIFKAN / AKTIFKAN
+      // TOGGLE STATUS
       // ===============================================
 
       if (
@@ -963,21 +1066,26 @@ exports.handler = async (event) => {
             "RAW",
 
           requestBody: {
+
             values: [[
               newStatus
             ]]
+
           }
+
         });
 
         return response(200, {
 
-          success: true,
+          success:
+            true,
 
           message:
             `Status siswa diubah menjadi ${newStatus}.`,
 
           status:
             newStatus
+
         });
       }
 
@@ -992,9 +1100,13 @@ exports.handler = async (event) => {
         if (!password) {
 
           return response(400, {
-            success: false,
+
+            success:
+              false,
+
             message:
               "Password baru wajib diisi."
+
           });
         }
 
@@ -1009,23 +1121,28 @@ exports.handler = async (event) => {
             "RAW",
 
           requestBody: {
+
             values: [[
               password
             ]]
+
           }
+
         });
 
         return response(200, {
 
-          success: true,
+          success:
+            true,
 
           message:
             "Password berhasil direset."
+
         });
       }
 
       // ===============================================
-      // PINDAHKAN SISWA
+      // PINDAH SISWA
       // ===============================================
 
       if (
@@ -1041,9 +1158,13 @@ exports.handler = async (event) => {
         if (!kelasId) {
 
           return response(400, {
-            success: false,
+
+            success:
+              false,
+
             message:
               "Kelas tujuan wajib dipilih."
+
           });
         }
 
@@ -1058,16 +1179,19 @@ exports.handler = async (event) => {
             oldRow[3] || ""
           ).trim();
 
-        // Tidak boleh sama
         if (
           kelasSekarangId ===
           tujuanKelasId
         ) {
 
           return response(400, {
-            success: false,
+
+            success:
+              false,
+
             message:
               "Siswa sudah berada di kelas tersebut."
+
           });
         }
 
@@ -1077,8 +1201,12 @@ exports.handler = async (event) => {
 
         const kelasResult =
           await sheets.spreadsheets.values.get({
+
             spreadsheetId,
-            range: "Kelas!A:E"
+
+            range:
+              "Kelas!A:E"
+
           });
 
         const kelasRows =
@@ -1116,6 +1244,7 @@ exports.handler = async (event) => {
 
             kelasSekarang =
               namaKelas;
+
           }
 
           if (
@@ -1125,6 +1254,7 @@ exports.handler = async (event) => {
 
             kelasTujuan =
               namaKelas;
+
           }
         }
 
@@ -1133,14 +1263,18 @@ exports.handler = async (event) => {
         ) {
 
           return response(400, {
-            success: false,
+
+            success:
+              false,
+
             message:
               "Kelas tujuan tidak ditemukan."
+
           });
         }
 
         // =============================================
-        // 1. UBAH KELAS
+        // UBAH KELAS
         // =============================================
 
         await sheets.spreadsheets.values.update({
@@ -1154,14 +1288,17 @@ exports.handler = async (event) => {
             "RAW",
 
           requestBody: {
+
             values: [[
               tujuanKelasId
             ]]
+
           }
+
         });
 
         // =============================================
-        // 2. ID RIWAYAT
+        // RIWAYAT
         // =============================================
 
         const historyId =
@@ -1169,10 +1306,6 @@ exports.handler = async (event) => {
           String(
             Date.now()
           ).slice(-8);
-
-        // =============================================
-        // 3. TANGGAL
-        // =============================================
 
         const now =
           new Date();
@@ -1188,10 +1321,6 @@ exports.handler = async (event) => {
           "/" +
           now.getFullYear();
 
-        // =============================================
-        // 4. SIMPAN RIWAYAT
-        // =============================================
-
         await sheets.spreadsheets.values.append({
 
           spreadsheetId,
@@ -1205,20 +1334,31 @@ exports.handler = async (event) => {
           requestBody: {
 
             values: [[
+
               historyId,
+
               siswaId,
+
               kelasSekarangId,
+
               tujuanKelasId,
+
               alasan || "",
+
               tanggal,
+
               admin || ""
+
             ]]
+
           }
+
         });
 
         return response(200, {
 
-          success: true,
+          success:
+            true,
 
           message:
             `Siswa berhasil dipindahkan dari ${kelasSekarang} ke ${kelasTujuan}.`,
@@ -1239,25 +1379,31 @@ exports.handler = async (event) => {
 
             keKelas:
               kelasTujuan
+
           }
+
         });
       }
 
       return response(400, {
 
-        success: false,
+        success:
+          false,
 
         message:
           "Action tidak dikenali."
+
       });
     }
 
     return response(405, {
 
-      success: false,
+      success:
+        false,
 
       message:
         "Method tidak diizinkan."
+
     });
 
   } catch (error) {
@@ -1269,10 +1415,13 @@ exports.handler = async (event) => {
 
     return response(500, {
 
-      success: false,
+      success:
+        false,
 
       message:
+        error.message ||
         "Terjadi kesalahan pada server."
+
     });
   }
 };
@@ -1298,9 +1447,11 @@ function response(
 
       "Cache-Control":
         "no-store"
+
     },
 
     body:
       JSON.stringify(body)
+
   };
 }
