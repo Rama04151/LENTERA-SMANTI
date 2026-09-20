@@ -1,12 +1,231 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Admin Panel - LENTERA SMANTI</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0b132b;
+      --card-bg: #1c2541;
+      --accent-gold: #fbc02d;
+      --accent-gold-hover: #f57f17;
+      --gold-glow: rgba(251, 192, 45, 0.25);
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(11, 19, 43, 0.7);
+      --danger-color: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(251, 192, 45, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(28, 37, 65, 0.6) 0%, transparent 50%);
+    }
+
+    .dashboard-container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .dashboard-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Header */
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .logo-small {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      color: #0b132b;
+      font-weight: 800;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px var(--gold-glow);
+    }
+
+    .dashboard-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+    }
+
+    .dashboard-header p {
+      font-size: 13px;
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+
+    /* Welcome Banner */
+    .welcome {
+      margin-top: 20px;
+      background: linear-gradient(135deg, rgba(251, 192, 45, 0.08), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(251, 192, 45, 0.2);
+      padding: 16px 20px;
+      border-radius: 16px;
+    }
+
+    .welcome p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .welcome h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-top: 2px;
+    }
+
+    /* Stat Cards Summary */
+    .points-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .point-card {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(11, 19, 43, 0.6);
+      border: 1px solid var(--border-color);
+    }
+
+    .point-card span {
+      font-size: 22px;
+      margin-right: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px;
+      border-radius: 10px;
+    }
+
+    .point-card p {
+      flex-grow: 1;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .point-card strong {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    /* Section & Menu Area */
+    .history-section {
+      background: rgba(11, 19, 43, 0.4);
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      margin-top: 20px;
+    }
+
+    .section-title h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    .section-title p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      margin-bottom: 16px;
+    }
+
+    .menu-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Buttons */
+    .logout-button {
+      width: 100%;
+      padding: 13px 16px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      color: #0b132b;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px var(--gold-glow);
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logout-button:hover {
+      background: linear-gradient(135deg, #ffd54f, var(--accent-gold));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(251, 192, 45, 0.4);
+    }
+
+    .logout-button:active {
+      transform: translateY(0);
+    }
+
+    .logout-button.danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      box-shadow: none;
+      justify-content: center;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .logout-button.danger:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
 
 <body>
@@ -16,96 +235,84 @@
     <section class="dashboard-card">
 
       <div class="dashboard-header">
-
         <div class="logo-small">L</div>
 
         <div>
           <h1>LENTERA SMANTI</h1>
           <p>Admin Panel</p>
         </div>
-
       </div>
 
       <div class="welcome">
-
         <p>Selamat datang,</p>
-
-        <h2 id="adminUsername">
-          Memuat...
-        </h2>
-
+        <h2 id="adminUsername">Memuat...</h2>
       </div>
 
       <div class="points-container">
-
         <div class="point-card">
           <span>👨‍🎓</span>
-          <p>Total Siswa</p>
-          <strong id="totalSiswa">0</strong>
+          <div>
+            <p>Total Siswa</p>
+            <strong id="totalSiswa">0</strong>
+          </div>
         </div>
 
         <div class="point-card">
           <span>🏫</span>
-          <p>Total Kelas</p>
-          <strong id="totalKelas">6</strong>
+          <div>
+            <p>Total Kelas</p>
+            <strong id="totalKelas">6</strong>
+          </div>
         </div>
-
       </div>
 
       <section class="history-section">
 
         <div class="section-title">
-
           <h3>Menu Admin</h3>
-
-          <p>
-            Kelola data LENTERA SMANTI
-          </p>
-
+          <p>Kelola data LENTERA SMANTI</p>
         </div>
 
-        <div class="points-container">
-
-         <button
-  type="button"
-  class="logout-button"
-  onclick="window.location.href='admin-siswa.html'"
->
-  👨‍🎓 Data Siswa
-</button>
-
-<button
-  type="button"
-  class="logout-button"
-  onclick="window.location.href='admin-kelas.html'"
->
-  🏫 Data Kelas
-</button>
-
-<button
-  type="button"
-  class="logout-button"
-  onclick="window.location.href='admin-poin.html'"
->
-  🏆 Poin Siswa
-</button>
+        <div class="menu-grid">
+          <button
+            type="button"
+            class="logout-button"
+            onclick="window.location.href='admin-siswa.html'"
+          >
+            👨‍🎓 Data Siswa
+          </button>
 
           <button
-  type="button"
-  class="logout-button"
-  onclick="window.location.href='admin-kenaikan.html'"
->
-  📈 Kenaikan Kelas
-</button>
+            type="button"
+            class="logout-button"
+            onclick="window.location.href='admin-kelas.html'"
+          >
+            🏫 Data Kelas
+          </button>
 
-<button
-  type="button"
-  class="logout-button"
-  onclick="window.location.href='admin-siswa.html'"
->
-  🔄 Pindahkan Siswa
-</button>
+          <button
+            type="button"
+            class="logout-button"
+            onclick="window.location.href='admin-poin.html'"
+          >
+            🏆 Poin Siswa
+          </button>
 
+          <button
+            type="button"
+            class="logout-button"
+            onclick="window.location.href='admin-kenaikan.html'"
+          >
+            📈 Kenaikan Kelas
+          </button>
+
+          <button
+            type="button"
+            class="logout-button"
+            onclick="window.location.href='admin-siswa.html'"
+          >
+            🔄 Pindahkan Siswa
+          </button>
         </div>
 
       </section>
@@ -113,9 +320,9 @@
       <button
         type="button"
         id="logoutAdmin"
-        class="logout-button"
+        class="logout-button danger"
       >
-        Keluar
+        🚪 Keluar
       </button>
 
     </section>
@@ -123,117 +330,61 @@
   </main>
 
   <script>
-
-    const session =
-      sessionStorage.getItem(
-        "lentera_admin_session"
-      );
+    const session = sessionStorage.getItem("lentera_admin_session");
 
     if (!session) {
-
-      window.location.replace(
-        "admin-login.html"
-      );
-
+      window.location.replace("admin-login.html");
     }
 
     try {
+      const admin = JSON.parse(session);
 
-      const admin =
-        JSON.parse(session);
-
-      document.getElementById(
-        "adminUsername"
-      ).textContent =
+      document.getElementById("adminUsername").textContent =
         admin.username || "Admin";
 
     } catch (error) {
-
-      sessionStorage.removeItem(
-        "lentera_admin_session"
-      );
-
-      window.location.replace(
-        "admin-login.html"
-      );
-
+      sessionStorage.removeItem("lentera_admin_session");
+      window.location.replace("admin-login.html");
     }
 
-    document.getElementById(
-      "logoutAdmin"
-    ).onclick = function () {
-
-      sessionStorage.removeItem(
-        "lentera_admin_session"
-      );
-
-      window.location.replace(
-        "admin-login.html"
-      );
-
+    document.getElementById("logoutAdmin").onclick = function () {
+      sessionStorage.removeItem("lentera_admin_session");
+      window.location.replace("admin-login.html");
     };
 
     // =========================
-// HITUNG TOTAL SISWA
-// =========================
+    // HITUNG TOTAL SISWA
+    // =========================
 
-async function loadTotalSiswa() {
+    async function loadTotalSiswa() {
+      const totalSiswaElement = document.getElementById("totalSiswa");
 
-  const totalSiswaElement =
-    document.getElementById("totalSiswa");
+      try {
+        const response = await fetch("/.netlify/functions/admin-students");
+        const result = await response.json();
 
-  try {
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Gagal mengambil data siswa.");
+        }
 
-    const response =
-      await fetch(
-        "/.netlify/functions/admin-students"
-      );
+        const siswa = Array.isArray(result.siswa) ? result.siswa : [];
 
-    const result =
-      await response.json();
+        // Hanya menghitung siswa aktif
+        const totalAktif = siswa.filter(
+          siswa => String(siswa.status || "").trim().toLowerCase() === "aktif"
+        ).length;
 
-    if (!response.ok || !result.success) {
+        totalSiswaElement.textContent = totalAktif;
 
-      throw new Error(
-        result.message ||
-        "Gagal mengambil data siswa."
-      );
-
+      } catch (error) {
+        console.error("TOTAL SISWA ERROR:", error);
+        totalSiswaElement.textContent = "—";
+      }
     }
 
-    const siswa =
-      Array.isArray(result.siswa)
-        ? result.siswa
-        : [];
-
-    // Hanya menghitung siswa aktif
-    const totalAktif =
-      siswa.filter(
-        siswa =>
-          String(siswa.status || "")
-            .trim()
-            .toLowerCase() === "aktif"
-      ).length;
-
-    totalSiswaElement.textContent =
-      totalAktif;
-
-  } catch (error) {
-
-    console.error(
-      "TOTAL SISWA ERROR:",
-      error
-    );
-
-    totalSiswaElement.textContent =
-      "—";
-
-  }
-}
-
-loadTotalSiswa();
-
+    loadTotalSiswa();
   </script>
 
 </body>
+
 </html>
