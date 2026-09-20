@@ -1324,38 +1324,140 @@
 
 function viewStudentPassword(id) {
 
-  const siswa =
-    students.find(
-      s => String(s.id) === String(id)
-    );
+  const siswa = students.find(
+    s => String(s.id) === String(id)
+  );
 
   if (!siswa) {
     alert("Data siswa tidak ditemukan.");
     return;
   }
 
-  const password =
-    siswa.password || "";
+  const password = siswa.password || "";
 
   if (!password) {
-    alert(
-      `Password siswa tidak tersedia.\n\n` +
-      `Nama: ${siswa.nama}\n` +
-      `NISN: ${siswa.nisn}`
-    );
-
+    alert("Password siswa tidak tersedia.");
     return;
   }
 
-  alert(
-    `🔐 PASSWORD SISWA\n\n` +
-    `Nama     : ${siswa.nama}\n` +
-    `NISN     : ${siswa.nisn}\n` +
-    `Kelas    : ${siswa.kelas}\n` +
-    `Password : ${password}`
-  );
+  // Hapus modal lama jika ada
+  const oldModal = document.getElementById("passwordModal");
+  if (oldModal) oldModal.remove();
+
+  const modal = document.createElement("div");
+
+  modal.id = "passwordModal";
+
+  modal.innerHTML = `
+    <div class="password-overlay" onclick="closePasswordModal(event)">
+      
+      <div class="password-modal" onclick="event.stopPropagation()">
+
+        <div class="password-icon">
+          🔐
+        </div>
+
+        <h2>Password Siswa</h2>
+
+        <p class="password-subtitle">
+          Informasi akun siswa
+        </p>
+
+        <div class="password-student">
+          <strong>${escapeHtml(siswa.nama)}</strong>
+          <span>${escapeHtml(siswa.nisn)} • ${escapeHtml(siswa.kelas)}</span>
+        </div>
+
+        <div class="password-box">
+
+          <span id="studentPassword">
+            ${escapeHtml(password)}
+          </span>
+
+          <button
+            type="button"
+            onclick="copyStudentPassword()"
+            title="Salin password"
+          >
+            📋
+          </button>
+
+        </div>
+
+        <button
+          type="button"
+          class="password-close"
+          onclick="closePasswordModal()"
+        >
+          Tutup
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(modal);
 }
 
+
+// =========================
+// TUTUP MODAL PASSWORD
+// =========================
+
+function closePasswordModal(event) {
+
+  if (
+    event &&
+    event.target &&
+    !event.target.classList.contains("password-overlay")
+  ) {
+    return;
+  }
+
+  const modal = document.getElementById("passwordModal");
+
+  if (modal) {
+    modal.remove();
+  }
+}
+
+
+// =========================
+// COPY PASSWORD
+// =========================
+
+function copyStudentPassword() {
+
+  const passwordElement =
+    document.getElementById("studentPassword");
+
+  if (!passwordElement) return;
+
+  const password =
+    passwordElement.textContent.trim();
+
+  navigator.clipboard.writeText(password)
+    .then(() => {
+
+      const button =
+        document.querySelector(
+          ".password-box button"
+        );
+
+      if (button) {
+        button.textContent = "✅";
+
+        setTimeout(() => {
+          button.textContent = "📋";
+        }, 1500);
+      }
+
+    })
+    .catch(() => {
+      alert("Gagal menyalin password.");
+    });
+}
   </script>
 
 </body>
