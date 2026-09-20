@@ -145,6 +145,171 @@
       color: var(--danger-color);
       text-align: center;
     }
+
+    /* =========================
+   DETAIL POIN SISWA
+   ========================= */
+
+.student-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.student-name {
+  display: block;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.student-nisn {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+
+/* =========================
+   POINT GRID
+   ========================= */
+
+.point-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.point-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 10px;
+
+  border-radius: 11px;
+
+  border: 1px solid var(--border-color);
+}
+
+.point-card small {
+  display: block;
+
+  font-size: 10px;
+
+  color: var(--text-muted);
+
+  margin-bottom: 2px;
+}
+
+.point-card strong {
+  display: block;
+
+  font-size: 15px;
+
+  font-weight: 800;
+}
+
+
+/* =========================
+   PENGHARGAAN
+   ========================= */
+
+.point-card.reward {
+  background: rgba(16, 185, 129, 0.08);
+
+  border-color:
+    rgba(16, 185, 129, 0.18);
+}
+
+.point-card.reward strong {
+  color: var(--success-color);
+}
+
+
+/* =========================
+   PELANGGARAN
+   ========================= */
+
+.point-card.violation {
+  background: rgba(239, 68, 68, 0.08);
+
+  border-color:
+    rgba(239, 68, 68, 0.18);
+}
+
+.point-card.violation strong {
+  color: var(--danger-color);
+}
+
+
+/* =========================
+   TOTAL POIN
+   ========================= */
+
+.total-point {
+  margin-top: 9px;
+
+  padding: 11px 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  border-radius: 11px;
+
+  background: rgba(251, 192, 45, 0.06);
+
+  border:
+    1px solid
+    rgba(251, 192, 45, 0.15);
+}
+
+.total-point span {
+  font-size: 11px;
+
+  color: var(--text-muted);
+}
+
+.total-point strong {
+  font-size: 16px;
+
+  font-weight: 800;
+}
+
+
+/* =========================
+   WARNA TOTAL
+   ========================= */
+
+.point-positive strong {
+  color: var(--success-color);
+}
+
+.point-negative strong {
+  color: var(--danger-color);
+}
+
+.point-zero strong {
+  color: var(--text-muted);
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 420px) {
+
+  .point-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
   </style>
 </head>
 
@@ -285,17 +450,101 @@
       } else {
         html += `
           <div style="margin-top: 12px;">
-            ${kelas.siswa.map((siswa, index) => `
-              <div class="student-item">
-                <strong style="color: var(--text-main);">
-                  ${index + 1}.${escapeHtml(siswa.nama)}
-                </strong>
-                <br>
-                <small style="color: var(--text-muted);">
-                  NISN: ${escapeHtml(siswa.nisn)}
-                </small>
-              </div>
-            `).join("")}
+            ${kelas.siswa.map((siswa, index) => {
+
+  const penghargaan =
+    Number(siswa.penghargaan || 0);
+
+  const pelanggaran =
+    Number(siswa.pelanggaran || 0);
+
+  const total =
+    Number(siswa.total || 0);
+
+  const totalClass =
+    total > 0
+      ? "point-positive"
+      : total < 0
+        ? "point-negative"
+        : "point-zero";
+
+  const totalText =
+    total > 0
+      ? `+${total}`
+      : `${total}`;
+
+  return `
+    <div class="student-item">
+
+      <div class="student-header">
+
+        <div>
+          <strong class="student-name">
+            ${index + 1}. ${escapeHtml(siswa.nama)}
+          </strong>
+
+          <small class="student-nisn">
+            NISN: ${escapeHtml(siswa.nisn)}
+          </small>
+        </div>
+
+      </div>
+
+
+      <div class="point-grid">
+
+        <div class="point-card reward">
+
+          <span class="point-icon">
+            🟢
+          </span>
+
+          <div>
+            <small>Penghargaan</small>
+
+            <strong>
+              +${penghargaan}
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div class="point-card violation">
+
+          <span class="point-icon">
+            🔴
+          </span>
+
+          <div>
+            <small>Pelanggaran</small>
+
+            <strong>
+              -${pelanggaran}
+            </strong>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="total-point ${totalClass}">
+
+        <span>
+          📊 Total Poin
+        </span>
+
+        <strong>
+          ${totalText}
+        </strong>
+
+      </div>
+
+    </div>
+  `;
+
+}).join("")}
           </div>
         `;
       }
