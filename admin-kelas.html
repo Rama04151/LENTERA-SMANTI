@@ -3,14 +3,149 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Data Kelas - LENTERA SMANTI</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0b132b;
+      --card-bg: #1c2541;
+      --accent-gold: #fbc02d;
+      --accent-gold-hover: #f57f17;
+      --gold-glow: rgba(251, 192, 45, 0.25);
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(11, 19, 43, 0.7);
+      --danger-color: #ef4444;
+      --success-color: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(251, 192, 45, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(28, 37, 65, 0.6) 0%, transparent 50%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Buttons */
+    .logout-button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid var(--border-color);
+      margin-top: 16px;
+    }
+
+    .logout-button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* Class Cards */
+    .history-section {
+      background: rgba(11, 19, 43, 0.5);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .class-card {
+      cursor: pointer;
+    }
+
+    .class-card:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      background: rgba(11, 19, 43, 0.7);
+    }
+
+    .history-section h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-bottom: 8px;
+    }
+
+    .history-section p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .history-section strong {
+      color: var(--text-main);
+    }
+
+    /* Student List Item */
+    .student-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(28, 37, 65, 0.3);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .student-item:last-child {
+      margin-bottom: 0;
+    }
+
+    #classMessage {
+      font-size: 13px;
+      color: var(--danger-color);
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
@@ -18,10 +153,7 @@
   <div class="container">
 
     <h1>🏫 Data Kelas</h1>
-
-    <p>
-      Kelola dan lihat jumlah siswa setiap kelas.
-    </p>
+    <p>Kelola dan lihat jumlah siswa setiap kelas.</p>
 
     <button
       type="button"
@@ -31,290 +163,152 @@
       ← Kembali
     </button>
 
-    <div
-      id="classList"
-      style="margin-top:20px;"
-    >
-      <p>Memuat data kelas...</p>
+    <div id="classList" style="margin-top: 20px;">
+      <p style="text-align: center; padding: 20px;">Memuat data kelas...</p>
     </div>
 
-    <div
-      id="classMessage"
-      style="margin-top:15px;"
-    ></div>
+    <div id="classMessage"></div>
 
-    <div
-  id="studentClassList"
-  style="margin-top:20px;"
-></div>
+    <div id="studentClassList" style="margin-top: 20px;"></div>
 
   </div>
 
 
   <script>
-
     // =========================
     // CEK LOGIN ADMIN
     // =========================
-
-    const adminSession =
-      sessionStorage.getItem(
-        "lentera_admin_session"
-      );
+    const adminSession = sessionStorage.getItem("lentera_admin_session");
 
     if (!adminSession) {
-
-      window.location.href =
-        "admin-login.html";
-
+      window.location.href = "admin-login.html";
     }
-
 
     // =========================
     // LOAD DATA KELAS
     // =========================
-
     async function loadClasses() {
-
-      const classList =
-        document.getElementById(
-          "classList"
-        );
-
-      const message =
-        document.getElementById(
-          "classMessage"
-        );
+      const classList = document.getElementById("classList");
+      const message = document.getElementById("classMessage");
 
       try {
+        const response = await fetch("/.netlify/functions/admin-classes");
+        const result = await response.json();
 
-        const response =
-          await fetch(
-            "/.netlify/functions/admin-classes"
-          );
-
-        const result =
-          await response.json();
-
-        if (
-          !response.ok ||
-          !result.success
-        ) {
-
-          classList.innerHTML =
-            "<p>Data kelas gagal dimuat.</p>";
-
+        if (!response.ok || !result.success) {
+          classList.innerHTML = "<p style='text-align:center;'>Data kelas gagal dimuat.</p>";
           return;
-
         }
 
-        window.classData =
-  result.kelas;
-
-renderClasses(
-  result.kelas
-);
+        window.classData = result.kelas;
+        renderClasses(result.kelas);
 
       } catch (error) {
-
-        console.error(
-          "LOAD CLASSES ERROR:",
-          error
-        );
-
-        message.textContent =
-          "Terjadi kesalahan koneksi.";
-
+        console.error("LOAD CLASSES ERROR:", error);
+        message.textContent = "Terjadi kesalahan koneksi.";
       }
-
     }
-
 
     // =========================
     // TAMPILKAN DATA KELAS
     // =========================
-
     function renderClasses(data) {
+      const classList = document.getElementById("classList");
 
-  const classList =
-    document.getElementById(
-      "classList"
-    );
+      if (!data || data.length === 0) {
+        classList.innerHTML = "<p style='text-align:center;'>Belum ada data kelas.</p>";
+        return;
+      }
 
-  if (!data || data.length === 0) {
+      classList.innerHTML = data.map((kelas) => `
+        <div
+          class="history-section class-card"
+          style="margin-bottom: 14px;"
+          onclick="showStudents('${kelas.id}')"
+        >
+          <h2>🏫 ${escapeHtml(kelas.nama)}</h2>
 
-    classList.innerHTML =
-      "<p>Belum ada data kelas.</p>";
+          <p><strong>Tingkat:</strong> ${escapeHtml(kelas.tingkat)}</p>
+          <p><strong>Status:</strong> ${escapeHtml(kelas.status)}</p>
+          <p><strong>Jumlah Siswa:</strong> ${kelas.jumlahSiswa} siswa</p>
 
-    return;
-
-  }
-
-  classList.innerHTML =
-    data.map((kelas) => `
-
-      <div
-        class="history-section"
-        style="margin-bottom:15px; cursor:pointer;"
-        onclick="showStudents('${kelas.id}')"
-      >
-
-        <h2>
-          🏫 ${escapeHtml(kelas.nama)}
-        </h2>
-
-        <p>
-          <strong>Tingkat:</strong>
-          ${escapeHtml(kelas.tingkat)}
-        </p>
-
-        <p>
-          <strong>Status:</strong>
-          ${escapeHtml(kelas.status)}
-        </p>
-
-        <p>
-          <strong>Jumlah Siswa:</strong>
-          ${kelas.jumlahSiswa} siswa
-        </p>
-
-        <p>
-          👆 Klik untuk melihat siswa
-        </p>
-
-      </div>
-
-    `).join("");
-
-}
+          <p style="color: var(--accent-gold); font-weight: 600; margin-top: 8px; font-size: 12px;">
+            👆 Klik untuk melihat siswa
+          </p>
+        </div>
+      `).join("");
+    }
 
     // =========================
     // ESCAPE HTML
     // =========================
-
     function escapeHtml(value) {
-
       return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-
     }
-
 
     // =========================
     // JALANKAN
     // =========================
-
     loadClasses();
 
     // =========================
-// TAMPILKAN SISWA DALAM KELAS
-// =========================
+    // TAMPILKAN SISWA DALAM KELAS
+    // =========================
+    function showStudents(kelasId) {
+      const kelas = window.classData.find(k => String(k.id) === String(kelasId));
+      const container = document.getElementById("studentClassList");
 
-function showStudents(kelasId) {
+      if (!kelas) {
+        container.innerHTML = "<p style='text-align:center;'>Data kelas tidak ditemukan.</p>";
+        return;
+      }
 
-  const kelas =
-    window.classData.find(
-      k => String(k.id) === String(kelasId)
-    );
+      let html = `
+        <div class="history-section" style="border-color: rgba(251, 192, 45, 0.4);">
+          <h2>👨‍🎓 Siswa ${escapeHtml(kelas.nama)}</h2>
+          <p style="margin-bottom: 12px;">
+            Jumlah: <strong style="color: var(--accent-gold);">${kelas.jumlahSiswa} siswa</strong>
+          </p>
+      `;
 
-  const container =
-    document.getElementById(
-      "studentClassList"
-    );
-
-  if (!kelas) {
-
-    container.innerHTML =
-      "<p>Data kelas tidak ditemukan.</p>";
-
-    return;
-
-  }
-
-  let html = `
-
-    <div class="history-section">
-
-      <h2>
-        👨‍🎓 Siswa ${escapeHtml(kelas.nama)}
-      </h2>
-
-      <p>
-        Jumlah:
-        <strong>
-          ${kelas.jumlahSiswa} siswa
-        </strong>
-      </p>
-
-  `;
-
-  if (
-    !kelas.siswa ||
-    kelas.siswa.length === 0
-  ) {
-
-    html += `
-      <p>
-        Belum ada siswa aktif di kelas ini.
-      </p>
-    `;
-
-  } else {
-
-    html += `
-
-      <div style="margin-top:15px;">
-
-        ${kelas.siswa.map((siswa, index) => `
-
-          <div
-            style="
-              padding:12px;
-              border-bottom:1px solid #ddd;
-            "
-          >
-
-            <strong>
-              ${index + 1}.
-              ${escapeHtml(siswa.nama)}
-            </strong>
-
-            <br>
-
-            <small>
-              NISN:
-              ${escapeHtml(siswa.nisn)}
-            </small>
-
+      if (!kelas.siswa || kelas.siswa.length === 0) {
+        html += `
+          <p style="font-style: italic; color: var(--text-muted);">
+            Belum ada siswa aktif di kelas ini.
+          </p>
+        `;
+      } else {
+        html += `
+          <div style="margin-top: 12px;">
+            ${kelas.siswa.map((siswa, index) => `
+              <div class="student-item">
+                <strong style="color: var(--text-main);">
+                  ${index + 1}.${escapeHtml(siswa.nama)}
+                </strong>
+                <br>
+                <small style="color: var(--text-muted);">
+                  NISN: ${escapeHtml(siswa.nisn)}
+                </small>
+              </div>
+            `).join("")}
           </div>
+        `;
+      }
 
-        `).join("")}
+      html += `</div>`;
 
-      </div>
+      container.innerHTML = html;
 
-    `;
-
-  }
-
-  html += `
-
-    </div>
-
-  `;
-
-  container.innerHTML = html;
-
-  // Scroll ke daftar siswa
-  container.scrollIntoView({
-    behavior: "smooth"
-  });
-
-}
-
+      // Scroll ke daftar siswa
+      container.scrollIntoView({
+        behavior: "smooth"
+      });
+    }
   </script>
 
 </body>
