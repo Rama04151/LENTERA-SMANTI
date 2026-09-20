@@ -627,65 +627,179 @@ if (action === "import_students") {
       });
     }
 
-        // =========================
-    // PATCH — STATUS / PASSWORD
     // =========================
+// DELETE — HAPUS SISWA + POIN
+// =========================
 
-    if (event.httpMethod === "DELETE") {
+if (event.httpMethod === "DELETE") {
+
   try {
-    const body = JSON.parse(event.body || "{}");
-    const id = String(body.id || "").trim();
+
+    const body =
+      JSON.parse(event.body || "{}");
+
+    const id =
+      String(body.id || "").trim();
 
     if (!id) {
+
       return response(400, {
         success: false,
-        message: "ID siswa wajib diisi"
+        message: "ID siswa wajib diisi."
       });
+
     }
 
-    const result = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "Siswa!A:F"
-    });
+    // =========================
+    // 1. BACA DATA SISWA
+    // =========================
 
-    const rows = result.data.values || [];
+    const siswaResult =
+      await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "Siswa!A:F"
+      });
 
-    let rowNumber = -1;
+    const siswaRows =
+      siswaResult.data.values || [];
 
-    for (let i = 1; i < rows.length; i++) {
-      if (String(rows[i][0] || "").trim() === id) {
-        rowNumber = i + 1;
+    let siswaRowNumber = -1;
+
+    for (
+      let i = 1;
+      i < siswaRows.length;
+      i++
+    ) {
+
+      const siswaId =
+        String(
+          siswaRows[i][0] || ""
+        ).trim();
+
+      if (siswaId === id) {
+
+        siswaRowNumber = i + 1;
+
         break;
       }
     }
 
-    if (rowNumber === -1) {
+    if (siswaRowNumber === -1) {
+
       return response(404, {
         success: false,
-        message: "Siswa tidak ditemukan"
+        message: "Siswa tidak ditemukan."
       });
+
     }
 
+    // =========================
+    // 2. BACA DATA POIN
+    // =========================
+
+    const poinResult =
+      await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "Poin!A:G"
+      });
+
+    const poinRows =
+      poinResult.data.values || [];
+
+    const poinRowsToDelete = [];
+
+    for (
+      let i = 1;
+      i < poinRows.length;
+      i++
+    ) {
+
+      const siswaIdPoin =
+        String(
+          poinRows[i][1] || ""
+        ).trim();
+
+      if (siswaIdPoin === id) {
+
+        poinRowsToDelete.push(i + 1);
+
+      }
+    }
+
+    // =========================
+    // 3. HAPUS DATA POIN
+    // =========================
+
+    for (
+      let i = poinRowsToDelete.length - 1;
+      i >= 0;
+      i--
+    ) {
+
+      const rowNumber =
+        poinRowsToDelete[i];
+
+      await sheets.spreadsheets.values.clear({
+
+        spreadsheetId,
+
+        range:
+          `Poin!A${rowNumber}:G${rowNumber}`
+
+      });
+
+    }
+
+    // =========================
+    // 4. HAPUS DATA SISWA
+    // =========================
+
     await sheets.spreadsheets.values.clear({
+
       spreadsheetId,
-      range: `Siswa!A${rowNumber}:F${rowNumber}`
+
+      range:
+        `Siswa!A${siswaRowNumber}:F${siswaRowNumber}`
+
     });
 
     return response(200, {
+
       success: true,
-      message: "Siswa berhasil dihapus"
+
+      message:
+        "Siswa dan seluruh poin siswa berhasil dihapus.",
+
+      poinTerhapus:
+        poinRowsToDelete.length
+
     });
 
   } catch (error) {
-    console.error("DELETE STUDENT ERROR:", error);
+
+    console.error(
+      "DELETE STUDENT ERROR:",
+      error
+    );
 
     return response(500, {
+
       success: false,
-      message: "Gagal menghapus siswa"
+
+      message:
+        "Gagal menghapus siswa dan poin."
+
     });
+
   }
+
 }
 
+        // =========================
+    // PATCH — STATUS / PASSWORD
+    // =========================
+
+  
     if (event.httpMethod === "PATCH") {
 
       const body =
