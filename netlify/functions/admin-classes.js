@@ -1,241 +1,369 @@
 const { google } = require("googleapis");
 
-async function getSheets() {
-  const privateKey =
-    process.env.GOOGLE_PRIVATE_KEY
-      .replace(/\\n/g, "\n")
-      .replace(/^"|"$/g, "");
+exports.handler = async function (event) {
 
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email:
-        process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      private_key: privateKey
-    },
-    scopes: [
-      "https://www.googleapis.com/auth/spreadsheets"
-    ]
-  });
-
-  return google.sheets({
-    version: "v4",
-    auth
-  });
-}
-
-exports.handler = async (event) => {
+  // =========================
+  // HANYA GET
+  // =========================
+  if (event.httpMethod !== "GET") {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({
+        success: false,
+        message: "Method tidak diizinkan."
+      })
+    };
+  }
 
   try {
 
-    const sheets = await getSheets();
+    // =========================
+    // GOOGLE AUTH
+    // =========================
+    const privateKey = process.env.GOOGLE_PRIVATE_KEY
+      .replace(/\\n/g, "\n")
+      .replace(/^"|"$/g, "");
+
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email:
+          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+
+        private_key:
+          privateKey
+      },
+
+      scopes: [
+        "https://www.googleapis.com/auth/spreadsheets"
+      ]
+    });
+
+    const sheets = google.sheets({
+      version: "v4",
+      auth
+    });
 
     const spreadsheetId =
       process.env.GOOGLE_SHEET_ID;
 
+
     // =========================
-    // GET — DATA KELAS
+    // AMBIL DATA KELAS
+    // =========================
+    const kelasResponse =
+      await sheets.spreadsheets.values.get({
+
+        spreadsheetId,
+
+        range: "Kelas!A:E"
+
+      });
+
+    const kelasRows =
+      kelasResponse.data.values || [];
+
+
+    // =========================
+    // AMBIL DATA SISWA
+    // =========================
+    const siswaResponse =
+      await sheets.spreadsheets.values.get({
+
+        spreadsheetId,
+
+        range: "Siswa!A:F"
+
+      });
+
+    const siswaRows =
+      siswaResponse.data.values || [];
+
+
+    // =========================
+    // AMBIL DATA POIN
+    // =========================
+    const poinResponse =
+      await sheets.spreadsheets.values.get({
+
+        spreadsheetId,
+
+        range: "Poin!A:G"
+
+      });
+
+    const poinRows =
+      poinResponse.data.values || [];
+
+
+    // =========================
+    // MAP TOTAL POIN SISWA
     // =========================
 
-    if (event.httpMethod === "GET") {
+    const poinMap = {};
 
-      // Ambil data kelas dan siswa bersamaan
-      const [kelasResult, siswaResult] =
-        await Promise.all([
 
-          sheets.spreadsheets.values.get({
-            spreadsheetId,
-            range: "Kelas!A:E"
-          }),
+    for (let i = 1; i < poinRows.length; i++) {
 
-          sheets.spreadsheets.values.get({
-            spreadsheetId,
-            range: "Siswa!A:F"
-          })
+      const row = poinRows[i];
 
-        ]);
+      const siswaId =
+        String(row[1] || "").trim();
 
-      const kelasRows =
-        kelasResult.data.values || [];
+      const jenis =
+        String(row[2] || "")
+          .trim()
+          .toLowerCase();
 
-      const siswaRows =
-        siswaResult.data.values || [];
+      const nilai =
+        Number(row[3] || 0);
 
-      const kelas = [];
 
-      // =========================
-      // BACA DATA KELAS
-      // =========================
+      if (!siswaId) {
+        continue;
+      }
 
-      for (
-        let i = 1;
-        i < kelasRows.length;
-        i++
-      ) {
 
-        const row =
-          kelasRows[i];
+      if (!poinMap[siswaId]) {
 
-        const id =
-          String(row[0] || "").trim();
+        poinMap[siswaId] = {
 
-        const nama =
-          String(row[1] || "").trim();
+          penghargaan: 0,
 
-        const tingkat =
-          String(row[2] || "").trim();
+          pelanggaran: 0
 
-        const tahunAjaranId =
-          String(row[3] || "").trim();
-
-        const status =
-          String(row[4] || "").trim();
-
-        if (!id) {
-          continue;
-        }
-
-        // =========================
-        // HITUNG JUMLAH SISWA
-        // =========================
-
-        // =========================
-// DAFTAR SISWA DALAM KELAS
-// =========================
-
-let jumlahSiswa = 0;
-const siswaDalamKelas = [];
-
-for (
-  let j = 1;
-  j < siswaRows.length;
-  j++
-) {
-
-  const siswaId =
-    String(siswaRows[j][0] || "").trim();
-
-  const siswaNisn =
-    String(siswaRows[j][1] || "").trim();
-
-  const siswaNama =
-    String(siswaRows[j][2] || "").trim();
-
-  const siswaKelasId =
-    String(siswaRows[j][3] || "").trim();
-
-  const siswaStatus =
-    String(siswaRows[j][5] || "")
-      .trim()
-      .toLowerCase();
-
-  if (
-    siswaKelasId === id &&
-    siswaStatus === "aktif"
-  ) {
-
-    jumlahSiswa++;
-
-    siswaDalamKelas.push({
-      id: siswaId,
-      nisn: siswaNisn,
-      nama: siswaNama,
-      status: "Aktif"
-    });
-
-  }
-
-}
-
-        kelas.push({
-
-  id,
-
-  nama,
-
-  tingkat,
-
-  tahunAjaranId,
-
-  status,
-
-  jumlahSiswa,
-
-  siswa: siswaDalamKelas
-
-});
+        };
 
       }
 
-      return response(200, {
 
-        success: true,
+      if (jenis === "penghargaan") {
 
-        kelas
+        poinMap[siswaId].penghargaan += nilai;
+
+      }
+
+      else if (jenis === "pelanggaran") {
+
+        poinMap[siswaId].pelanggaran += nilai;
+
+      }
+
+    }
+
+
+    // =========================
+    // MAP NAMA KELAS
+    // =========================
+
+    const kelasMap = {};
+
+
+    for (let i = 1; i < kelasRows.length; i++) {
+
+      const row = kelasRows[i];
+
+      const id =
+        String(row[0] || "").trim();
+
+      const nama =
+        String(row[1] || "").trim();
+
+      const tingkat =
+        String(row[2] || "").trim();
+
+      const status =
+        String(row[4] || "").trim();
+
+
+      if (!id) {
+        continue;
+      }
+
+
+      kelasMap[id] = {
+
+        id,
+
+        nama,
+
+        tingkat,
+
+        status
+
+      };
+
+    }
+
+
+    // =========================
+    // BUAT DATA SISWA
+    // =========================
+
+    const siswaPerKelas = {};
+
+
+    for (let i = 1; i < siswaRows.length; i++) {
+
+      const row = siswaRows[i];
+
+      const id =
+        String(row[0] || "").trim();
+
+      const nisn =
+        String(row[1] || "").trim();
+
+      const nama =
+        String(row[2] || "").trim();
+
+      const kelasId =
+        String(row[3] || "").trim();
+
+      const status =
+        String(row[5] || "").trim();
+
+
+      // Hanya siswa aktif
+      if (status !== "Aktif") {
+        continue;
+      }
+
+
+      if (!kelasId) {
+        continue;
+      }
+
+
+      if (!siswaPerKelas[kelasId]) {
+
+        siswaPerKelas[kelasId] = [];
+
+      }
+
+
+      const poin =
+        poinMap[id] || {
+
+          penghargaan: 0,
+
+          pelanggaran: 0
+
+        };
+
+
+      const total =
+        poin.penghargaan -
+        poin.pelanggaran;
+
+
+      siswaPerKelas[kelasId].push({
+
+        id,
+
+        nisn,
+
+        nama,
+
+        penghargaan:
+          poin.penghargaan,
+
+        pelanggaran:
+          poin.pelanggaran,
+
+        total
 
       });
 
     }
 
+
     // =========================
-    // METHOD TIDAK DIIZINKAN
+    // BUAT HASIL KELAS
     // =========================
 
-    return response(405, {
+    const kelas = [];
 
-      success: false,
 
-      message:
-        "Method tidak diizinkan."
+    Object.values(kelasMap).forEach(k => {
+
+      const siswa =
+        siswaPerKelas[k.id] || [];
+
+
+      kelas.push({
+
+        id: k.id,
+
+        nama: k.nama,
+
+        tingkat: k.tingkat,
+
+        status: k.status,
+
+        jumlahSiswa:
+          siswa.length,
+
+        siswa
+
+      });
 
     });
 
-  } catch (error) {
+
+    // =========================
+    // RESPONSE
+    // =========================
+
+    return {
+
+      statusCode: 200,
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify({
+
+        success: true,
+
+        kelas
+
+      })
+
+    };
+
+  }
+
+  catch (error) {
 
     console.error(
       "ADMIN CLASSES ERROR:",
       error
     );
 
-    return response(500, {
+    return {
 
-      success: false,
+      statusCode: 500,
 
-      message:
-        "Data kelas gagal dimuat."
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
 
-    });
+      body: JSON.stringify({
+
+        success: false,
+
+        message:
+          "Gagal mengambil data kelas.",
+
+        error:
+          error.message
+
+      })
+
+    };
 
   }
 
 };
-
-
-// =========================
-// RESPONSE HELPER
-// =========================
-
-function response(
-  statusCode,
-  body
-) {
-
-  return {
-
-    statusCode,
-
-    headers: {
-
-      "Content-Type":
-        "application/json",
-
-      "Cache-Control":
-        "no-store"
-
-    },
-
-    body:
-      JSON.stringify(body)
-
-  };
-
-}
