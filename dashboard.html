@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - LENTERA SMANTI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0b132b;
+      --card-bg: #1c2541;
+      --accent-gold: #fbc02d;
+      --accent-gold-hover: #f57f17;
+      --gold-glow: rgba(251, 192, 45, 0.2);
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --danger-color: #ef4444;
+      --success-color: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(251, 192, 45, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(28, 37, 65, 0.5) 0%, transparent 40%);
+    }
+
+    .dashboard-container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .dashboard-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Header */
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .logo-small {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      color: #0b132b;
+      font-weight: 800;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px var(--gold-glow);
+    }
+
+    .dashboard-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+    }
+
+    .dashboard-header p {
+      font-size: 13px;
+      color: var(--accent-gold);
+      font-weight: 500;
+    }
+
+    /* Welcome Banner */
+    .welcome {
+      margin-top: 24px;
+      background: linear-gradient(135deg, rgba(251, 192, 45, 0.08), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(251, 192, 45, 0.2);
+      padding: 18px 20px;
+      border-radius: 16px;
+    }
+
+    .welcome p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .welcome h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-top: 2px;
+    }
+
+    /* Student Info Cards */
+    .student-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .info-item {
+      background: rgba(11, 19, 43, 0.6);
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+    }
+
+    .info-item span {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .info-item strong {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Points Summary Grid */
+    .points-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .point-card {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      border-radius: 16px;
+      background: rgba(11, 19, 43, 0.4);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .point-card span {
+      font-size: 24px;
+      margin-right: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .point-card p {
+      flex-grow: 1;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .point-card strong {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .point-card.penghargaan strong {
+      color: var(--accent-gold);
+    }
+
+    .point-card.pelanggaran strong {
+      color: var(--danger-color);
+    }
+
+    /* History Section */
+    .history-section {
+      background: rgba(11, 19, 43, 0.5);
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    .section-title h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    .section-title p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      margin-bottom: 16px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    /* Scrollbar Styling */
+    .history-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .history-list::-webkit-scrollbar-thumb {
+      background: rgba(251, 192, 45, 0.3);
+      border-radius: 10px;
+    }
+
+    .history-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 14px;
+      border-radius: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .history-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(251, 192, 45, 0.3);
+    }
+
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .history-type {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .history-poin {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .history-description {
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .history-date {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .history-empty {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    /* Logout Button */
+    .logout-button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      color: #0b132b;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px var(--gold-glow);
+    }
+
+    .logout-button:hover {
+      background: linear-gradient(135deg, #ffd54f, var(--accent-gold));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(251, 192, 45, 0.4);
+    }
+
+    .logout-button:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="dashboard-container">
+
+    <section class="dashboard-card">
+
+      <div class="dashboard-header">
+        <div class="logo-small">L</div>
+
+        <div>
+          <h1>LENTERA SMANTI</h1>
+          <p>Dashboard Siswa</p>
+        </div>
+      </div>
+
+      <div class="welcome">
+        <p>Selamat datang,</p>
+        <h2 id="namaSiswa">Memuat...</h2>
+      </div>
+
+      <div class="student-info">
+
+        <div class="info-item">
+          <span>NISN</span>
+          <strong id="nisnSiswa">-</strong>
+        </div>
+
+        <div class="info-item">
+          <span>Kelas</span>
+          <strong id="kelasSiswa">-</strong>
+        </div>
+
+      </div>
+
+      <div class="points-container">
+
+        <div class="point-card penghargaan">
+          <span>🏆</span>
+          <p>Poin Penghargaan</p>
+          <strong id="poinPenghargaan">0</strong>
+        </div>
+
+        <div class="point-card pelanggaran">
+          <span>⚠️</span>
+          <p>Poin Pelanggaran</p>
+          <strong id="poinPelanggaran">0</strong>
+        </div>
+
+        <section class="history-section">
+          <div class="section-title">
+            <h3>Riwayat Poin</h3>
+            <p>Catatan penghargaan dan pelanggaran</p>
+          </div>
+
+          <div id="riwayatPoin" class="history-list">
+            <div class="history-empty">
+              Memuat riwayat...
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <button id="logoutButton" class="logout-button">
+        Keluar
+      </button>
+
+    </section>
+
+  </main>
+
+  <script>
+    const session = sessionStorage.getItem("lentera_session");
+
+    if (!session) {
+      window.location.href = "index.html";
+    }
+
+    try {
+      const siswa = JSON.parse(session);
+
+      document.getElementById("namaSiswa").textContent =
+        siswa.nama || "-";
+
+      document.getElementById("nisnSiswa").textContent =
+        siswa.nisn || "-";
+
+      document.getElementById("kelasSiswa").textContent =
+        siswa.kelas || "-";
+
+      async function loadPoints() {
+        const session = sessionStorage.getItem("lentera_session");
+
+        if (!session) {
+          window.location.href = "index.html";
+          return;
+        }
+
+        const riwayatContainer =
+          document.getElementById("riwayatPoin");
+
+        try {
+          const siswa = JSON.parse(session);
+
+          // Timeout 10 detik
+          const controller = new AbortController();
+
+          const timeout = setTimeout(() => {
+            controller.abort();
+          }, 10000);
+
+          const response = await fetch(
+            "/.netlify/functions/student-dashboard",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                siswaId: siswa.id
+              }),
+              signal: controller.signal
+            }
+          );
+
+          clearTimeout(timeout);
+
+          const result = await response.json();
+
+          if (!response.ok || !result.success) {
+            throw new Error(
+              result.message || "Gagal mengambil data."
+            );
+          }
+
+          // Total poin
+          document.getElementById("poinPenghargaan").textContent =
+            result.poin.penghargaan;
+
+          document.getElementById("poinPelanggaran").textContent =
+            result.poin.pelanggaran;
+
+          // Bersihkan loading
+          riwayatContainer.innerHTML = "";
+
+          if (!result.riwayat || result.riwayat.length === 0) {
+            riwayatContainer.innerHTML = `
+              <div class="history-empty">
+                Belum ada riwayat poin.
+              </div>
+            `;
+            return;
+          }
+
+          // Terbaru di atas
+          const riwayat = [...result.riwayat].reverse();
+
+          riwayat.forEach((item) => {
+            const div = document.createElement("div");
+
+            div.className = "history-item";
+
+            const jenis = String(item.jenis).toLowerCase();
+
+            const isPenghargaan =
+              jenis === "penghargaan";
+
+            const tanda =
+              isPenghargaan ? "+" : "-";
+
+            div.innerHTML = `
+              <div class="history-top">
+                <span class="history-type" style="color: ${isPenghargaan ? 'var(--accent-gold)' : 'var(--danger-color)'}">
+                  ${isPenghargaan
+                    ? "🏆 Penghargaan"
+                    : "⚠️ Pelanggaran"}
+                </span>
+
+                <span class="history-poin" style="color: ${isPenghargaan ? 'var(--accent-gold)' : 'var(--danger-color)'}">
+                  ${tanda}${item.poin}
+                </span>
+              </div>
+
+              <div class="history-description">
+                ${item.keterangan || "Tidak ada keterangan"}
+              </div>
+
+              <div class="history-date">
+                ${item.tanggal || "-"}
+              </div>
+            `;
+
+            riwayatContainer.appendChild(div);
+          });
+
+        } catch (error) {
+          console.error("Gagal mengambil data:", error);
+
+          if (error.name === "AbortError") {
+            riwayatContainer.innerHTML = `
+              <div class="history-empty">
+                Waktu memuat habis. Silakan refresh halaman.
+              </div>
+            `;
+          } else {
+            riwayatContainer.innerHTML = `
+              <div class="history-empty">
+                Gagal memuat riwayat poin.
+              </div>
+            `;
+          }
+        }
+      }
+
+      loadPoints();
+
+    } catch (error) {
+      sessionStorage.removeItem("lentera_session");
+      window.location.href = "index.html";
+    }
+
+    document
+      .getElementById("logoutButton")
+      .addEventListener("click", () => {
+
+        sessionStorage.removeItem("lentera_session");
+
+        window.location.href = "index.html";
+      });
+  </script>
+
+</body>
+</html>
