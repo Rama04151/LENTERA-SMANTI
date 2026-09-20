@@ -3,10 +3,194 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Kenaikan Kelas - LENTERA SMANTI</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0b132b;
+      --card-bg: #1c2541;
+      --accent-gold: #fbc02d;
+      --accent-gold-hover: #f57f17;
+      --gold-glow: rgba(251, 192, 45, 0.25);
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(11, 19, 43, 0.7);
+      --danger-color: #ef4444;
+      --success-color: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(251, 192, 45, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(28, 37, 65, 0.6) 0%, transparent 50%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 540px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Cards */
+    .card {
+      background: rgba(11, 19, 43, 0.5);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      margin-top: 18px;
+    }
+
+    .card h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-bottom: 12px;
+    }
+
+    /* Flow Promotion Grid */
+    .promotion-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .promotion-item {
+      background: rgba(28, 37, 65, 0.7);
+      border: 1px solid var(--border-color);
+      padding: 10px 14px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .promotion-item span {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .promotion-item strong {
+      color: var(--accent-gold);
+    }
+
+    /* Buttons */
+    .primary-button, .logout-button {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      color: #0b132b;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px var(--gold-glow);
+      margin-top: 14px;
+    }
+
+    .primary-button:hover {
+      background: linear-gradient(135deg, #ffd54f, var(--accent-gold));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(251, 192, 45, 0.4);
+    }
+
+    .primary-button:disabled {
+      background: #475569;
+      color: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .logout-button {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      box-shadow: none;
+      border: 1px solid var(--border-color);
+    }
+
+    .logout-button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* Result Info Boxes */
+    .success-message {
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      color: var(--text-main);
+    }
+
+    .success-message h3 {
+      color: var(--success-color);
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .success-message p {
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .success-message strong {
+      color: var(--accent-gold);
+    }
+
+    .error-message {
+      margin-top: 16px;
+      padding: 14px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      color: #f87171;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
@@ -14,18 +198,14 @@
   <div class="container">
 
     <h1>Kenaikan Kelas</h1>
-
     <p>
-      Sistem akan memindahkan seluruh siswa aktif
-      secara otomatis sesuai tingkat kelas.
+      Sistem akan memindahkan seluruh siswa aktif secara otomatis sesuai tingkat kelas.
     </p>
 
     <div class="card">
-
       <h2>Alur Kenaikan</h2>
 
       <div class="promotion-list">
-
         <div class="promotion-item">
           <span>X A</span>
           <strong>→</strong>
@@ -53,30 +233,26 @@
         <div class="promotion-item">
           <span>XII A</span>
           <strong>→</strong>
-          <span>LULUS</span>
+          <span style="color: var(--accent-gold);">LULUS</span>
         </div>
 
         <div class="promotion-item">
           <span>XII B</span>
           <strong>→</strong>
-          <span>LULUS</span>
+          <span style="color: var(--accent-gold);">LULUS</span>
         </div>
-
       </div>
-
     </div>
 
     <div class="card">
-
       <h2>Perhatian</h2>
 
-      <p>
+      <p style="margin-bottom: 6px;">
         Proses ini akan memindahkan semua siswa aktif.
       </p>
 
       <p>
-        Siswa kelas XII akan otomatis berstatus
-        <strong>Lulus</strong>.
+        Siswa kelas XII akan otomatis berstatus <strong style="color: var(--accent-gold);">Lulus</strong>.
       </p>
 
       <button
@@ -95,13 +271,11 @@
       </button>
 
       <div id="result"></div>
-
     </div>
 
   </div>
 
   <script>
-
     const adminSession =
       sessionStorage.getItem("lentera_admin_session");
 
@@ -205,7 +379,6 @@
           "🔄 Proses Kenaikan Kelas";
       }
     }
-
   </script>
 
 </body>
