@@ -552,4 +552,50 @@ footer {
   overflow-wrap: anywhere;
   word-break: break-word;
 }
+
+  /* =========================
+   KENAIKAN KELAS
+========================= */
+
+.promotion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.promotion-item {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr;
+  align-items: center;
+  text-align: center;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f5f7fa;
+  font-weight: 600;
+}
+
+.promotion-item strong {
+  font-size: 20px;
+}
+
+.success-message {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  background: #e8f7ee;
+}
+
+.error-message {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  background: #fdeaea;
+  color: #b00020;
+}
+
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
   
