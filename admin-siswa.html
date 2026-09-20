@@ -681,6 +681,14 @@
                 </button>
 
                 <button
+  type="button"
+  class="logout-button secondary"
+  onclick="viewStudentPassword('${escapeHtml(siswa.id)}')"
+>
+  👁️ Lihat Password
+</button>
+
+                <button
                   type="button"
                   class="logout-button secondary"
                   onclick="toggleStudentStatus('${escapeHtml(siswa.id)}')"
@@ -1309,6 +1317,44 @@
         );
       }
     }
+
+    // =========================
+// LIHAT PASSWORD SISWA
+// =========================
+
+function viewStudentPassword(id) {
+
+  const siswa =
+    students.find(
+      s => String(s.id) === String(id)
+    );
+
+  if (!siswa) {
+    alert("Data siswa tidak ditemukan.");
+    return;
+  }
+
+  const password =
+    siswa.password || "";
+
+  if (!password) {
+    alert(
+      `Password siswa tidak tersedia.\n\n` +
+      `Nama: ${siswa.nama}\n` +
+      `NISN: ${siswa.nisn}`
+    );
+
+    return;
+  }
+
+  alert(
+    `🔐 PASSWORD SISWA\n\n` +
+    `Nama     : ${siswa.nama}\n` +
+    `NISN     : ${siswa.nisn}\n` +
+    `Kelas    : ${siswa.kelas}\n` +
+    `Password : ${password}`
+  );
+}
 
   </script>
 
