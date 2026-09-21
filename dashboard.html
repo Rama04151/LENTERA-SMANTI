@@ -742,6 +742,175 @@
 
   font-size: 13px;
 }
+
+    /* =========================================================
+   TOAST NOTIFIKASI INBOX
+========================================================= */
+
+#inboxToast {
+
+  position: fixed;
+
+  top: 20px;
+  right: 20px;
+
+  width: 320px;
+  max-width: calc(100vw - 40px);
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 14px 16px;
+
+  background:
+    rgba(18, 24, 38, 0.97);
+
+  border:
+    1px solid
+    rgba(251, 192, 45, 0.35);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 12px 35px
+    rgba(0, 0, 0, 0.35);
+
+  backdrop-filter:
+    blur(12px);
+
+  z-index: 99999;
+
+  opacity: 0;
+
+  transform:
+    translateY(-20px);
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+
+#inboxToast.show {
+
+  opacity: 1;
+
+  transform:
+    translateY(0);
+
+  pointer-events: auto;
+}
+
+
+.inbox-toast-icon {
+
+  width: 40px;
+  height: 40px;
+
+  min-width: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    rgba(251, 192, 45, 0.12);
+
+  font-size: 20px;
+}
+
+
+.inbox-toast-content {
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+
+.inbox-toast-content strong {
+
+  display: block;
+
+  color:
+    var(--accent-gold);
+
+  font-size: 13px;
+
+  margin-bottom: 3px;
+}
+
+
+.inbox-toast-content span {
+
+  display: block;
+
+  color:
+    var(--text-muted);
+
+  font-size: 11px;
+
+  line-height: 1.4;
+}
+
+
+.inbox-toast-close {
+
+  width: 28px;
+  height: 28px;
+
+  border: none;
+
+  background:
+    transparent;
+
+  color:
+    var(--text-muted);
+
+  font-size: 22px;
+
+  cursor: pointer;
+
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.inbox-toast-close:hover {
+
+  background:
+    rgba(255,255,255,0.06);
+
+  color:
+    white;
+}
+
+
+/* Tampilan HP */
+
+@media (max-width: 600px) {
+
+  #inboxToast {
+
+    top: 12px;
+    right: 12px;
+    left: 12px;
+
+    width: auto;
+    max-width: none;
+
+  }
+
+}
   </style>
 </head>
 
@@ -1887,6 +2056,239 @@ async function loadInboxBadge() {
 
 // Jalankan saat dashboard dibuka
 loadInboxBadge();
+
+    /* =========================================================
+   NOTIFIKASI INBOX BARU
+========================================================= */
+
+let knownInboxIds = new Set();
+let inboxInitialized = false;
+
+
+/* Membuat elemen toast notifikasi */
+function createInboxToast() {
+
+  if (document.getElementById("inboxToast")) {
+    return;
+  }
+
+  const toast = document.createElement("div");
+
+  toast.id = "inboxToast";
+
+  toast.innerHTML = `
+    <div class="inbox-toast-icon">
+      📩
+    </div>
+
+    <div class="inbox-toast-content">
+      <strong>Pesan baru</strong>
+      <span>Ada pesan baru dari Admin.</span>
+    </div>
+
+    <button
+      type="button"
+      class="inbox-toast-close"
+      onclick="closeInboxToast()"
+    >
+      ×
+    </button>
+  `;
+
+  document.body.appendChild(toast);
+}
+
+
+/* Menampilkan toast */
+function showInboxToast() {
+
+  createInboxToast();
+
+  const toast =
+    document.getElementById("inboxToast");
+
+  if (!toast) {
+    return;
+  }
+
+  toast.classList.add("show");
+
+  clearTimeout(
+    window.inboxToastTimer
+  );
+
+  window.inboxToastTimer =
+    setTimeout(() => {
+
+      closeInboxToast();
+
+    }, 5000);
+}
+
+
+/* Menutup toast */
+function closeInboxToast() {
+
+  const toast =
+    document.getElementById("inboxToast");
+
+  if (!toast) {
+    return;
+  }
+
+  toast.classList.remove("show");
+}
+
+
+/* Mengecek Inbox */
+async function checkNewInboxMessages() {
+
+  try {
+
+    const session =
+      sessionStorage.getItem(
+        "lentera_session"
+      );
+
+    if (!session) {
+      return;
+    }
+
+    const siswa =
+      JSON.parse(session);
+
+    if (!siswa || !siswa.id) {
+      return;
+    }
+
+    const response =
+      await fetch(
+        "/.netlify/functions/student-inbox",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            siswaId: siswa.id
+          })
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+      return;
+    }
+
+    const inbox =
+      Array.isArray(result.inbox)
+        ? result.inbox
+        : [];
+
+
+    /*
+      Saat pertama kali dashboard dibuka,
+      hanya simpan ID pesan yang sudah ada.
+      Jadi pesan lama tidak dianggap sebagai pesan baru.
+    */
+    if (!inboxInitialized) {
+
+      knownInboxIds =
+        new Set(
+          inbox.map(
+            item => item.id
+          )
+        );
+
+      inboxInitialized = true;
+
+      updateInboxBadge(
+        inbox.length
+      );
+
+      return;
+    }
+
+
+    let newMessageFound =
+      false;
+
+
+    for (
+      const item of inbox
+    ) {
+
+      if (
+        !knownInboxIds.has(
+          item.id
+        )
+      ) {
+
+        newMessageFound = true;
+
+        knownInboxIds.add(
+          item.id
+        );
+
+      }
+
+    }
+
+
+    updateInboxBadge(
+      inbox.length
+    );
+
+
+    if (newMessageFound) {
+
+      showInboxToast();
+
+    }
+
+  }
+  catch (error) {
+
+    console.error(
+      "CHECK NEW INBOX ERROR:",
+      error
+    );
+
+  }
+
+}
+
+
+/* Mulai pemeriksaan Inbox */
+function startInboxNotification() {
+
+  checkNewInboxMessages();
+
+  setInterval(
+    checkNewInboxMessages,
+    30000
+  );
+
+}
+
+
+/* Jalankan setelah halaman selesai */
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    startInboxNotification();
+
+  }
+);
   </script>
 
 </body>
