@@ -302,6 +302,192 @@
     .logout-button:active {
       transform: translateY(0);
     }
+
+    /* =========================
+   UBAH PASSWORD
+========================= */
+
+.change-password-button {
+  width: 100%;
+  padding: 13px 16px;
+  margin-top: 12px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 13px;
+
+  background: #1c2541;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.change-password-button:hover {
+  transform: translateY(-1px);
+  background: #26345b;
+}
+
+.password-change-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.6);
+
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  z-index: 9999;
+}
+
+.password-change-modal {
+  width: 100%;
+  max-width: 390px;
+
+  background: #ffffff;
+
+  border-radius: 22px;
+
+  padding: 25px;
+
+  box-shadow:
+    0 25px 70px rgba(0,0,0,0.3);
+
+  color: #172033;
+}
+
+.password-change-modal h2 {
+  margin: 0 0 6px;
+
+  font-size: 21px;
+}
+
+.password-change-subtitle {
+  margin-bottom: 20px;
+
+  font-size: 13px;
+
+  color: #7b8497;
+}
+
+.password-change-group {
+  margin-bottom: 14px;
+}
+
+.password-change-group label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  color: #4b5563;
+}
+
+.password-change-group input {
+  width: 100%;
+
+  padding: 12px 13px;
+
+  border:
+    1px solid #dfe4ec;
+
+  border-radius: 11px;
+
+  outline: none;
+
+  font-size: 14px;
+
+  box-sizing: border-box;
+
+  background: #f8fafc;
+}
+
+.password-change-group input:focus {
+  border-color: #2563eb;
+
+  background: #ffffff;
+}
+
+.password-change-actions {
+  display: flex;
+
+  gap: 9px;
+
+  margin-top: 20px;
+}
+
+.password-change-actions button {
+  flex: 1;
+
+  padding: 12px;
+
+  border: none;
+
+  border-radius: 11px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.password-change-cancel {
+  background: #eef1f5;
+
+  color: #374151;
+}
+
+.password-change-submit {
+  background: #2563eb;
+
+  color: white;
+}
+
+.password-change-submit:hover {
+  background: #1d4ed8;
+}
+
+.password-change-message {
+  display: none;
+
+  margin-top: 12px;
+
+  padding: 10px;
+
+  border-radius: 9px;
+
+  font-size: 12px;
+
+  text-align: center;
+}
+
+.password-change-message.error {
+  display: block;
+
+  background: #fef2f2;
+
+  color: #dc2626;
+}
+
+.password-change-message.success {
+  display: block;
+
+  background: #ecfdf5;
+
+  color: #059669;
+}
   </style>
 </head>
 
@@ -542,6 +728,388 @@
 
         window.location.href = "index.html";
       });
+
+    // =========================
+// UBAH PASSWORD SISWA
+// =========================
+
+function openChangePassword() {
+
+  const oldModal =
+    document.getElementById("changePasswordModal");
+
+  if (oldModal) {
+    oldModal.remove();
+  }
+
+  const modal =
+    document.createElement("div");
+
+  modal.id =
+    "changePasswordModal";
+
+  modal.className =
+    "password-change-overlay";
+
+  modal.innerHTML = `
+
+    <div
+      class="password-change-modal"
+      onclick="event.stopPropagation()"
+    >
+
+      <h2>🔐 Ubah Password</h2>
+
+      <p class="password-change-subtitle">
+        Masukkan password sekarang untuk membuat password baru.
+      </p>
+
+      <div class="password-change-group">
+
+        <label>
+          Password Sekarang
+        </label>
+
+        <input
+          type="password"
+          id="currentPassword"
+          placeholder="Masukkan password sekarang"
+          autocomplete="current-password"
+        >
+
+      </div>
+
+      <div class="password-change-group">
+
+        <label>
+          Password Baru
+        </label>
+
+        <input
+          type="password"
+          id="newPassword"
+          placeholder="Minimal 6 karakter"
+          autocomplete="new-password"
+        >
+
+      </div>
+
+      <div class="password-change-group">
+
+        <label>
+          Konfirmasi Password Baru
+        </label>
+
+        <input
+          type="password"
+          id="confirmPassword"
+          placeholder="Ulangi password baru"
+          autocomplete="new-password"
+        >
+
+      </div>
+
+      <div
+        id="passwordChangeMessage"
+        class="password-change-message"
+      ></div>
+
+      <div class="password-change-actions">
+
+        <button
+          type="button"
+          class="password-change-cancel"
+          onclick="closeChangePassword()"
+        >
+          Batal
+        </button>
+
+        <button
+          type="button"
+          class="password-change-submit"
+          onclick="changeStudentPassword()"
+        >
+          Simpan
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+  modal.onclick = function(event) {
+
+    if (
+      event.target === modal
+    ) {
+      closeChangePassword();
+    }
+
+  };
+
+  document.body.appendChild(modal);
+
+  setTimeout(() => {
+
+    const input =
+      document.getElementById(
+        "currentPassword"
+      );
+
+    if (input) {
+      input.focus();
+    }
+
+  }, 50);
+}
+
+
+function closeChangePassword() {
+
+  const modal =
+    document.getElementById(
+      "changePasswordModal"
+    );
+
+  if (modal) {
+    modal.remove();
+  }
+}
+
+
+async function changeStudentPassword() {
+
+  const currentPassword =
+    document.getElementById(
+      "currentPassword"
+    ).value;
+
+  const newPassword =
+    document.getElementById(
+      "newPassword"
+    ).value;
+
+  const confirmPassword =
+    document.getElementById(
+      "confirmPassword"
+    ).value;
+
+  const message =
+    document.getElementById(
+      "passwordChangeMessage"
+    );
+
+  function showMessage(
+    text,
+    type
+  ) {
+
+    message.textContent = text;
+
+    message.className =
+      `password-change-message ${type}`;
+
+  }
+
+  // =========================
+  // VALIDASI
+  // =========================
+
+  if (
+    !currentPassword ||
+    !newPassword ||
+    !confirmPassword
+  ) {
+
+    showMessage(
+      "Semua kolom wajib diisi.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (newPassword.length < 6) {
+
+    showMessage(
+      "Password baru minimal 6 karakter.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (
+    newPassword !==
+    confirmPassword
+  ) {
+
+    showMessage(
+      "Konfirmasi password tidak cocok.",
+      "error"
+    );
+
+    return;
+  }
+
+  // =========================
+  // AMBIL SESSION SISWA
+  // =========================
+
+  const session =
+    sessionStorage.getItem(
+      "lentera_session"
+    );
+
+  if (!session) {
+
+    window.location.href =
+      "index.html";
+
+    return;
+  }
+
+  let siswa;
+
+  try {
+
+    siswa =
+      JSON.parse(session);
+
+  } catch (error) {
+
+    sessionStorage.removeItem(
+      "lentera_session"
+    );
+
+    window.location.href =
+      "index.html";
+
+    return;
+  }
+
+  if (!siswa.id) {
+
+    showMessage(
+      "Session siswa tidak valid.",
+      "error"
+    );
+
+    return;
+  }
+
+  // =========================
+  // TOMBOL SIMPAN
+  // =========================
+
+  const submitButton =
+    document.querySelector(
+      ".password-change-submit"
+    );
+
+  submitButton.disabled = true;
+
+  submitButton.textContent =
+    "Menyimpan...";
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/change-password",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            siswaId:
+              siswa.id,
+
+            currentPassword:
+              currentPassword,
+
+            newPassword:
+              newPassword
+
+          })
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      showMessage(
+        result.message ||
+        "Gagal mengubah password.",
+        "error"
+      );
+
+      submitButton.disabled =
+        false;
+
+      submitButton.textContent =
+        "Simpan";
+
+      return;
+    }
+
+    showMessage(
+      "Password berhasil diubah.",
+      "success"
+    );
+
+    submitButton.textContent =
+      "Berhasil";
+
+    // Kosongkan input password
+    document.getElementById(
+      "currentPassword"
+    ).value = "";
+
+    document.getElementById(
+      "newPassword"
+    ).value = "";
+
+    document.getElementById(
+      "confirmPassword"
+    ).value = "";
+
+    // Tutup setelah 1,2 detik
+    setTimeout(() => {
+
+      closeChangePassword();
+
+    }, 1200);
+
+  } catch (error) {
+
+    console.error(
+      "CHANGE PASSWORD ERROR:",
+      error
+    );
+
+    showMessage(
+      "Terjadi kesalahan koneksi.",
+      "error"
+    );
+
+    submitButton.disabled =
+      false;
+
+    submitButton.textContent =
+      "Simpan";
+  }
+}
   </script>
 
 </body>
