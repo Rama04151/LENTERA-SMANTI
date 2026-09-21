@@ -41,6 +41,225 @@ exports.handler = async function (event) {
     const spreadsheetId =
       process.env.GOOGLE_SHEET_ID;
 
+
+    // =========================
+    // GET
+    // DATA PESAN
+    // =========================
+
+    if (
+      event.httpMethod === "GET"
+    ) {
+
+      // Ambil Inbox
+      const inboxResponse =
+        await sheets.spreadsheets.values.get({
+
+          spreadsheetId,
+
+          range: "Inbox!A:H"
+
+        });
+
+      const inboxRows =
+        inboxResponse.data.values || [];
+
+
+      // Ambil data siswa
+      const siswaResponse =
+        await sheets.spreadsheets.values.get({
+
+          spreadsheetId,
+
+          range: "Siswa!A:F"
+
+        });
+
+      const siswaRows =
+        siswaResponse.data.values || [];
+
+
+      // Ambil data kelas
+      const kelasResponse =
+        await sheets.spreadsheets.values.get({
+
+          spreadsheetId,
+
+          range: "Kelas!A:E"
+
+        });
+
+      const kelasRows =
+        kelasResponse.data.values || [];
+
+
+      // =========================
+      // MAP KELAS
+      // =========================
+
+      const kelasMap = {};
+
+      for (
+        let i = 1;
+        i < kelasRows.length;
+        i++
+      ) {
+
+        const row =
+          kelasRows[i];
+
+        const id =
+          String(row[0] || "").trim();
+
+        const nama =
+          String(row[1] || "").trim();
+
+        if (!id) {
+          continue;
+        }
+
+        kelasMap[id] =
+          nama || "-";
+
+      }
+
+
+      // =========================
+      // MAP SISWA
+      // =========================
+
+      const siswaMap = {};
+
+      for (
+        let i = 1;
+        i < siswaRows.length;
+        i++
+      ) {
+
+        const row =
+          siswaRows[i];
+
+        const id =
+          String(row[0] || "").trim();
+
+        if (!id) {
+          continue;
+        }
+
+        siswaMap[id] = {
+
+          nama:
+            String(row[2] || "").trim(),
+
+          nisn:
+            String(row[1] || "").trim(),
+
+          kelas:
+            kelasMap[
+              String(row[3] || "").trim()
+            ] || "-",
+
+          status:
+            String(row[5] || "").trim()
+
+        };
+
+      }
+
+
+      // =========================
+      // DATA INBOX
+      // =========================
+
+      const inbox = [];
+
+      for (
+        let i = 1;
+        i < inboxRows.length;
+        i++
+      ) {
+
+        const row =
+          inboxRows[i];
+
+        const id =
+          String(row[0] || "").trim();
+
+        const siswaId =
+          String(row[1] || "").trim();
+
+        const siswa =
+          siswaMap[siswaId] || {};
+
+
+        inbox.push({
+
+          id,
+
+          siswaId,
+
+          siswaNama:
+            siswa.nama || "-",
+
+          siswaNisn:
+            siswa.nisn || "-",
+
+          siswaKelas:
+            siswa.kelas || "-",
+
+          judul:
+            String(row[2] || "").trim(),
+
+          pesan:
+            String(row[3] || "").trim(),
+
+          dibuat:
+            String(row[4] || "").trim(),
+
+          kedaluwarsa:
+            String(row[5] || "").trim(),
+
+          admin:
+            String(row[6] || "").trim(),
+
+          status:
+            String(row[7] || "").trim()
+
+        });
+
+      }
+
+
+      // Pesan terbaru di atas
+      inbox.sort(
+        (a, b) =>
+          new Date(b.dibuat) -
+          new Date(a.dibuat)
+      );
+
+
+      return {
+
+        statusCode: 200,
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+
+          success: true,
+
+          inbox
+
+        })
+
+      };
+
+    }
+
+
     // =========================
     // POST
     // KIRIM PESAN
@@ -63,6 +282,7 @@ exports.handler = async function (event) {
         admin
       } = data;
 
+
       if (
         !siswaId ||
         !judul ||
@@ -73,6 +293,11 @@ exports.handler = async function (event) {
         return {
 
           statusCode: 400,
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
 
           body: JSON.stringify({
 
@@ -86,6 +311,7 @@ exports.handler = async function (event) {
         };
 
       }
+
 
       // =========================
       // DURASI
@@ -109,14 +335,21 @@ exports.handler = async function (event) {
 
       };
 
+
       const hours =
         durationMap[durasi];
+
 
       if (!hours) {
 
         return {
 
           statusCode: 400,
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
 
           body: JSON.stringify({
 
@@ -131,32 +364,41 @@ exports.handler = async function (event) {
 
       }
 
+
       const createdAt =
         new Date();
 
       const expiredAt =
         new Date(
           createdAt.getTime() +
-          hours * 60 * 60 * 1000
+          hours *
+          60 *
+          60 *
+          1000
         );
+
 
       const id =
         "MSG" +
         Date.now();
 
+
       // =========================
-      // SIMPAN
+      // SIMPAN PESAN
       // =========================
 
       await sheets.spreadsheets.values.append({
 
         spreadsheetId,
 
-        range: "Inbox!A:H",
+        range:
+          "Inbox!A:H",
 
-        valueInputOption: "RAW",
+        valueInputOption:
+          "RAW",
 
-        insertDataOption: "INSERT_ROWS",
+        insertDataOption:
+          "INSERT_ROWS",
 
         requestBody: {
 
@@ -174,7 +416,9 @@ exports.handler = async function (event) {
 
             expiredAt.toISOString(),
 
-            String(admin || "admin"),
+            String(
+              admin || "admin"
+            ),
 
             "Aktif"
 
@@ -184,15 +428,14 @@ exports.handler = async function (event) {
 
       });
 
+
       return {
 
         statusCode: 200,
 
         headers: {
-
           "Content-Type":
             "application/json"
-
         },
 
         body: JSON.stringify({
@@ -220,28 +463,74 @@ exports.handler = async function (event) {
 
     }
 
+
     // =========================
-    // GET
-    // DATA INBOX ADMIN
+    // DELETE
+    // HAPUS PESAN
     // =========================
 
     if (
-      event.httpMethod === "GET"
+      event.httpMethod === "DELETE"
     ) {
+
+      const data =
+        JSON.parse(
+          event.body || "{}"
+        );
+
+      const messageId =
+        String(
+          data.id || ""
+        ).trim();
+
+
+      if (!messageId) {
+
+        return {
+
+          statusCode: 400,
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            success: false,
+
+            message:
+              "ID pesan wajib diisi."
+
+          })
+
+        };
+
+      }
+
+
+      // =========================
+      // CARI PESAN
+      // =========================
 
       const response =
         await sheets.spreadsheets.values.get({
 
           spreadsheetId,
 
-          range: "Inbox!A:H"
+          range:
+            "Inbox!A:H"
 
         });
+
 
       const rows =
         response.data.values || [];
 
-      const inbox = [];
+
+      let rowNumber =
+        -1;
+
 
       for (
         let i = 1;
@@ -249,54 +538,146 @@ exports.handler = async function (event) {
         i++
       ) {
 
-        const row = rows[i];
+        const id =
+          String(
+            rows[i][0] || ""
+          ).trim();
 
-        inbox.push({
 
-          id:
-            String(row[0] || ""),
+        if (
+          id === messageId
+        ) {
 
-          siswaId:
-            String(row[1] || ""),
+          rowNumber =
+            i + 1;
 
-          judul:
-            String(row[2] || ""),
+          break;
 
-          pesan:
-            String(row[3] || ""),
+        }
 
-          dibuat:
-            String(row[4] || ""),
+      }
 
-          kedaluwarsa:
-            String(row[5] || ""),
 
-          admin:
-            String(row[6] || ""),
+      if (
+        rowNumber === -1
+      ) {
 
-          status:
-            String(row[7] || "")
+        return {
+
+          statusCode: 404,
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            success: false,
+
+            message:
+              "Pesan tidak ditemukan."
+
+          })
+
+        };
+
+      }
+
+
+      // =========================
+      // CARI SHEET ID
+      // =========================
+
+      const spreadsheet =
+        await sheets.spreadsheets.get({
+
+          spreadsheetId,
+
+          fields:
+            "sheets(properties(sheetId,title))"
 
         });
 
+
+      const inboxSheet =
+        spreadsheet.data.sheets.find(
+          sheet =>
+            sheet.properties.title ===
+            "Inbox"
+        );
+
+
+      if (!inboxSheet) {
+
+        throw new Error(
+          'Sheet "Inbox" tidak ditemukan.'
+        );
+
       }
+
+
+      const sheetId =
+        inboxSheet.properties.sheetId;
+
+
+      // =========================
+      // HAPUS BARIS
+      // =========================
+
+      await sheets.spreadsheets.batchUpdate({
+
+        spreadsheetId,
+
+        requestBody: {
+
+          requests: [
+
+            {
+
+              deleteDimension: {
+
+                range: {
+
+                  sheetId,
+
+                  dimension:
+                    "ROWS",
+
+                  startIndex:
+                    rowNumber - 1,
+
+                  endIndex:
+                    rowNumber
+
+                }
+
+              }
+
+            }
+
+          ]
+
+        }
+
+      });
+
 
       return {
 
         statusCode: 200,
 
         headers: {
-
           "Content-Type":
             "application/json"
-
         },
 
         body: JSON.stringify({
 
           success: true,
 
-          inbox
+          message:
+            "Pesan berhasil dihapus."
 
         })
 
@@ -304,9 +685,19 @@ exports.handler = async function (event) {
 
     }
 
+
+    // =========================
+    // METHOD TIDAK DIIZINKAN
+    // =========================
+
     return {
 
       statusCode: 405,
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
 
       body: JSON.stringify({
 
@@ -332,10 +723,8 @@ exports.handler = async function (event) {
       statusCode: 500,
 
       headers: {
-
         "Content-Type":
           "application/json"
-
       },
 
       body: JSON.stringify({
