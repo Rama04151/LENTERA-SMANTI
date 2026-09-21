@@ -1551,15 +1551,10 @@ async function changeStudentPassword() {
 async function openStudentInbox() {
 
   const session =
-    sessionStorage.getItem(
-      "lentera_session"
-    );
+    sessionStorage.getItem("lentera_session");
 
   if (!session) {
-
-    window.location.href =
-      "index.html";
-
+    window.location.href = "index.html";
     return;
   }
 
@@ -1567,10 +1562,13 @@ async function openStudentInbox() {
 
   try {
 
-    siswa =
-      JSON.parse(session);
+    siswa = JSON.parse(session);
 
   } catch (error) {
+
+    sessionStorage.removeItem(
+      "lentera_session"
+    );
 
     window.location.href =
       "index.html";
@@ -1578,7 +1576,7 @@ async function openStudentInbox() {
     return;
   }
 
-  if (!siswa.id) {
+  if (!siswa || !siswa.id) {
 
     alert(
       "Session siswa tidak valid."
@@ -1587,7 +1585,7 @@ async function openStudentInbox() {
     return;
   }
 
-  // Hapus modal lama jika ada
+  // Hapus modal lama
   const oldModal =
     document.getElementById(
       "studentInboxModal"
@@ -1659,16 +1657,24 @@ async function openStudentInbox() {
     if (
       event.target === modal
     ) {
+
       closeStudentInbox();
+
     }
 
   };
 
   document.body.appendChild(modal);
 
+
   // =========================
   // AMBIL PESAN
   // =========================
+
+  const content =
+    document.getElementById(
+      "inboxContent"
+    );
 
   try {
 
@@ -1684,96 +1690,125 @@ async function openStudentInbox() {
           },
 
           body: JSON.stringify({
-
-            siswaId:
-              siswa.id
-
+            siswaId: siswa.id
           })
-
         }
       );
 
-    const result =
-      await response.json();
+
+    const responseText =
+      await response.text();
+
+
+    let result;
+
+    try {
+
+      result =
+        JSON.parse(
+          responseText
+        );
+
+    } catch (parseError) {
+
+      console.error(
+        "STUDENT INBOX INVALID RESPONSE:",
+        responseText
+      );
+
+      throw new Error(
+        "Server mengembalikan respons yang tidak valid."
+      );
+
+    }
+
 
     if (
       !response.ok ||
       !result.success
     ) {
 
-      document.getElementById(
-        "inboxContent"
-      ).innerHTML = `
+      throw new Error(
+        result.message ||
+        "Gagal mengambil pesan Inbox."
+      );
 
-        <div class="inbox-empty">
-
-          <div class="inbox-empty-icon">
-            ⚠️
-          </div>
-
-          <strong>
-            Inbox gagal dimuat
-          </strong>
-
-          <span>
-            ${escapeHtml(
-              result.message ||
-              "Terjadi kesalahan."
-            )}
-          </span>
-
-        </div>
-
-      `;
-
-      return;
     }
 
+
+    const inbox =
+      Array.isArray(result.inbox)
+        ? result.inbox
+        : [];
+
+
     renderStudentInbox(
-      result.inbox || []
+      inbox
     );
 
-  }
-  catch (error) {
+
+    // Sinkronkan badge
+    updateInboxBadge(
+      inbox.length
+    );
+
+
+  } catch (error) {
 
     console.error(
       "INBOX ERROR:",
       error
     );
 
-    const content =
-      document.getElementById(
-        "inboxContent"
-      );
 
-    if (content) {
+    if (!content) {
+      return;
+    }
 
-      content.innerHTML = `
 
-        <div class="inbox-empty">
+    content.innerHTML = `
 
-          <div class="inbox-empty-icon">
-            📡
-          </div>
+      <div class="inbox-empty">
 
-          <strong>
-            Koneksi bermasalah
-          </strong>
-
-          <span>
-            Silakan coba lagi.
-          </span>
-
+        <div class="inbox-empty-icon">
+          📡
         </div>
 
-      `;
+        <strong>
+          Inbox gagal dimuat
+        </strong>
 
-    }
+        <span>
+          ${escapeHtml(
+            error.message ||
+            "Terjadi kesalahan koneksi."
+          )}
+        </span>
+
+        <button
+          type="button"
+          onclick="openStudentInbox()"
+          style="
+            margin-top:14px;
+            padding:10px 16px;
+            border:none;
+            border-radius:10px;
+            background:#f1f5f9;
+            color:#334155;
+            font-weight:700;
+            cursor:pointer;
+          "
+        >
+          Coba Lagi
+        </button>
+
+      </div>
+
+    `;
 
   }
 
 }
-
 
 // =========================
 // RENDER PESAN
@@ -2000,7 +2035,7 @@ async function loadInboxBadge() {
 
   }
 
-  if (!siswa.id) {
+  if (!siswa || !siswa.id) {
     return;
   }
 
@@ -2018,31 +2053,32 @@ async function loadInboxBadge() {
           },
 
           body: JSON.stringify({
-
-            siswaId:
-              siswa.id
-
+            siswaId: siswa.id
           })
-
         }
       );
+
+    if (!response.ok) {
+      return;
+    }
 
     const result =
       await response.json();
 
     if (
-      response.ok &&
+      result &&
       result.success
     ) {
 
       updateInboxBadge(
-        (result.inbox || []).length
+        Array.isArray(result.inbox)
+          ? result.inbox.length
+          : 0
       );
 
     }
 
-  }
-  catch (error) {
+  } catch (error) {
 
     console.error(
       "INBOX BADGE ERROR:",
@@ -2052,7 +2088,6 @@ async function loadInboxBadge() {
   }
 
 }
-
 
 // Jalankan saat dashboard dibuka
 loadInboxBadge();
@@ -2289,6 +2324,8 @@ document.addEventListener(
 
   }
 );
+
+    
   </script>
 
 </body>
