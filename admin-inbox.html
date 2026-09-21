@@ -544,6 +544,87 @@
 
     }
 
+    .inbox-recipient {
+  margin-top: 11px;
+
+  padding: 10px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(251,192,45,0.06);
+
+  border:
+    1px solid
+    rgba(251,192,45,0.12);
+}
+
+.inbox-recipient strong {
+  display: block;
+
+  color:
+    var(--accent-gold);
+
+  font-size: 12px;
+
+  margin-bottom: 4px;
+}
+
+.inbox-recipient span {
+  display: block;
+
+  color:
+    var(--text-muted);
+
+  font-size: 10px;
+
+  line-height: 1.6;
+}
+
+.delete-message-button {
+  width: 100%;
+
+  margin-top: 12px;
+
+  padding: 10px;
+
+  border:
+    1px solid
+    rgba(239,68,68,0.25);
+
+  border-radius: 10px;
+
+  background:
+    rgba(239,68,68,0.08);
+
+  color:
+    #f87171;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.delete-message-button:hover {
+  background:
+    rgba(239,68,68,0.16);
+
+  border-color:
+    rgba(239,68,68,0.4);
+
+  transform:
+    translateY(-1px);
+}
+
+.delete-message-button:active {
+  transform:
+    scale(0.98);
+}
+
   </style>
 
 </head>
@@ -1443,6 +1524,104 @@
     loadStudents();
 
     loadSentMessages();
+
+    // =========================
+// HAPUS PESAN INBOX
+// =========================
+
+async function deleteInboxMessage(
+  id
+) {
+
+  if (!id) {
+    return;
+  }
+
+
+  const confirmed =
+    confirm(
+      "Hapus pesan ini?\n\n" +
+      "Pesan akan langsung dihapus " +
+      "dari Inbox dan tidak dapat dikembalikan."
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/admin-inbox",
+        {
+
+          method:
+            "DELETE",
+
+          headers: {
+
+            "Content-Type":
+              "application/json"
+
+          },
+
+          body:
+            JSON.stringify({
+
+              id
+
+            })
+
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      alert(
+        result.message ||
+        "Gagal menghapus pesan."
+      );
+
+      return;
+
+    }
+
+
+    alert(
+      "Pesan berhasil dihapus."
+    );
+
+
+    // Refresh daftar pesan
+    loadSentMessages();
+
+
+  }
+  catch (error) {
+
+    console.error(
+      "DELETE INBOX ERROR:",
+      error
+    );
+
+    alert(
+      "Terjadi kesalahan koneksi."
+    );
+
+  }
+
+}
 
   </script>
 
