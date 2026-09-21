@@ -1293,58 +1293,88 @@
         );
 
 
-        container.innerHTML =
-          messages.map(
-            item => `
+       container.innerHTML =
+  messages.map(
+    item => `
 
-              <div class="inbox-item">
+      <div class="inbox-item">
 
-                <div class="inbox-item-title">
-                  ${escapeHtml(
-                    item.judul
-                  )}
-                </div>
+        <div class="inbox-item-title">
+          ${escapeHtml(
+            item.judul
+          )}
+        </div>
 
-                <div class="inbox-item-text">
-                  ${escapeHtml(
-                    item.pesan
-                  )}
-                </div>
+        <div class="inbox-item-text">
+          ${escapeHtml(
+            item.pesan
+          )}
+        </div>
 
-                <div class="inbox-item-meta">
 
-                  👤 Siswa ID:
-                  ${escapeHtml(
-                    item.siswaId
-                  )}
+        <div class="inbox-recipient">
 
-                  <br>
+          <strong>
+            👤 ${escapeHtml(
+              item.siswaNama
+            )}
+          </strong>
 
-                  🕒 Dibuat:
-                  ${formatDate(
-                    item.dibuat
-                  )}
+          <span>
+            NISN:
+            ${escapeHtml(
+              item.siswaNisn
+            )}
+          </span>
 
-                  <br>
+          <span>
+            Kelas:
+            ${escapeHtml(
+              item.siswaKelas
+            )}
+          </span>
 
-                  ⏳ Kedaluwarsa:
-                  ${formatDate(
-                    item.kedaluwarsa
-                  )}
+        </div>
 
-                  <br>
 
-                  🛠 Admin:
-                  ${escapeHtml(
-                    item.admin
-                  )}
+        <div class="inbox-item-meta">
 
-                </div>
+          🕒 Dibuat:
+          ${formatDate(
+            item.dibuat
+          )}
 
-              </div>
+          <br>
 
-            `
-          ).join("");
+          ⏳ Kedaluwarsa:
+          ${formatDate(
+            item.kedaluwarsa
+          )}
+
+          <br>
+
+          🛠 Admin:
+          ${escapeHtml(
+            item.admin
+          )}
+
+        </div>
+
+
+        <button
+          type="button"
+          class="delete-message-button"
+          onclick="deleteInboxMessage('${escapeHtml(
+            item.id
+          )}')"
+        >
+          🗑️ Hapus Pesan
+        </button>
+
+      </div>
+
+    `
+  ).join("");
 
       }
       catch (error) {
