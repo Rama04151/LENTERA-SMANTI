@@ -2,110 +2,7 @@ const { google } = require("googleapis");
 
 exports.handler = async function (event) {
 
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        success: false,
-        message: "Method tidak diizinkan."
-      })
-    };
-  }
-
   try {
-
-    const body = JSON.parse(event.body || "{}");
-
-    const siswaId =
-      String(body.siswaId || "").trim();
-
-    const poin =
-      Number(body.poin || 0);
-
-    const keterangan =
-      String(body.keterangan || "").trim();
-
-    const jenis =
-      String(body.jenis || "")
-        .trim()
-        .toLowerCase();
-
-    const guruId =
-      String(body.guruId || "").trim();
-
-    const guruUsername =
-      String(body.guruUsername || "").trim();
-
-    // =========================
-    // VALIDASI
-    // =========================
-
-    if (!siswaId) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          message: "Siswa belum dipilih."
-        })
-      };
-    }
-
-    if (!Number.isFinite(poin) || poin < 1 || poin > 100) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          message: "Poin harus antara 1 sampai 100."
-        })
-      };
-    }
-
-    if (!keterangan) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          message: "Keterangan wajib diisi."
-        })
-      };
-    }
-
-    if (keterangan.length > 500) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          message: "Keterangan maksimal 500 karakter."
-        })
-      };
-    }
-
-    // Hanya dua jenis yang diperbolehkan
-    if (
-      jenis !== "penghargaan" &&
-      jenis !== "pelanggaran"
-    ) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          message: "Jenis poin tidak valid."
-        })
-      };
-    }
-
-    if (!guruId || !guruUsername) {
-      return {
-        statusCode: 401,
-        body: JSON.stringify({
-          success: false,
-          message: "Data akun guru tidak ditemukan."
-        })
-      };
-    }
 
     // =========================
     // GOOGLE AUTH
@@ -140,77 +37,157 @@ exports.handler = async function (event) {
     const spreadsheetId =
       process.env.GOOGLE_SHEET_ID;
 
-    // =========================
-    // CEK SISWA
-    // =========================
+    // ========================================
+    // POST = TAMBAH POIN
+    // ========================================
 
-    const siswaResponse =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "Siswa!A:F"
-      });
+    if (event.httpMethod === "POST") {
 
-    const siswaRows =
-      siswaResponse.data.values || [];
+      const body =
+        JSON.parse(event.body || "{}");
 
-    const siswa =
-      siswaRows
-        .slice(1)
-        .find(row =>
-          String(row[0] || "").trim() === siswaId
+      const siswaId =
+        String(body.siswaId || "").trim();
+
+      const poin =
+        Number(body.poin || 0);
+
+      const keterangan =
+        String(body.keterangan || "").trim();
+
+      const jenis =
+        String(body.jenis || "")
+          .trim()
+          .toLowerCase();
+
+      const guruId =
+        String(body.guruId || "").trim();
+
+      const guruUsername =
+        String(body.guruUsername || "").trim();
+
+      if (!siswaId) {
+
+        return error(
+          400,
+          "Siswa belum dipilih."
         );
 
-    if (!siswa) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({
-          success: false,
-          message: "Siswa tidak ditemukan."
-        })
-      };
-    }
+      }
 
-    const status =
-      String(siswa[5] || "")
-        .trim()
-        .toLowerCase();
+      if (
+        !Number.isInteger(poin) ||
+        poin < 1 ||
+        poin > 100
+      ) {
 
-    if (status !== "aktif") {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          message: "Siswa tidak aktif."
-        })
-      };
-    }
+        return error(
+          400,
+          "Poin harus antara 1 sampai 100."
+        );
 
-    // =========================
-    // ID POIN
-    // =========================
+      }
 
-    const pointId =
-      "P" + Date.now();
+      if (!keterangan) {
 
-    const tanggal =
-      new Date().toISOString();
+        return error(
+          400,
+          "Keterangan wajib diisi."
+        );
 
-    // =========================
-    // SIMPAN KE GOOGLE SHEETS
-    // =========================
+      }
 
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
+      if (keterangan.length > 500) {
 
-      range: "Poin!A:H",
+        return error(
+          400,
+          "Keterangan maksimal 500 karakter."
+        );
 
-      valueInputOption: "USER_ENTERED",
+      }
 
-      insertDataOption: "INSERT_ROWS",
+      if (
+        jenis !== "penghargaan" &&
+        jenis !== "pelanggaran"
+      ) {
 
-      requestBody: {
-        values: [
-          [
+        return error(
+          400,
+          "Jenis poin tidak valid."
+        );
+
+      }
+
+      if (!guruId || !guruUsername) {
+
+        return error(
+          401,
+          "Data akun guru tidak ditemukan."
+        );
+
+      }
+
+      // CEK SISWA
+
+      const siswaResponse =
+        await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: "Siswa!A:F"
+        });
+
+      const siswaRows =
+        siswaResponse.data.values || [];
+
+      const siswa =
+        siswaRows
+          .slice(1)
+          .find(row =>
+            String(row[0] || "").trim() === siswaId
+          );
+
+      if (!siswa) {
+
+        return error(
+          404,
+          "Siswa tidak ditemukan."
+        );
+
+      }
+
+      const status =
+        String(siswa[5] || "")
+          .trim()
+          .toLowerCase();
+
+      if (status !== "aktif") {
+
+        return error(
+          400,
+          "Siswa tidak aktif."
+        );
+
+      }
+
+      const pointId =
+        "P" + Date.now();
+
+      const tanggal =
+        new Date().toISOString();
+
+      await sheets.spreadsheets.values.append({
+
+        spreadsheetId,
+
+        range: "Poin!A:H",
+
+        valueInputOption: "USER_ENTERED",
+
+        insertDataOption: "INSERT_ROWS",
+
+        requestBody: {
+
+          values: [[
+
             pointId,
             siswaId,
             jenis,
@@ -219,43 +196,282 @@ exports.handler = async function (event) {
             tanggal,
             guruUsername,
             "Guru"
-          ]
-        ]
-      }
-    });
 
-    console.log(
-      `POIN GURU: ${guruUsername} | ${jenis} | ${poin} | ${siswaId}`
-    );
+          ]]
 
-    return {
-      statusCode: 200,
-
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
-
-      body: JSON.stringify({
-        success: true,
-
-        message:
-          jenis === "penghargaan"
-            ? "Poin penghargaan berhasil ditambahkan."
-            : "Poin pelanggaran berhasil ditambahkan.",
-
-        data: {
-          id: pointId,
-          siswaId,
-          jenis,
-          poin,
-          keterangan,
-          tanggal,
-          dibuatOleh: guruUsername,
-          peran: "Guru"
         }
-      })
-    };
+
+      });
+
+      return success(
+        "Poin berhasil ditambahkan.",
+        {
+          id: pointId
+        }
+      );
+
+    }
+
+    // ========================================
+    // PUT = EDIT POIN SENDIRI
+    // ========================================
+
+    if (event.httpMethod === "PUT") {
+
+      const body =
+        JSON.parse(event.body || "{}");
+
+      const pointId =
+        String(body.id || "").trim();
+
+      const poin =
+        Number(body.poin || 0);
+
+      const keterangan =
+        String(body.keterangan || "").trim();
+
+      const jenis =
+        String(body.jenis || "")
+          .trim()
+          .toLowerCase();
+
+      const guruUsername =
+        String(body.guruUsername || "").trim();
+
+      if (!pointId || !guruUsername) {
+
+        return error(
+          400,
+          "Data poin tidak lengkap."
+        );
+
+      }
+
+      if (
+        !Number.isInteger(poin) ||
+        poin < 1 ||
+        poin > 100
+      ) {
+
+        return error(
+          400,
+          "Poin harus antara 1 sampai 100."
+        );
+
+      }
+
+      if (!keterangan) {
+
+        return error(
+          400,
+          "Keterangan wajib diisi."
+        );
+
+      }
+
+      if (
+        jenis !== "penghargaan" &&
+        jenis !== "pelanggaran"
+      ) {
+
+        return error(
+          400,
+          "Jenis poin tidak valid."
+        );
+
+      }
+
+      const response =
+        await sheets.spreadsheets.values.get({
+
+          spreadsheetId,
+
+          range: "Poin!A:H"
+
+        });
+
+      const rows =
+        response.data.values || [];
+
+      const rowIndex =
+        rows.findIndex((row, index) => {
+
+          if (index === 0) {
+            return false;
+          }
+
+          const id =
+            String(row[0] || "").trim();
+
+          const pembuat =
+            String(row[6] || "").trim();
+
+          return (
+            id === pointId &&
+            pembuat === guruUsername
+          );
+
+        });
+
+      if (rowIndex === -1) {
+
+        return error(
+          403,
+          "Poin tidak ditemukan atau bukan milik Anda."
+        );
+
+      }
+
+      // rowIndex = index array
+      // Sheets row = index + 1
+
+      const sheetRow =
+        rowIndex + 1;
+
+      await sheets.spreadsheets.values.update({
+
+        spreadsheetId,
+
+        range:
+          `Poin!C${sheetRow}:E${sheetRow}`,
+
+        valueInputOption:
+          "USER_ENTERED",
+
+        requestBody: {
+
+          values: [[
+
+            jenis,
+            poin,
+            keterangan
+
+          ]]
+
+        }
+
+      });
+
+      return success(
+        "Poin berhasil diperbarui."
+      );
+
+    }
+
+    // ========================================
+    // DELETE = HAPUS POIN SENDIRI
+    // ========================================
+
+    if (event.httpMethod === "DELETE") {
+
+      const body =
+        JSON.parse(event.body || "{}");
+
+      const pointId =
+        String(body.id || "").trim();
+
+      const guruUsername =
+        String(body.guruUsername || "").trim();
+
+      if (!pointId || !guruUsername) {
+
+        return error(
+          400,
+          "Data poin tidak lengkap."
+        );
+
+      }
+
+      const response =
+        await sheets.spreadsheets.values.get({
+
+          spreadsheetId,
+
+          range: "Poin!A:H"
+
+        });
+
+      const rows =
+        response.data.values || [];
+
+      const rowIndex =
+        rows.findIndex((row, index) => {
+
+          if (index === 0) {
+            return false;
+          }
+
+          const id =
+            String(row[0] || "").trim();
+
+          const pembuat =
+            String(row[6] || "").trim();
+
+          return (
+            id === pointId &&
+            pembuat === guruUsername
+          );
+
+        });
+
+      if (rowIndex === -1) {
+
+        return error(
+          403,
+          "Poin tidak ditemukan atau bukan milik Anda."
+        );
+
+      }
+
+      const sheetId =
+        await getSheetId(
+          sheets,
+          spreadsheetId,
+          "Poin"
+        );
+
+      await sheets.spreadsheets.batchUpdate({
+
+        spreadsheetId,
+
+        requestBody: {
+
+          requests: [{
+
+            deleteDimension: {
+
+              range: {
+
+                sheetId,
+
+                dimension: "ROWS",
+
+                startIndex:
+                  rowIndex,
+
+                endIndex:
+                  rowIndex + 1
+
+              }
+
+            }
+
+          }]
+
+        }
+
+      });
+
+      return success(
+        "Poin berhasil dihapus."
+      );
+
+    }
+
+    return error(
+      405,
+      "Method tidak diizinkan."
+    );
 
   } catch (error) {
 
@@ -264,20 +480,111 @@ exports.handler = async function (event) {
       error
     );
 
-    return {
-      statusCode: 500,
+    return error(
+      500,
+      "Gagal memproses poin."
+    );
 
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
-
-      body: JSON.stringify({
-        success: false,
-
-        message:
-          "Gagal menyimpan poin."
-      })
-    };
   }
+
 };
+
+
+// ========================================
+// HELPER RESPONSE
+// ========================================
+
+function success(
+  message,
+  data = {}
+) {
+
+  return {
+
+    statusCode: 200,
+
+    headers: {
+      "Content-Type":
+        "application/json"
+    },
+
+    body: JSON.stringify({
+
+      success: true,
+
+      message,
+
+      ...data
+
+    })
+
+  };
+
+}
+
+
+function error(
+  statusCode,
+  message
+) {
+
+  return {
+
+    statusCode,
+
+    headers: {
+      "Content-Type":
+        "application/json"
+    },
+
+    body: JSON.stringify({
+
+      success: false,
+
+      message
+
+    })
+
+  };
+
+}
+
+
+// ========================================
+// GET SHEET ID
+// ========================================
+
+async function getSheetId(
+  sheets,
+  spreadsheetId,
+  sheetName
+) {
+
+  const response =
+    await sheets.spreadsheets.get({
+
+      spreadsheetId,
+
+      fields:
+        "sheets.properties"
+
+    });
+
+  const sheet =
+    response.data.sheets.find(
+      item =>
+        item.properties.title ===
+        sheetName
+    );
+
+  if (!sheet) {
+
+    throw new Error(
+      `Sheet ${sheetName} tidak ditemukan.`
+    );
+
+  }
+
+  return sheet.properties.sheetId;
+
+}
