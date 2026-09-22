@@ -638,10 +638,10 @@ exports.handler =
             body.id || ""
           ).trim();
 
-        const siswaId =
-          String(
-            body.siswaId || ""
-          ).trim();
+        const siswaIdBaru =
+  String(
+    body.siswaId || ""
+  ).trim();
 
         const jenis =
           String(
@@ -770,33 +770,52 @@ exports.handler =
           );
         }
 
-        await sheets.spreadsheets.values.update({
+        const oldRow =
+  rows[rowNumber - 1];
 
-          spreadsheetId,
+const siswaIdLama =
+  String(
+    oldRow[1] || ""
+  ).trim();
 
-          range:
-            `Poin!B${rowNumber}:E${rowNumber}`,
+const siswaIdFinal =
+  siswaIdBaru ||
+  siswaIdLama;
 
-          valueInputOption:
-            "USER_ENTERED",
+if (!siswaIdFinal) {
 
-          requestBody: {
+  return error(
+    "Siswa_ID tidak ditemukan. Poin tidak dapat diedit."
+  );
+}
 
-            values: [[
+await sheets.spreadsheets.values.update({
 
-              siswaId,
+  spreadsheetId,
 
-              jenis,
+  range:
+    `Poin!B${rowNumber}:E${rowNumber}`,
 
-              poin,
+  valueInputOption:
+    "USER_ENTERED",
 
-              keterangan
+  requestBody: {
 
-            ]]
+    values: [[
 
-          }
+      siswaIdFinal,
 
-        });
+      jenis,
+
+      poin,
+
+      keterangan
+
+    ]]
+
+  }
+
+});
 
         return success({
 
