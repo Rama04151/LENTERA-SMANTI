@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Login Guru - LENTERA SMANTI</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <style>
+
+    .login-role {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .login-role-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .login-role h1 {
+      margin: 0;
+    }
+
+    .login-role p {
+      margin-top: 6px;
+      opacity: 0.7;
+      font-size: 13px;
+    }
+
+    .login-button {
+      width: 100%;
+    }
+
+    .login-message {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 13px;
+      min-height: 20px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <main class="container">
+
+    <section class="card">
+
+      <div class="login-role">
+
+        <div class="login-role-icon">
+          👨‍🏫
+        </div>
+
+        <h1>
+          LENTERA SMANTI
+        </h1>
+
+        <p>
+          Panel Guru
+        </p>
+
+      </div>
+
+
+      <form id="guruLoginForm">
+
+        <label for="username">
+          Username
+        </label>
+
+        <input
+          id="username"
+          type="text"
+          autocomplete="username"
+          placeholder="Masukkan username"
+          required
+        >
+
+
+        <label for="password">
+          Password
+        </label>
+
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Masukkan password"
+          required
+        >
+
+
+        <button
+          type="submit"
+          class="login-button"
+          id="loginButton"
+        >
+          👨‍🏫 Masuk sebagai Guru
+        </button>
+
+      </form>
+
+
+      <p
+        id="loginMessage"
+        class="login-message"
+      ></p>
+
+    </section>
+
+  </main>
+
+
+  <script src="guru-login.js"></script>
+
+</body>
+
+</html>
