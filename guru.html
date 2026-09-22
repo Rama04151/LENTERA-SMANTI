@@ -12,10 +12,7 @@
 
   <title>Panel Guru - LENTERA SMANTI</title>
 
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
+  
 
   <style>
 
@@ -211,6 +208,309 @@
       }
 
     }
+
+    .guru-students-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0,0,0,0.72);
+
+  backdrop-filter: blur(8px);
+
+  z-index: 9999;
+
+  padding: 20px;
+
+  overflow-y: auto;
+}
+
+.guru-students-modal {
+  width: 100%;
+  max-width: 850px;
+
+  margin: 20px auto;
+
+  background: #111827;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  border-radius: 18px;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+}
+
+.guru-students-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 18px;
+}
+
+.guru-students-header h2 {
+  margin: 0;
+
+  color: #fff;
+
+  font-size: 18px;
+}
+
+.guru-students-header p {
+  margin: 5px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 11px;
+}
+
+.guru-close-button {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.06);
+
+  color: #fff;
+
+  font-size: 24px;
+
+  cursor: pointer;
+}
+
+.guru-students-tools {
+  display: grid;
+
+  grid-template-columns: 1fr 180px;
+
+  gap: 10px;
+
+  margin-bottom: 16px;
+}
+
+.guru-students-tools input,
+.guru-students-tools select {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px 13px;
+
+  border-radius: 10px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  background: rgba(255,255,255,0.05);
+
+  color: #fff;
+
+  outline: none;
+}
+
+.guru-students-tools input::placeholder {
+  color: var(--text-muted);
+}
+
+.guru-students-tools select option {
+  background: #111827;
+
+  color: #fff;
+}
+
+.guru-students-loading {
+  padding: 25px;
+
+  text-align: center;
+
+  color: var(--text-muted);
+
+  font-size: 12px;
+}
+
+.guru-students-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  max-height: 65vh;
+
+  overflow-y: auto;
+
+  padding-right: 4px;
+}
+
+.guru-student-card {
+  padding: 14px;
+
+  border-radius: 14px;
+
+  background: rgba(255,255,255,0.04);
+
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.guru-student-main {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.guru-student-avatar {
+  width: 42px;
+  height: 42px;
+
+  min-width: 42px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: rgba(251,192,45,0.10);
+
+  border: 1px solid rgba(251,192,45,0.16);
+
+  font-size: 19px;
+}
+
+.guru-student-info {
+  min-width: 0;
+}
+
+.guru-student-info strong {
+  display: block;
+
+  color: #fff;
+
+  font-size: 13px;
+
+  margin-bottom: 4px;
+}
+
+.guru-student-info span {
+  display: inline-block;
+
+  margin-right: 12px;
+
+  color: var(--text-muted);
+
+  font-size: 10px;
+}
+
+.guru-student-points {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
+.guru-point {
+  padding: 9px;
+
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.035);
+
+  text-align: center;
+}
+
+.guru-point span {
+  display: block;
+
+  color: var(--text-muted);
+
+  font-size: 9px;
+
+  margin-bottom: 4px;
+}
+
+.guru-point strong {
+  font-size: 13px;
+}
+
+.guru-point.reward strong {
+  color: #4ade80;
+}
+
+.guru-point.violation strong {
+  color: #f87171;
+}
+
+.guru-point.total strong {
+  color: #fff;
+}
+
+.guru-point.total.positive strong {
+  color: #4ade80;
+}
+
+.guru-point.total.negative strong {
+  color: #f87171;
+}
+
+.guru-point.total.neutral strong {
+  color: var(--text-muted);
+}
+
+.guru-students-empty {
+  padding: 30px;
+
+  text-align: center;
+
+  color: var(--text-muted);
+
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+
+  .guru-students-overlay {
+    padding: 10px;
+  }
+
+  .guru-students-modal {
+    margin: 5px auto;
+
+    padding: 14px;
+
+    border-radius: 15px;
+  }
+
+  .guru-students-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .guru-student-info span {
+    display: block;
+
+    margin-right: 0;
+
+    margin-top: 2px;
+  }
+
+  .guru-student-points {
+    grid-template-columns: 1fr;
+  }
+
+}
 
   </style>
 
@@ -465,13 +765,384 @@
       ============================
     */
 
-    function openGuruStudents() {
+    async function openGuruStudents() {
 
-      alert(
-        "Fitur Data Siswa akan dibuat pada tahap berikutnya."
+  const existing =
+    document.getElementById(
+      "guruStudentsModal"
+    );
+
+  if (existing) {
+    existing.remove();
+  }
+
+  const modal =
+    document.createElement("div");
+
+  modal.id =
+    "guruStudentsModal";
+
+  modal.className =
+    "guru-students-overlay";
+
+  modal.innerHTML = `
+
+    <div class="guru-students-modal">
+
+      <div class="guru-students-header">
+
+        <div>
+          <h2>Data Siswa</h2>
+          <p>
+            Data siswa dan rekap poin
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="guru-close-button"
+          onclick="closeGuruStudents()"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="guru-students-tools">
+
+        <input
+          type="text"
+          id="guruStudentSearch"
+          placeholder="Cari nama atau NISN..."
+          oninput="filterGuruStudents()"
+        >
+
+        <select
+          id="guruClassFilter"
+          onchange="filterGuruStudents()"
+        >
+
+          <option value="">
+            Semua Kelas
+          </option>
+
+          <option value="X A">
+            X A
+          </option>
+
+          <option value="X B">
+            X B
+          </option>
+
+          <option value="XI A">
+            XI A
+          </option>
+
+          <option value="XI B">
+            XI B
+          </option>
+
+          <option value="XII A">
+            XII A
+          </option>
+
+          <option value="XII B">
+            XII B
+          </option>
+
+        </select>
+
+      </div>
+
+      <div
+        id="guruStudentsLoading"
+        class="guru-students-loading"
+      >
+        Memuat data siswa...
+      </div>
+
+      <div
+        id="guruStudentsList"
+        class="guru-students-list"
+      ></div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(modal);
+
+  await loadGuruStudents();
+
+}
+
+    let guruStudentsData = [];
+
+async function loadGuruStudents() {
+
+  const loading =
+    document.getElementById(
+      "guruStudentsLoading"
+    );
+
+  const list =
+    document.getElementById(
+      "guruStudentsList"
+    );
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-students"
+      );
+
+    const result =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengambil data."
       );
 
     }
+
+    guruStudentsData =
+      Array.isArray(result.siswa)
+        ? result.siswa
+        : [];
+
+    if (loading) {
+      loading.style.display =
+        "none";
+    }
+
+    renderGuruStudents(
+      guruStudentsData
+    );
+
+  }
+  catch (error) {
+
+    console.error(
+      "GURU STUDENTS ERROR:",
+      error
+    );
+
+    if (loading) {
+
+      loading.textContent =
+        "Gagal memuat data siswa.";
+
+    }
+
+  }
+
+}
+
+function renderGuruStudents(data) {
+
+  const list =
+    document.getElementById(
+      "guruStudentsList"
+    );
+
+  if (!list) {
+    return;
+  }
+
+  if (!data.length) {
+
+    list.innerHTML = `
+      <div class="guru-students-empty">
+        Data siswa tidak ditemukan.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  list.innerHTML =
+    data.map(siswa => {
+
+      const totalClass =
+        siswa.total > 0
+          ? "positive"
+          : siswa.total < 0
+            ? "negative"
+            : "neutral";
+
+      return `
+
+        <div class="guru-student-card">
+
+          <div class="guru-student-main">
+
+            <div class="guru-student-avatar">
+              👤
+            </div>
+
+            <div class="guru-student-info">
+
+              <strong>
+                ${escapeHtml(
+                  siswa.nama
+                )}
+              </strong>
+
+              <span>
+                NISN:
+                ${escapeHtml(
+                  siswa.nisn
+                )}
+              </span>
+
+              <span>
+                Kelas:
+                ${escapeHtml(
+                  siswa.kelas
+                )}
+              </span>
+
+            </div>
+
+          </div>
+
+          <div class="guru-student-points">
+
+            <div class="guru-point reward">
+
+              <span>
+                Penghargaan
+              </span>
+
+              <strong>
+                +${siswa.penghargaan}
+              </strong>
+
+            </div>
+
+            <div class="guru-point violation">
+
+              <span>
+                Pelanggaran
+              </span>
+
+              <strong>
+                -${siswa.pelanggaran}
+              </strong>
+
+            </div>
+
+            <div class="guru-point total ${totalClass}">
+
+              <span>
+                Total
+              </span>
+
+              <strong>
+                ${siswa.total > 0 ? "+" : ""}
+                ${siswa.total}
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+}
+
+function filterGuruStudents() {
+
+  const searchInput =
+    document.getElementById(
+      "guruStudentSearch"
+    );
+
+  const classFilter =
+    document.getElementById(
+      "guruClassFilter"
+    );
+
+  const search =
+    String(
+      searchInput?.value || ""
+    )
+      .trim()
+      .toLowerCase();
+
+  const selectedClass =
+    String(
+      classFilter?.value || ""
+    )
+      .trim()
+      .toLowerCase();
+
+  const filtered =
+    guruStudentsData.filter(
+      siswa => {
+
+        const nama =
+          String(
+            siswa.nama || ""
+          ).toLowerCase();
+
+        const nisn =
+          String(
+            siswa.nisn || ""
+          ).toLowerCase();
+
+        const kelas =
+          String(
+            siswa.kelas || ""
+          ).toLowerCase();
+
+        const cocokSearch =
+          !search ||
+          nama.includes(search) ||
+          nisn.includes(search);
+
+        const cocokKelas =
+          !selectedClass ||
+          kelas === selectedClass;
+
+        return (
+          cocokSearch &&
+          cocokKelas
+        );
+
+      }
+    );
+
+  renderGuruStudents(
+    filtered
+  );
+
+}
+
+function closeGuruStudents() {
+
+  const modal =
+    document.getElementById(
+      "guruStudentsModal"
+    );
+
+  if (modal) {
+    modal.remove();
+  }
+
+}
 
 
     function openGuruRewards() {
@@ -526,6 +1197,17 @@
         "guru-login.html";
 
     }
+
+    function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
 
   </script>
 
