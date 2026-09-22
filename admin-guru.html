@@ -1,0 +1,1022 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manajemen Akun Guru - LENTERA SMANTI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #07111f;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #0b1d33;
+      padding: 18px 20px;
+      border-bottom: 1px solid #c9a227;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    header h1 {
+      color: #d4af37;
+      font-size: 21px;
+    }
+
+    header p {
+      color: #aeb8c5;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .back-btn {
+      background: transparent;
+      color: #d4af37;
+      border: 1px solid #d4af37;
+      padding: 9px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .back-btn:hover {
+      background: #d4af37;
+      color: #07111f;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 220px;
+      background: #0d2037;
+      color: #fff;
+      border: 1px solid #29415c;
+      border-radius: 9px;
+      padding: 12px;
+      outline: none;
+    }
+
+    .search-box:focus {
+      border-color: #d4af37;
+    }
+
+    .add-btn {
+      background: #d4af37;
+      color: #07111f;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .add-btn:hover {
+      background: #f0ce57;
+    }
+
+    .status {
+      margin-bottom: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .status.success {
+      display: block;
+      background: #123c2b;
+      border: 1px solid #2d8a61;
+      color: #9df0c7;
+    }
+
+    .status.error {
+      display: block;
+      background: #401c23;
+      border: 1px solid #a94455;
+      color: #ffb4c0;
+    }
+
+    .guru-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .guru-card {
+      background: #0d2037;
+      border: 1px solid #213b57;
+      border-radius: 12px;
+      padding: 17px;
+    }
+
+    .guru-card:hover {
+      border-color: #8f7725;
+    }
+
+    .guru-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .guru-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .guru-username {
+      margin-top: 4px;
+      color: #aeb8c5;
+      font-size: 14px;
+    }
+
+    .status-badge {
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .status-aktif {
+      background: #123c2b;
+      color: #8ff0bd;
+    }
+
+    .status-nonaktif {
+      background: #422029;
+      color: #ffabb9;
+    }
+
+    .guru-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .action-btn {
+      border: 1px solid #38536e;
+      background: #102943;
+      color: #fff;
+      padding: 8px 11px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .action-btn:hover {
+      border-color: #d4af37;
+      color: #d4af37;
+    }
+
+    .action-danger {
+      border-color: #8b3544;
+      color: #ff9baa;
+    }
+
+    .action-danger:hover {
+      background: #481d27;
+      border-color: #ff6f83;
+      color: #ff9baa;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #8f9baa;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: #c9a227;
+    }
+
+    /* MODAL */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 470px;
+      background: #0b1d33;
+      border: 1px solid #c9a227;
+      border-radius: 13px;
+      padding: 20px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-box h2 {
+      color: #d4af37;
+      margin-bottom: 18px;
+      font-size: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      color: #c7d0db;
+      font-size: 13px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 11px;
+      border-radius: 8px;
+      border: 1px solid #304a64;
+      background: #07182b;
+      color: #fff;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #d4af37;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+      margin-top: 20px;
+    }
+
+    .cancel-btn {
+      background: #1a3048;
+      color: #fff;
+      border: 1px solid #38536e;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .save-btn {
+      background: #d4af37;
+      color: #07111f;
+      border: none;
+      padding: 10px 17px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        align-items: flex-start;
+      }
+
+      header h1 {
+        font-size: 18px;
+      }
+
+      .back-btn {
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+
+      .container {
+        padding: 14px;
+      }
+
+      .guru-header {
+        flex-direction: column;
+      }
+
+      .guru-actions button {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div>
+    <h1>Manajemen Akun Guru</h1>
+    <p>LENTERA SMANTI — Panel Administrator</p>
+  </div>
+
+  <button class="back-btn" onclick="window.location.href='admin.html'">
+    ← Kembali
+  </button>
+</header>
+
+<div class="container">
+
+  <div id="statusMessage" class="status"></div>
+
+  <div class="toolbar">
+    <input
+      type="text"
+      id="searchInput"
+      class="search-box"
+      placeholder="Cari nama atau username guru..."
+      oninput="renderGuru()"
+    >
+
+    <button class="add-btn" onclick="openAddModal()">
+      + Tambah Guru
+    </button>
+  </div>
+
+  <div id="guruList" class="guru-list">
+    <div class="loading">Memuat akun guru...</div>
+  </div>
+
+</div>
+
+<!-- MODAL TAMBAH / EDIT -->
+
+<div id="guruModal" class="modal">
+  <div class="modal-box">
+
+    <h2 id="modalTitle">Tambah Akun Guru</h2>
+
+    <form id="guruForm">
+
+      <input type="hidden" id="guruId">
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          required
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="nama">Nama Guru</label>
+        <input
+          type="text"
+          id="nama"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          autocomplete="new-password"
+        >
+        <small id="passwordHelp" style="color:#8f9baa;display:block;margin-top:5px;">
+          Wajib diisi untuk akun baru.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status">
+          <option value="Aktif">Aktif</option>
+          <option value="Nonaktif">Nonaktif</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="cancel-btn"
+          onclick="closeModal()"
+        >
+          Batal
+        </button>
+
+        <button
+          type="submit"
+          class="save-btn"
+        >
+          Simpan
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+<script>
+  const adminSession = sessionStorage.getItem("lentera_admin_session");
+
+  if (!adminSession) {
+    window.location.href = "admin-login.html";
+  }
+
+  let guruData = [];
+  let editingGuru = null;
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function showStatus(message, type = "success") {
+    const el = document.getElementById("statusMessage");
+
+    el.textContent = message;
+    el.className = "status " + type;
+
+    setTimeout(() => {
+      el.className = "status";
+    }, 4000);
+  }
+
+  async function loadGuru() {
+    const list = document.getElementById("guruList");
+
+    list.innerHTML = `
+      <div class="loading">
+        Memuat akun guru...
+      </div>
+    `;
+
+    try {
+      const response = await fetch("/.netlify/functions/admin-guru");
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Gagal memuat akun guru.");
+      }
+
+      guruData = result.guru || [];
+
+      renderGuru();
+
+    } catch (error) {
+      console.error(error);
+
+      list.innerHTML = `
+        <div class="empty">
+          Gagal memuat akun guru.<br>
+          <small>${escapeHtml(error.message)}</small>
+        </div>
+      `;
+    }
+  }
+
+  function renderGuru() {
+    const list = document.getElementById("guruList");
+    const keyword = document
+      .getElementById("searchInput")
+      .value
+      .toLowerCase()
+      .trim();
+
+    const filtered = guruData.filter(guru => {
+      const nama = String(guru.nama || "").toLowerCase();
+      const username = String(guru.username || "").toLowerCase();
+
+      return (
+        nama.includes(keyword) ||
+        username.includes(keyword)
+      );
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <div class="empty">
+          Tidak ada akun guru yang ditemukan.
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = filtered.map(guru => {
+
+      const aktif =
+        String(guru.status || "").toLowerCase() === "aktif";
+
+      return `
+        <div class="guru-card">
+
+          <div class="guru-header">
+
+            <div>
+              <div class="guru-name">
+                ${escapeHtml(guru.nama || "-")}
+              </div>
+
+              <div class="guru-username">
+                @${escapeHtml(guru.username || "-")}
+              </div>
+            </div>
+
+            <span class="status-badge ${
+              aktif
+                ? "status-aktif"
+                : "status-nonaktif"
+            }">
+              ${escapeHtml(guru.status || "Nonaktif")}
+            </span>
+
+          </div>
+
+          <div class="guru-actions">
+
+            <button
+              class="action-btn"
+              onclick="editGuru('${escapeHtml(guru.id)}')"
+            >
+              ✏️ Edit
+            </button>
+
+            <button
+              class="action-btn"
+              onclick="resetPassword('${escapeHtml(guru.id)}')"
+            >
+              🔑 Reset Password
+            </button>
+
+            <button
+              class="action-btn"
+              onclick="toggleStatus('${escapeHtml(guru.id)}')"
+            >
+              ${aktif ? "🔒 Nonaktifkan" : "🔓 Aktifkan"}
+            </button>
+
+            <button
+              class="action-btn action-danger"
+              onclick="deleteGuru('${escapeHtml(guru.id)}')"
+            >
+              🗑️ Hapus
+            </button>
+
+          </div>
+
+        </div>
+      `;
+    }).join("");
+  }
+
+  function openAddModal() {
+
+    editingGuru = null;
+
+    document.getElementById("modalTitle").textContent =
+      "Tambah Akun Guru";
+
+    document.getElementById("guruId").value = "";
+    document.getElementById("username").value = "";
+    document.getElementById("nama").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("status").value = "Aktif";
+
+    document.getElementById("username").disabled = false;
+
+    document.getElementById("passwordHelp").textContent =
+      "Wajib diisi untuk akun baru.";
+
+    document.getElementById("guruModal").classList.add("active");
+
+    setTimeout(() => {
+      document.getElementById("username").focus();
+    }, 100);
+  }
+
+  function editGuru(id) {
+
+    const guru = guruData.find(
+      item => String(item.id) === String(id)
+    );
+
+    if (!guru) {
+      showStatus("Data guru tidak ditemukan.", "error");
+      return;
+    }
+
+    editingGuru = guru;
+
+    document.getElementById("modalTitle").textContent =
+      "Edit Akun Guru";
+
+    document.getElementById("guruId").value =
+      guru.id || "";
+
+    document.getElementById("username").value =
+      guru.username || "";
+
+    document.getElementById("nama").value =
+      guru.nama || "";
+
+    document.getElementById("password").value = "";
+
+    document.getElementById("status").value =
+      guru.status || "Aktif";
+
+    /*
+      Username tidak diubah saat edit.
+      Jika ingin mengganti username,
+      gunakan akun baru agar riwayat poin
+      tetap konsisten.
+    */
+    document.getElementById("username").disabled = true;
+
+    document.getElementById("passwordHelp").textContent =
+      "Kosongkan jika password tidak ingin diubah.";
+
+    document.getElementById("guruModal").classList.add("active");
+  }
+
+  function closeModal() {
+    document.getElementById("guruModal")
+      .classList.remove("active");
+
+    editingGuru = null;
+  }
+
+  document.getElementById("guruForm")
+    .addEventListener("submit", async function(event) {
+
+      event.preventDefault();
+
+      const id =
+        document.getElementById("guruId").value.trim();
+
+      const username =
+        document.getElementById("username").value.trim();
+
+      const nama =
+        document.getElementById("nama").value.trim();
+
+      const password =
+        document.getElementById("password").value;
+
+      const status =
+        document.getElementById("status").value;
+
+      if (!username || !nama) {
+        showStatus(
+          "Username dan nama guru wajib diisi.",
+          "error"
+        );
+        return;
+      }
+
+      if (!editingGuru && !password) {
+        showStatus(
+          "Password wajib diisi untuk akun baru.",
+          "error"
+        );
+        return;
+      }
+
+      const admin = getAdminUsername();
+
+      try {
+
+        let response;
+
+        if (editingGuru) {
+
+          const payload = {
+            id,
+            nama,
+            status,
+            admin
+          };
+
+          if (password) {
+            payload.password = password;
+          }
+
+          response = await fetch(
+            "/.netlify/functions/admin-guru",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(payload)
+            }
+          );
+
+        } else {
+
+          response = await fetch(
+            "/.netlify/functions/admin-guru",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                username,
+                nama,
+                password,
+                status,
+                admin
+              })
+            }
+          );
+        }
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.error ||
+            "Gagal menyimpan akun guru."
+          );
+        }
+
+        closeModal();
+
+        showStatus(
+          editingGuru
+            ? "Akun guru berhasil diperbarui."
+            : "Akun guru berhasil ditambahkan."
+        );
+
+        await loadGuru();
+
+      } catch (error) {
+
+        console.error(error);
+
+        showStatus(
+          error.message ||
+          "Terjadi kesalahan.",
+          "error"
+        );
+      }
+    });
+
+  async function resetPassword(id) {
+
+    const guru = guruData.find(
+      item => String(item.id) === String(id)
+    );
+
+    if (!guru) return;
+
+    const password = prompt(
+      "Masukkan password baru untuk @" +
+      guru.username
+    );
+
+    if (password === null) return;
+
+    if (!password.trim()) {
+      showStatus(
+        "Password tidak boleh kosong.",
+        "error"
+      );
+      return;
+    }
+
+    try {
+
+      const response = await fetch(
+        "/.netlify/functions/admin-guru",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            id: guru.id,
+            password: password,
+            admin: getAdminUsername()
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+          "Gagal mereset password."
+        );
+      }
+
+      showStatus(
+        "Password @" +
+        guru.username +
+        " berhasil diubah."
+      );
+
+      await loadGuru();
+
+    } catch (error) {
+
+      showStatus(
+        error.message,
+        "error"
+      );
+    }
+  }
+
+  async function toggleStatus(id) {
+
+    const guru = guruData.find(
+      item => String(item.id) === String(id)
+    );
+
+    if (!guru) return;
+
+    const aktif =
+      String(guru.status || "").toLowerCase() === "aktif";
+
+    const newStatus =
+      aktif ? "Nonaktif" : "Aktif";
+
+    const actionText =
+      aktif ? "menonaktifkan" : "mengaktifkan";
+
+    const yakin = confirm(
+      `Yakin ingin ${actionText} akun @${guru.username}?`
+    );
+
+    if (!yakin) return;
+
+    try {
+
+      const response = await fetch(
+        "/.netlify/functions/admin-guru",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            id: guru.id,
+            status: newStatus,
+            admin: getAdminUsername()
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+          "Gagal mengubah status akun."
+        );
+      }
+
+      showStatus(
+        `Akun @${guru.username} sekarang ${newStatus}.`
+      );
+
+      await loadGuru();
+
+    } catch (error) {
+
+      showStatus(
+        error.message,
+        "error"
+      );
+    }
+  }
+
+  async function deleteGuru(id) {
+
+    const guru = guruData.find(
+      item => String(item.id) === String(id)
+    );
+
+    if (!guru) return;
+
+    const yakin = confirm(
+      `Yakin ingin menghapus akun @${guru.username}?\n\n` +
+      "Data poin yang sudah dibuat oleh guru ini " +
+      "tidak ikut dihapus."
+    );
+
+    if (!yakin) return;
+
+    try {
+
+      const response = await fetch(
+        "/.netlify/functions/admin-guru",
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            id: guru.id,
+            admin: getAdminUsername()
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+          "Gagal menghapus akun guru."
+        );
+      }
+
+      showStatus(
+        "Akun @" +
+        guru.username +
+        " berhasil dihapus."
+      );
+
+      await loadGuru();
+
+    } catch (error) {
+
+      showStatus(
+        error.message,
+        "error"
+      );
+    }
+  }
+
+  function getAdminUsername() {
+
+    try {
+
+      const session =
+        JSON.parse(
+          sessionStorage.getItem(
+            "lentera_admin_session"
+          ) || "{}"
+        );
+
+      return (
+        session.username ||
+        session.user ||
+        "admin"
+      );
+
+    } catch {
+
+      return "admin";
+    }
+  }
+
+  document.getElementById("guruModal")
+    .addEventListener("click", function(event) {
+
+      if (event.target === this) {
+        closeModal();
+      }
+
+    });
+
+  loadGuru();
+</script>
+
+</body>
+</html>
+```
