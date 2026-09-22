@@ -1,45 +1,310 @@
 const { google } = require("googleapis");
 
+function getSheets() {
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      private_key: process.env.GOOGLE_PRIVATE_KEY
+        .replace(/\\n/g, "\n")
+        .replace(/^"|"$/g, "")
+    },
+    scopes: [
+      "https://www.googleapis.com/auth/spreadsheets"
+    ]
+  });
+
+  return google.sheets({
+    version: "v4",
+    auth
+  });
+}
+
+function success(data = {}) {
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      success: true,
+      ...data
+    })
+  };
+}
+
+function error(message, statusCode = 400) {
+  return {
+    statusCode,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      success: false,
+      message
+    })
+  };
+}
+
+async function getGuru(sheets, spreadsheetId, guruId, guruUsername) {
+
+  const response =
+    await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "Guru!A:E"
+    });
+
+  const rows =
+    response.data.values || [];
+
+  for (const row of rows.slice(1)) {
+
+    const id =
+      String(row[0] || "").trim();
+
+    const username =
+      String(row[1] || "").trim();
+
+    const nama =
+      String(row[3] || "").trim();
+
+    const status =
+      String(row[4] || "").trim();
+
+    if (
+      status.toLowerCase() !== "aktif"
+    ) {
+      continue;
+    }
+
+    if (
+      (guruId && id === String(guruId).trim()) ||
+      (guruUsername &&
+        username.toLowerCase() ===
+        String(guruUsername).trim().toLowerCase())
+    ) {
+      return {
+        id,
+        username,
+        nama
+      };
+    }
+  }
+
+  return null;
+}
+
+async function getSheetId(
+  sheets,
+  spreadsheetId,
+  sheetName
+) {
+
+  const response =
+    await sheets.spreadsheets.get({
+      spreadsheetId,
+      fields: "sheets.properties"
+    });
+
+  const sheet =
+    response.data.sheets.find(
+      item =>
+        item.properties.title === sheetName
+    );
+
+  return sheet
+    ? sheet.properties.sheetId
+    : null;
+}
+
 exports.handler = async function (event) {
+
+  const sheets = getSheets();
+
+  const spreadsheetId =
+    process.env.GOOGLE_SHEET_ID;
 
   try {
 
-    // =========================
-    // GOOGLE AUTH
-    // =========================
+    // =====================================================
+    // GET — POIN YANG DIBUAT GURU
+    // =====================================================
 
-    const privateKey =
-      process.env.GOOGLE_PRIVATE_KEY
-        .replace(/\\n/g, "\n")
-        .replace(/^"|"$/g, "");
+    if (event.httpMethod === "GET") {
 
-    const auth =
-      new google.auth.GoogleAuth({
-        credentials: {
-          client_email:
-            process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      const params =
+        event.queryStringParameters || {};
 
-          private_key:
-            privateKey
+      const guruId =
+        String(params.guruId || "").trim();
+
+      const guruUsername =
+        String(params.guruUsername || "").trim();
+
+      if (!guruId && !guruUsername) {
+        return error(
+          "Identitas guru tidak ditemukan.",
+          401
+        );
+      }
+
+      const guru =
+        await getGuru(
+          sheets,
+          spreadsheetId,
+          guruId,
+          guruUsername
+        );
+
+      if (!guru) {
+        return error(
+          "Akun guru tidak ditemukan.",
+          404
+        );
+      }
+
+      const poinResponse =
+        await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: "Poin!A:H"
+        });
+
+      const siswaResponse =
+        await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: "Siswa!A:F"
+        });
+
+      const kelasResponse =
+        await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: "Kelas!A:E"
+        });
+
+      const poinRows =
+        poinResponse.data.values || [];
+
+      const siswaRows =
+        siswaResponse.data.values || [];
+
+      const kelasRows =
+        kelasResponse.data.values || [];
+
+      const siswaMap = {};
+      const kelasMap = {};
+
+      siswaRows
+        .slice(1)
+        .forEach(row => {
+
+          const id =
+            String(row[0] || "").trim();
+
+          if (!id) return;
+
+          siswaMap[id] = {
+            nama:
+              String(row[2] || "").trim(),
+
+            nisn:
+              String(row[1] || "").trim(),
+
+            kelasId:
+              String(row[3] || "").trim()
+          };
+        });
+
+      kelasRows
+        .slice(1)
+        .forEach(row => {
+
+          const id =
+            String(row[0] || "").trim();
+
+          const nama =
+            String(row[1] || "").trim();
+
+          if (id) {
+            kelasMap[id] = nama;
+          }
+        });
+
+      const poinSaya = [];
+
+      poinRows
+        .slice(1)
+        .forEach(row => {
+
+          const creator =
+            String(row[6] || "").trim();
+
+          if (
+            creator.toLowerCase() !==
+            guru.username.toLowerCase()
+          ) {
+            return;
+          }
+
+          const id =
+            String(row[0] || "").trim();
+
+          const siswaId =
+            String(row[1] || "").trim();
+
+          const siswa =
+            siswaMap[siswaId] || {};
+
+          poinSaya.push({
+
+            id,
+
+            siswaId,
+
+            siswaNama:
+              siswa.nama || "-",
+
+            siswaNisn:
+              siswa.nisn || "-",
+
+            siswaKelas:
+              kelasMap[siswa.kelasId] || "-",
+
+            jenis:
+              String(row[2] || "").trim(),
+
+            poin:
+              Number(row[3] || 0),
+
+            keterangan:
+              String(row[4] || "").trim(),
+
+            tanggal:
+              String(row[5] || "").trim(),
+
+            guruUsername:
+              guru.username
+          });
+
+        });
+
+      poinSaya.sort(
+        (a, b) =>
+          new Date(b.tanggal) -
+          new Date(a.tanggal)
+      );
+
+      return success({
+        guru: {
+          id: guru.id,
+          username: guru.username,
+          nama: guru.nama
         },
-
-        scopes: [
-          "https://www.googleapis.com/auth/spreadsheets"
-        ]
+        poin: poinSaya
       });
+    }
 
-    const sheets =
-      google.sheets({
-        version: "v4",
-        auth
-      });
-
-    const spreadsheetId =
-      process.env.GOOGLE_SHEET_ID;
-
-    // ========================================
-    // POST = TAMBAH POIN
-    // ========================================
+    // =====================================================
+    // POST — TAMBAH POIN
+    // =====================================================
 
     if (event.httpMethod === "POST") {
 
@@ -50,7 +315,7 @@ exports.handler = async function (event) {
         String(body.siswaId || "").trim();
 
       const poin =
-        Number(body.poin || 0);
+        Number(body.poin);
 
       const keterangan =
         String(body.keterangan || "").trim();
@@ -67,12 +332,7 @@ exports.handler = async function (event) {
         String(body.guruUsername || "").trim();
 
       if (!siswaId) {
-
-        return error(
-          400,
-          "Siswa belum dipilih."
-        );
-
+        return error("Siswa belum dipilih.");
       }
 
       if (
@@ -80,318 +340,83 @@ exports.handler = async function (event) {
         poin < 1 ||
         poin > 100
       ) {
-
         return error(
-          400,
-          "Poin harus antara 1 sampai 100."
+          "Poin harus berupa angka 1 sampai 100."
         );
-
       }
 
       if (!keterangan) {
-
         return error(
-          400,
           "Keterangan wajib diisi."
         );
-
-      }
-
-      if (keterangan.length > 500) {
-
-        return error(
-          400,
-          "Keterangan maksimal 500 karakter."
-        );
-
       }
 
       if (
         jenis !== "penghargaan" &&
         jenis !== "pelanggaran"
       ) {
-
         return error(
-          400,
           "Jenis poin tidak valid."
         );
-
       }
 
-      if (!guruId || !guruUsername) {
-
-        return error(
-          401,
-          "Data akun guru tidak ditemukan."
-        );
-
-      }
-
-      // CEK SISWA
-
-      const siswaResponse =
-        await sheets.spreadsheets.values.get({
+      const guru =
+        await getGuru(
+          sheets,
           spreadsheetId,
-          range: "Siswa!A:F"
-        });
-
-      const siswaRows =
-        siswaResponse.data.values || [];
-
-      const siswa =
-        siswaRows
-          .slice(1)
-          .find(row =>
-            String(row[0] || "").trim() === siswaId
-          );
-
-      if (!siswa) {
-
-        return error(
-          404,
-          "Siswa tidak ditemukan."
+          guruId,
+          guruUsername
         );
 
-      }
-
-      const status =
-        String(siswa[5] || "")
-          .trim()
-          .toLowerCase();
-
-      if (status !== "aktif") {
-
+      if (!guru) {
         return error(
-          400,
-          "Siswa tidak aktif."
+          "Akun guru tidak ditemukan.",
+          404
         );
-
       }
 
       const pointId =
         "P" + Date.now();
 
+      // Simpan tanggal lokal Indonesia
       const tanggal =
-        new Date().toISOString();
+        new Intl.DateTimeFormat(
+          "sv-SE",
+          {
+            timeZone: "Asia/Jakarta",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+          }
+        ).format(new Date());
 
       await sheets.spreadsheets.values.append({
-
         spreadsheetId,
-
         range: "Poin!A:H",
-
         valueInputOption: "USER_ENTERED",
-
         insertDataOption: "INSERT_ROWS",
-
         requestBody: {
-
           values: [[
-
             pointId,
             siswaId,
             jenis,
             poin,
             keterangan,
             tanggal,
-            guruUsername,
+            guru.username,
             "Guru"
-
           ]]
-
         }
-
       });
 
-      return success(
-        "Poin berhasil ditambahkan.",
-        {
-          id: pointId
-        }
-      );
-
+      return success({
+        message: "Poin berhasil ditambahkan."
+      });
     }
 
-    // ========================================
-// GET = POIN YANG DIBUAT GURU SENDIRI
-// ========================================
-
-if (event.httpMethod === "GET") {
-
-  const params =
-    event.queryStringParameters || {};
-
-  const guruUsername =
-    String(
-      params.guruUsername || ""
-    ).trim();
-
-  if (!guruUsername) {
-
-    return error(
-      400,
-      "Username guru tidak ditemukan."
-    );
-
-  }
-
-  const response =
-    await sheets.spreadsheets.values.get({
-
-      spreadsheetId,
-
-      range: "Poin!A:H"
-
-    });
-
-  const rows =
-    response.data.values || [];
-
-  // Ambil data siswa
-  const siswaResponse =
-    await sheets.spreadsheets.values.get({
-
-      spreadsheetId,
-
-      range: "Siswa!A:F"
-
-    });
-
-  const siswaRows =
-    siswaResponse.data.values || [];
-
-  const siswaMap = {};
-
-  siswaRows
-    .slice(1)
-    .forEach(row => {
-
-      siswaMap[
-        String(row[0] || "").trim()
-      ] = {
-
-        nama:
-          String(row[2] || "").trim(),
-
-        nisn:
-          String(row[1] || "").trim(),
-
-        kelasId:
-          String(row[3] || "").trim()
-
-      };
-
-    });
-
-  // Ambil kelas
-  const kelasResponse =
-    await sheets.spreadsheets.values.get({
-
-      spreadsheetId,
-
-      range: "Kelas!A:E"
-
-    });
-
-  const kelasRows =
-    kelasResponse.data.values || [];
-
-  const kelasMap = {};
-
-  kelasRows
-    .slice(1)
-    .forEach(row => {
-
-      kelasMap[
-        String(row[0] || "").trim()
-      ] =
-        String(row[1] || "").trim();
-
-    });
-
-  const points =
-    rows
-      .slice(1)
-      .filter(row => {
-
-        return (
-          String(row[6] || "").trim() ===
-          guruUsername
-        );
-
-      })
-      .map(row => {
-
-        const siswaId =
-          String(row[1] || "").trim();
-
-        const siswa =
-          siswaMap[siswaId] || {};
-
-        return {
-
-          id:
-            String(row[0] || "").trim(),
-
-          siswaId,
-
-          siswaNama:
-            siswa.nama || "-",
-
-          siswaNisn:
-            siswa.nisn || "-",
-
-          siswaKelas:
-            kelasMap[
-              siswa.kelasId
-            ] || "-",
-
-          jenis:
-            String(row[2] || "").trim(),
-
-          poin:
-            Number(row[3] || 0),
-
-          keterangan:
-            String(row[4] || "").trim(),
-
-          tanggal:
-            String(row[5] || "").trim(),
-
-          guruUsername
-
-        };
-
-      })
-      .sort((a, b) =>
-        new Date(b.tanggal) -
-        new Date(a.tanggal)
-      );
-
-  return {
-
-    statusCode: 200,
-
-    headers: {
-      "Content-Type":
-        "application/json"
-    },
-
-    body: JSON.stringify({
-
-      success: true,
-
-      points
-
-    })
-
-  };
-
-}
-
-    // ========================================
-    // PUT = EDIT POIN SENDIRI
-    // ========================================
+    // =====================================================
+    // PUT — EDIT POIN SENDIRI
+    // =====================================================
 
     if (event.httpMethod === "PUT") {
 
@@ -401,27 +426,45 @@ if (event.httpMethod === "GET") {
       const pointId =
         String(body.id || "").trim();
 
-      const poin =
-        Number(body.poin || 0);
-
-      const keterangan =
-        String(body.keterangan || "").trim();
+      const siswaId =
+        String(body.siswaId || "").trim();
 
       const jenis =
         String(body.jenis || "")
           .trim()
           .toLowerCase();
 
+      const poin =
+        Number(body.poin);
+
+      const keterangan =
+        String(body.keterangan || "").trim();
+
+      const guruId =
+        String(body.guruId || "").trim();
+
       const guruUsername =
         String(body.guruUsername || "").trim();
 
-      if (!pointId || !guruUsername) {
-
+      if (!pointId) {
         return error(
-          400,
-          "Data poin tidak lengkap."
+          "ID poin tidak ditemukan."
+        );
+      }
+
+      const guru =
+        await getGuru(
+          sheets,
+          spreadsheetId,
+          guruId,
+          guruUsername
         );
 
+      if (!guru) {
+        return error(
+          "Akun guru tidak ditemukan.",
+          404
+        );
       }
 
       if (
@@ -429,115 +472,88 @@ if (event.httpMethod === "GET") {
         poin < 1 ||
         poin > 100
       ) {
-
         return error(
-          400,
-          "Poin harus antara 1 sampai 100."
+          "Poin harus berupa angka 1 sampai 100."
         );
-
       }
 
       if (!keterangan) {
-
         return error(
-          400,
           "Keterangan wajib diisi."
         );
-
       }
 
       if (
         jenis !== "penghargaan" &&
         jenis !== "pelanggaran"
       ) {
-
         return error(
-          400,
           "Jenis poin tidak valid."
         );
-
       }
 
       const response =
         await sheets.spreadsheets.values.get({
-
           spreadsheetId,
-
           range: "Poin!A:H"
-
         });
 
       const rows =
         response.data.values || [];
 
-      const rowIndex =
-        rows.findIndex((row, index) => {
+      let rowNumber = -1;
 
-          if (index === 0) {
-            return false;
-          }
+      for (
+        let i = 1;
+        i < rows.length;
+        i++
+      ) {
 
-          const id =
-            String(row[0] || "").trim();
+        const id =
+          String(rows[i][0] || "").trim();
 
-          const pembuat =
-            String(row[6] || "").trim();
+        const creator =
+          String(rows[i][6] || "").trim();
 
-          return (
-            id === pointId &&
-            pembuat === guruUsername
-          );
-
-        });
-
-      if (rowIndex === -1) {
-
-        return error(
-          403,
-          "Poin tidak ditemukan atau bukan milik Anda."
-        );
-
+        if (
+          id === pointId &&
+          creator.toLowerCase() ===
+          guru.username.toLowerCase()
+        ) {
+          rowNumber = i + 1;
+          break;
+        }
       }
 
-      // rowIndex = index array
-      // Sheets row = index + 1
-
-      const sheetRow =
-        rowIndex + 1;
+      if (rowNumber === -1) {
+        return error(
+          "Poin tidak ditemukan atau bukan poin Anda.",
+          403
+        );
+      }
 
       await sheets.spreadsheets.values.update({
-
         spreadsheetId,
-
-        range:
-          `Poin!C${sheetRow}:E${sheetRow}`,
-
-        valueInputOption:
-          "USER_ENTERED",
-
+        range: `Poin!B${rowNumber}:E${rowNumber}`,
+        valueInputOption: "USER_ENTERED",
         requestBody: {
-
           values: [[
-
+            siswaId,
             jenis,
             poin,
             keterangan
-
           ]]
-
         }
-
       });
 
-      return success(
-        "Poin berhasil diperbarui."
-      );
-
+      return success({
+        message: "Poin berhasil diperbarui."
+      });
     }
 
-    // ========================================
-    // DELETE = HAPUS POIN SENDIRI
-    // ========================================
+    // =====================================================
+    // DELETE — HAPUS POIN SENDIRI
+    // =====================================================
 
     if (event.httpMethod === "DELETE") {
 
@@ -547,57 +563,71 @@ if (event.httpMethod === "GET") {
       const pointId =
         String(body.id || "").trim();
 
+      const guruId =
+        String(body.guruId || "").trim();
+
       const guruUsername =
         String(body.guruUsername || "").trim();
 
-      if (!pointId || !guruUsername) {
-
+      if (!pointId) {
         return error(
-          400,
-          "Data poin tidak lengkap."
+          "ID poin tidak ditemukan."
+        );
+      }
+
+      const guru =
+        await getGuru(
+          sheets,
+          spreadsheetId,
+          guruId,
+          guruUsername
         );
 
+      if (!guru) {
+        return error(
+          "Akun guru tidak ditemukan.",
+          404
+        );
       }
 
       const response =
         await sheets.spreadsheets.values.get({
-
           spreadsheetId,
-
           range: "Poin!A:H"
-
         });
 
       const rows =
         response.data.values || [];
 
-      const rowIndex =
-        rows.findIndex((row, index) => {
+      let rowNumber = -1;
 
-          if (index === 0) {
-            return false;
-          }
+      for (
+        let i = 1;
+        i < rows.length;
+        i++
+      ) {
 
-          const id =
-            String(row[0] || "").trim();
+        const id =
+          String(rows[i][0] || "").trim();
 
-          const pembuat =
-            String(row[6] || "").trim();
+        const creator =
+          String(rows[i][6] || "").trim();
 
-          return (
-            id === pointId &&
-            pembuat === guruUsername
-          );
+        if (
+          id === pointId &&
+          creator.toLowerCase() ===
+          guru.username.toLowerCase()
+        ) {
+          rowNumber = i + 1;
+          break;
+        }
+      }
 
-        });
-
-      if (rowIndex === -1) {
-
+      if (rowNumber === -1) {
         return error(
-          403,
-          "Poin tidak ditemukan atau bukan milik Anda."
+          "Poin tidak ditemukan atau bukan poin Anda.",
+          403
         );
-
       }
 
       const sheetId =
@@ -607,161 +637,51 @@ if (event.httpMethod === "GET") {
           "Poin"
         );
 
+      if (sheetId === null) {
+        return error(
+          "Sheet Poin tidak ditemukan.",
+          500
+        );
+      }
+
       await sheets.spreadsheets.batchUpdate({
-
         spreadsheetId,
-
         requestBody: {
-
           requests: [{
-
             deleteDimension: {
-
               range: {
-
                 sheetId,
-
                 dimension: "ROWS",
-
                 startIndex:
-                  rowIndex,
-
+                  rowNumber - 1,
                 endIndex:
-                  rowIndex + 1
-
+                  rowNumber
               }
-
             }
-
           }]
-
         }
-
       });
 
-      return success(
-        "Poin berhasil dihapus."
-      );
-
+      return success({
+        message: "Poin berhasil dihapus."
+      });
     }
 
     return error(
-      405,
-      "Method tidak diizinkan."
+      "Method tidak diizinkan.",
+      405
     );
 
-  } catch (error) {
+  } catch (err) {
 
     console.error(
       "GURU POINTS ERROR:",
-      error
+      err
     );
 
     return error(
-      500,
-      "Gagal memproses poin."
+      "Terjadi kesalahan pada server.",
+      500
     );
-
   }
-
 };
-
-
-// ========================================
-// HELPER RESPONSE
-// ========================================
-
-function success(
-  message,
-  data = {}
-) {
-
-  return {
-
-    statusCode: 200,
-
-    headers: {
-      "Content-Type":
-        "application/json"
-    },
-
-    body: JSON.stringify({
-
-      success: true,
-
-      message,
-
-      ...data
-
-    })
-
-  };
-
-}
-
-
-function error(
-  statusCode,
-  message
-) {
-
-  return {
-
-    statusCode,
-
-    headers: {
-      "Content-Type":
-        "application/json"
-    },
-
-    body: JSON.stringify({
-
-      success: false,
-
-      message
-
-    })
-
-  };
-
-}
-
-
-// ========================================
-// GET SHEET ID
-// ========================================
-
-async function getSheetId(
-  sheets,
-  spreadsheetId,
-  sheetName
-) {
-
-  const response =
-    await sheets.spreadsheets.get({
-
-      spreadsheetId,
-
-      fields:
-        "sheets.properties"
-
-    });
-
-  const sheet =
-    response.data.sheets.find(
-      item =>
-        item.properties.title ===
-        sheetName
-    );
-
-  if (!sheet) {
-
-    throw new Error(
-      `Sheet ${sheetName} tidak ditemukan.`
-    );
-
-  }
-
-  return sheet.properties.sheetId;
-
-}
