@@ -8,6 +8,9 @@ exports.handler = async function (event) {
   if (event.httpMethod !== "GET") {
     return {
       statusCode: 405,
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         success: false,
         message: "Method tidak diizinkan."
@@ -48,57 +51,39 @@ exports.handler = async function (event) {
 
 
     // =========================
-    // AMBIL DATA KELAS
+    // AMBIL SEMUA DATA SEKALIGUS
     // =========================
-    const kelasResponse =
-      await sheets.spreadsheets.values.get({
+    const response =
+      await sheets.spreadsheets.values.batchGet({
 
         spreadsheetId,
 
-        range: "Kelas!A:E"
+        ranges: [
+          "Kelas!A:E",
+          "Siswa!A:F",
+          "Poin!A:G"
+        ]
 
       });
+
+
+    const valueRanges =
+      response.data.valueRanges || [];
+
 
     const kelasRows =
-      kelasResponse.data.values || [];
-
-
-    // =========================
-    // AMBIL DATA SISWA
-    // =========================
-    const siswaResponse =
-      await sheets.spreadsheets.values.get({
-
-        spreadsheetId,
-
-        range: "Siswa!A:F"
-
-      });
+      valueRanges[0]?.values || [];
 
     const siswaRows =
-      siswaResponse.data.values || [];
-
-
-    // =========================
-    // AMBIL DATA POIN
-    // =========================
-    const poinResponse =
-      await sheets.spreadsheets.values.get({
-
-        spreadsheetId,
-
-        range: "Poin!A:G"
-
-      });
+      valueRanges[1]?.values || [];
 
     const poinRows =
-      poinResponse.data.values || [];
+      valueRanges[2]?.values || [];
 
 
     // =========================
     // MAP TOTAL POIN SISWA
     // =========================
-
     const poinMap = {};
 
 
@@ -154,7 +139,6 @@ exports.handler = async function (event) {
     // =========================
     // MAP NAMA KELAS
     // =========================
-
     const kelasMap = {};
 
 
@@ -198,7 +182,6 @@ exports.handler = async function (event) {
     // =========================
     // BUAT DATA SISWA
     // =========================
-
     const siswaPerKelas = {};
 
 
@@ -279,7 +262,6 @@ exports.handler = async function (event) {
     // =========================
     // BUAT HASIL KELAS
     // =========================
-
     const kelas = [];
 
 
@@ -312,14 +294,18 @@ exports.handler = async function (event) {
     // =========================
     // RESPONSE
     // =========================
-
     return {
 
       statusCode: 200,
 
       headers: {
+
         "Content-Type":
-          "application/json"
+          "application/json",
+
+        "Cache-Control":
+          "no-store"
+
       },
 
       body: JSON.stringify({
@@ -346,8 +332,13 @@ exports.handler = async function (event) {
       statusCode: 500,
 
       headers: {
+
         "Content-Type":
-          "application/json"
+          "application/json",
+
+        "Cache-Control":
+          "no-store"
+
       },
 
       body: JSON.stringify({
