@@ -597,7 +597,8 @@
               <p><strong>Poin:</strong> ${point.poin}</p>
               <p><strong>Keterangan:</strong> ${escapeHtml(point.keterangan)}</p>
               <p><strong>Tanggal:</strong> ${escapeHtml(point.tanggal)}</p>
-              <p><strong>Admin:</strong> ${escapeHtml(point.admin || "-")}</p>
+              <p><strong>Dibuat oleh:</strong> ${escapeHtml(point.dibuatOleh || "-")}</p>
+<p><strong>Peran:</strong> ${escapeHtml(point.peran || "-")}</p>
 
               <div class="card-actions">
                 <button type="button" class="logout-button secondary" onclick="openEditPoint('${escapeHtml(point.id)}')">
