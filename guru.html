@@ -460,6 +460,59 @@
       font-size: 13px;
     }
 
+    /* PASSWORD FORM */
+
+.password-form {
+  margin-top: 8px;
+}
+
+.password-form .form-group {
+  margin-bottom: 16px;
+}
+
+.password-form label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-gold);
+}
+
+.password-form input {
+  width: 100%;
+}
+
+.password-message {
+  display: none;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.password-message.show {
+  display: block;
+}
+
+.password-message.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success-color);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.password-message.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.password-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
     @media (max-width: 650px) {
       .guru-container {
         padding: 0;
@@ -539,12 +592,11 @@
     <!-- BOTTOM -->
     <div class="guru-bottom">
       <button
-        type="button"
-        class="disabled"
-        onclick="alert('Fitur ubah password akan dibuat pada tahap berikutnya.')"
-      >
-        🔐 Ubah Password
-      </button>
+  type="button"
+  onclick="openGuruPassword()"
+>
+  🔐 Ubah Password
+</button>
 
       <button
         type="button"
@@ -556,6 +608,92 @@
     </div>
 
   </div>
+
+  <!-- MODAL UBAH PASSWORD GURU -->
+
+<div id="guruPasswordModal" class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2>🔐 Ubah Password</h2>
+
+      <button
+        type="button"
+        class="close"
+        onclick="closeGuruPassword()"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      id="guruPasswordMessage"
+      class="password-message"
+    ></div>
+
+    <div class="password-form">
+
+      <div class="form-group">
+
+        <label for="guruCurrentPassword">
+          Password Lama
+        </label>
+
+        <input
+          type="password"
+          id="guruCurrentPassword"
+          placeholder="Masukkan password lama"
+          autocomplete="current-password"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label for="guruNewPassword">
+          Password Baru
+        </label>
+
+        <input
+          type="password"
+          id="guruNewPassword"
+          placeholder="Minimal 6 karakter"
+          autocomplete="new-password"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label for="guruConfirmPassword">
+          Konfirmasi Password Baru
+        </label>
+
+        <input
+          type="password"
+          id="guruConfirmPassword"
+          placeholder="Ulangi password baru"
+          autocomplete="new-password"
+        >
+
+      </div>
+
+      <button
+        type="button"
+        class="submit password-submit"
+        onclick="submitGuruPassword()"
+      >
+        🔐 Simpan Password
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
   <!-- MODAL DATA SISWA -->
   <div id="studentsModal" class="modal">
@@ -1113,6 +1251,272 @@
       element.textContent = text;
       element.className = "message show " + type;
     }
+
+    // ========================================
+// UBAH PASSWORD GURU
+// ========================================
+
+function openGuruPassword() {
+
+  const modal =
+    document.getElementById("guruPasswordModal");
+
+  document.getElementById(
+    "guruCurrentPassword"
+  ).value = "";
+
+  document.getElementById(
+    "guruNewPassword"
+  ).value = "";
+
+  document.getElementById(
+    "guruConfirmPassword"
+  ).value = "";
+
+  const message =
+    document.getElementById(
+      "guruPasswordMessage"
+    );
+
+  message.textContent = "";
+  message.className = "password-message";
+
+  modal.classList.add("show");
+
+}
+
+
+function closeGuruPassword() {
+
+  document
+    .getElementById("guruPasswordModal")
+    .classList.remove("show");
+
+}
+
+
+async function submitGuruPassword() {
+
+  const currentPassword =
+    document.getElementById(
+      "guruCurrentPassword"
+    ).value;
+
+  const newPassword =
+    document.getElementById(
+      "guruNewPassword"
+    ).value;
+
+  const confirmPassword =
+    document.getElementById(
+      "guruConfirmPassword"
+    ).value;
+
+  // =========================
+  // VALIDASI
+  // =========================
+
+  if (!currentPassword) {
+
+    showPasswordMessage(
+      "Password lama wajib diisi.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (!newPassword) {
+
+    showPasswordMessage(
+      "Password baru wajib diisi.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (newPassword.length < 6) {
+
+    showPasswordMessage(
+      "Password baru minimal 6 karakter.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+
+    showPasswordMessage(
+      "Konfirmasi password tidak cocok.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (currentPassword === newPassword) {
+
+    showPasswordMessage(
+      "Password baru harus berbeda dari password lama.",
+      "error"
+    );
+
+    return;
+  }
+
+  // =========================
+  // CEK SESSION
+  // =========================
+
+  if (!guruSession || !guruSession.id) {
+
+    showPasswordMessage(
+      "Sesi guru tidak ditemukan. Silakan login kembali.",
+      "error"
+    );
+
+    return;
+  }
+
+  // =========================
+  // TOMBOL
+  // =========================
+
+  const button =
+    document.querySelector(
+      ".password-submit"
+    );
+
+  button.disabled = true;
+  button.textContent = "Menyimpan...";
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-change-password",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            guruId:
+              guruSession.id,
+
+            currentPassword:
+              currentPassword,
+
+            newPassword:
+              newPassword
+
+          })
+        }
+      );
+
+    const raw =
+      await response.text();
+
+    let result;
+
+    try {
+
+      result =
+        JSON.parse(raw);
+
+    } catch (error) {
+
+      throw new Error(
+        "Response server bukan JSON."
+      );
+
+    }
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengubah password."
+      );
+
+    }
+
+    // =========================
+    // BERHASIL
+    // =========================
+
+    showPasswordMessage(
+      "Password berhasil diubah.",
+      "success"
+    );
+
+    document.getElementById(
+      "guruCurrentPassword"
+    ).value = "";
+
+    document.getElementById(
+      "guruNewPassword"
+    ).value = "";
+
+    document.getElementById(
+      "guruConfirmPassword"
+    ).value = "";
+
+    setTimeout(() => {
+
+      closeGuruPassword();
+
+    }, 1500);
+
+  } catch (error) {
+
+    console.error(
+      "GURU PASSWORD ERROR:",
+      error
+    );
+
+    showPasswordMessage(
+      error.message ||
+      "Terjadi kesalahan.",
+      "error"
+    );
+
+  } finally {
+
+    button.disabled = false;
+    button.textContent =
+      "🔐 Simpan Password";
+
+  }
+
+}
+
+
+function showPasswordMessage(
+  text,
+  type
+) {
+
+  const message =
+    document.getElementById(
+      "guruPasswordMessage"
+    );
+
+  message.textContent = text;
+
+  message.className =
+    "password-message show " + type;
+
+}
 
     function logoutGuru() {
       sessionStorage.removeItem("lentera_guru_session");
