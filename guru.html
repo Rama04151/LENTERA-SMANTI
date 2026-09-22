@@ -577,6 +577,20 @@
         <div class="menu-desc">Menambahkan poin pelanggaran.</div>
       </button>
 
+      <button type="button" onclick="openMyPoints()">
+
+  <div class="menu-icon">📋</div>
+
+  <div class="menu-title">
+    Poin Saya
+  </div>
+
+  <div class="menu-desc">
+    Melihat, mengedit, dan menghapus poin yang Anda tambahkan.
+  </div>
+
+</button>
+
       <button
         type="button"
         class="disabled"
@@ -608,6 +622,46 @@
     </div>
 
   </div>
+
+  <!-- MODAL POIN SAYA -->
+
+<div id="myPointsModal" class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2>📋 Poin Saya</h2>
+
+      <button
+        type="button"
+        class="close"
+        onclick="closeMyPoints()"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      id="myPointsMessage"
+      class="message"
+    ></div>
+
+    <div
+      id="myPointsList"
+      class="student-list"
+    >
+
+      <div class="loading">
+        Memuat poin...
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
   <!-- MODAL UBAH PASSWORD GURU -->
 
@@ -1245,6 +1299,33 @@
       }
     }
 
+    function formatTanggalIndonesia(value) {
+
+  if (!value) {
+    return "-";
+  }
+
+  const date =
+    new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      timeZone: "Asia/Jakarta",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  ).format(date);
+
+}
+
     // UTILS
     function showMessage(id, text, type) {
       const element = document.getElementById(id);
@@ -1531,6 +1612,488 @@ function showPasswordMessage(
         }
       });
     });
+
+    // ========================================
+// POIN SAYA
+// ========================================
+
+let myPoints = [];
+
+
+async function openMyPoints() {
+
+  const modal =
+    document.getElementById(
+      "myPointsModal"
+    );
+
+  modal.classList.add("show");
+
+  await loadMyPoints();
+
+}
+
+
+function closeMyPoints() {
+
+  document
+    .getElementById(
+      "myPointsModal"
+    )
+    .classList.remove("show");
+
+}
+
+
+async function loadMyPoints() {
+
+  const list =
+    document.getElementById(
+      "myPointsList"
+    );
+
+  list.innerHTML =
+    `<div class="loading">
+      Memuat poin...
+    </div>`;
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-points",
+        {
+          method: "GET"
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengambil poin."
+      );
+
+    }
+
+    myPoints =
+      Array.isArray(result.points)
+        ? result.points
+        : [];
+
+    renderMyPoints();
+
+  } catch (error) {
+
+    console.error(error);
+
+    list.innerHTML =
+      `<div class="loading">
+        ${escapeHtml(error.message)}
+      </div>`;
+
+  }
+
+}
+
+
+function renderMyPoints() {
+
+  const list =
+    document.getElementById(
+      "myPointsList"
+    );
+
+  if (!myPoints.length) {
+
+    list.innerHTML =
+      `<div class="loading">
+        Belum ada poin yang Anda tambahkan.
+      </div>`;
+
+    return;
+
+  }
+
+  list.innerHTML =
+    myPoints.map(point => {
+
+      const jenis =
+        String(point.jenis || "")
+          .toLowerCase();
+
+      const isReward =
+        jenis === "penghargaan";
+
+      return `
+
+        <div class="student">
+
+          <div class="student-name">
+
+            ${escapeHtml(
+              point.siswaNama ||
+              point.siswaId ||
+              "-"
+            )}
+
+          </div>
+
+          <div class="student-info">
+
+            ${escapeHtml(
+              point.siswaKelas || "-"
+            )}
+
+            ·
+
+            ${escapeHtml(
+              point.siswaNisn || "-"
+            )}
+
+          </div>
+
+          <div class="points">
+
+            <span class="badge ${
+              isReward ? "" : "red"
+            }">
+
+              ${
+                isReward
+                  ? "🏆 Penghargaan"
+                  : "⚠️ Pelanggaran"
+              }
+
+              · ${Number(point.poin || 0)}
+
+            </span>
+
+          </div>
+
+          <div
+            class="student-info"
+            style="margin-top:10px;"
+          >
+
+            ${escapeHtml(
+              point.keterangan || "-"
+            )}
+
+          </div>
+
+          <div
+            class="student-info"
+            style="margin-top:6px;"
+          >
+
+            📅 ${
+              escapeHtml(
+                formatTanggalIndonesia(
+                  point.tanggal
+                )
+              )
+            }
+
+          </div>
+
+          <div
+            style="
+              display:flex;
+              gap:8px;
+              margin-top:12px;
+            "
+          >
+
+            <button
+              type="button"
+              class="submit"
+              style="flex:1;"
+              onclick="editMyPoint('${escapeHtml(point.id)}')"
+            >
+              ✏️ Edit
+            </button>
+
+            <button
+              type="button"
+              class="submit red"
+              style="flex:1;"
+              onclick="deleteMyPoint('${escapeHtml(point.id)}')"
+            >
+              🗑️ Hapus
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+}
+
+
+async function editMyPoint(id) {
+
+  const point =
+    myPoints.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+  if (!point) {
+    return;
+  }
+
+  const jenis =
+    prompt(
+      "Jenis poin:\n\n1 = Penghargaan\n2 = Pelanggaran",
+      String(point.jenis).toLowerCase() ===
+      "pelanggaran"
+        ? "2"
+        : "1"
+    );
+
+  if (jenis === null) {
+    return;
+  }
+
+  let jenisValue;
+
+  if (jenis === "1") {
+
+    jenisValue =
+      "penghargaan";
+
+  } else if (jenis === "2") {
+
+    jenisValue =
+      "pelanggaran";
+
+  } else {
+
+    alert(
+      "Pilihan jenis tidak valid."
+    );
+
+    return;
+
+  }
+
+  const poin =
+    prompt(
+      "Jumlah poin:",
+      point.poin
+    );
+
+  if (poin === null) {
+    return;
+  }
+
+  const nilai =
+    Number(poin);
+
+  if (
+    !Number.isInteger(nilai) ||
+    nilai < 1 ||
+    nilai > 100
+  ) {
+
+    alert(
+      "Poin harus berupa angka 1 sampai 100."
+    );
+
+    return;
+
+  }
+
+  const keterangan =
+    prompt(
+      "Keterangan:",
+      point.keterangan || ""
+    );
+
+  if (keterangan === null) {
+    return;
+  }
+
+  if (!keterangan.trim()) {
+
+    alert(
+      "Keterangan wajib diisi."
+    );
+
+    return;
+
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-points",
+        {
+
+          method: "PUT",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            id: point.id,
+
+            jenis:
+              jenisValue,
+
+            poin:
+              nilai,
+
+            keterangan:
+              keterangan.trim(),
+
+            guruUsername:
+              guruSession.username
+
+          })
+
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengedit poin."
+      );
+
+    }
+
+    showMessage(
+      "myPointsMessage",
+      "Poin berhasil diperbarui.",
+      "success"
+    );
+
+    await loadMyPoints();
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "myPointsMessage",
+      error.message,
+      "error"
+    );
+
+  }
+
+}
+
+
+async function deleteMyPoint(id) {
+
+  const point =
+    myPoints.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+  if (!point) {
+    return;
+  }
+
+  const yakin =
+    confirm(
+      "Hapus poin ini?\n\n" +
+      (point.keterangan || "")
+    );
+
+  if (!yakin) {
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-points",
+        {
+
+          method: "DELETE",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            id:
+              point.id,
+
+            guruUsername:
+              guruSession.username
+
+          })
+
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal menghapus poin."
+      );
+
+    }
+
+    showMessage(
+      "myPointsMessage",
+      "Poin berhasil dihapus.",
+      "success"
+    );
+
+    await loadMyPoints();
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "myPointsMessage",
+      error.message,
+      "error"
+    );
+
+  }
+
+}
   </script>
 
 </body>
