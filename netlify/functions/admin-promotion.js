@@ -1,23 +1,29 @@
 const { google } = require("googleapis");
 
-// =========================
+// =====================================================
 // GOOGLE SHEETS AUTH
-// =========================
+// =====================================================
 
 async function getSheets() {
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY
-    .replace(/\\n/g, "\n")
-    .replace(/^"|"$/g, "");
+  const privateKey =
+    process.env.GOOGLE_PRIVATE_KEY
+      .replace(/\\n/g, "\n")
+      .replace(/^"|"$/g, "");
 
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      private_key: privateKey
-    },
-    scopes: [
-      "https://www.googleapis.com/auth/spreadsheets"
-    ]
-  });
+  const auth =
+    new google.auth.GoogleAuth({
+      credentials: {
+        client_email:
+          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+
+        private_key:
+          privateKey
+      },
+
+      scopes: [
+        "https://www.googleapis.com/auth/spreadsheets"
+      ]
+    });
 
   return google.sheets({
     version: "v4",
@@ -25,101 +31,202 @@ async function getSheets() {
   });
 }
 
-// =========================
-// RESPONSE
-// =========================
+// =====================================================
+// BATCH GET
+//
+// Beberapa range dibaca dalam 1 Google Sheets request.
+// =====================================================
 
-function response(statusCode, body) {
+async function batchGet(
+  sheets,
+  spreadsheetId,
+  ranges
+) {
+  const result =
+    await sheets.spreadsheets.values.batchGet({
+      spreadsheetId,
+      ranges
+    });
+
+  const valueRanges =
+    result.data.valueRanges || [];
+
+  const data = {};
+
+  for (
+    let i = 0;
+    i < ranges.length;
+    i++
+  ) {
+    data[ranges[i]] =
+      valueRanges[i]?.values || [];
+  }
+
+  return data;
+}
+
+// =====================================================
+// RESPONSE
+// =====================================================
+
+function response(
+  statusCode,
+  body
+) {
   return {
     statusCode,
 
     headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-store"
+      "Content-Type":
+        "application/json",
+
+      "Cache-Control":
+        "no-store"
     },
 
-    body: JSON.stringify(body)
+    body:
+      JSON.stringify(body)
   };
 }
 
-// =========================
+// =====================================================
 // HANDLER
-// =========================
+// =====================================================
 
-exports.handler = async (event) => {
+exports.handler = async (
+  event
+) => {
 
   try {
 
-    // Hanya POST
-    if (event.httpMethod !== "POST") {
-      return response(405, {
-        success: false,
-        message: "Method tidak diizinkan."
-      });
+    // ===================================================
+    // HANYA POST
+    // ===================================================
+
+    if (
+      event.httpMethod !==
+      "POST"
+    ) {
+
+      return response(
+        405,
+        {
+          success:
+            false,
+
+          message:
+            "Method tidak diizinkan."
+        }
+      );
     }
 
-    const sheets = await getSheets();
+    const sheets =
+      await getSheets();
 
     const spreadsheetId =
       process.env.GOOGLE_SHEET_ID;
 
-    // =========================
+    // ===================================================
     // DATA REQUEST
-    // =========================
+    // ===================================================
 
-    const body = JSON.parse(
-      event.body || "{}"
-    );
+    const body =
+      JSON.parse(
+        event.body || "{}"
+      );
 
     const admin =
-      String(body.admin || "Admin").trim();
+      String(
+        body.admin ||
+        "Admin"
+      ).trim();
 
-    // =========================
-    // BACA KELAS
-    // =========================
+    // ===================================================
+    // BACA KELAS + SISWA
+    //
+    // SEBELUM:
+    // Kelas GET  = 1
+    // Siswa GET  = 1
+    //
+    // SEKARANG:
+    // batchGet   = 1
+    // ===================================================
 
-    const kelasResult =
-      await sheets.spreadsheets.values.get({
+    const data =
+      await batchGet(
+        sheets,
         spreadsheetId,
-        range: "Kelas!A:E"
-      });
+        [
+          "Kelas!A:E",
+          "Siswa!A:F"
+        ]
+      );
 
     const kelasRows =
-      kelasResult.data.values || [];
+      data["Kelas!A:E"] || [];
 
-    if (kelasRows.length <= 1) {
-      return response(400, {
-        success: false,
-        message: "Data kelas tidak ditemukan."
-      });
+    const siswaRows =
+      data["Siswa!A:F"] || [];
+
+    // ===================================================
+    // VALIDASI KELAS
+    // ===================================================
+
+    if (
+      kelasRows.length <= 1
+    ) {
+
+      return response(
+        400,
+        {
+          success:
+            false,
+
+          message:
+            "Data kelas tidak ditemukan."
+        }
+      );
     }
 
-    // =========================
+    // ===================================================
     // MAP KELAS
-    // =========================
+    // ===================================================
 
     const kelasMap = {};
 
-    for (let i = 1; i < kelasRows.length; i++) {
+    for (
+      let i = 1;
+      i < kelasRows.length;
+      i++
+    ) {
 
-      const row = kelasRows[i];
+      const row =
+        kelasRows[i];
 
       const id =
-        String(row[0] || "").trim();
+        String(
+          row[0] || ""
+        ).trim();
 
       const nama =
-        String(row[1] || "").trim();
+        String(
+          row[1] || ""
+        ).trim();
 
-      if (!id || !nama) {
+      if (
+        !id ||
+        !nama
+      ) {
         continue;
       }
 
-      kelasMap[nama] = id;
+      kelasMap[nama] =
+        id;
     }
 
-    // =========================
+    // ===================================================
     // VALIDASI 6 KELAS
-    // =========================
+    // ===================================================
 
     const kelasWajib = [
       "X A",
@@ -130,117 +237,195 @@ exports.handler = async (event) => {
       "XII B"
     ];
 
-    for (const namaKelas of kelasWajib) {
+    for (
+      const namaKelas of kelasWajib
+    ) {
 
-      if (!kelasMap[namaKelas]) {
+      if (
+        !kelasMap[namaKelas]
+      ) {
 
-        return response(400, {
-          success: false,
-          message:
-            `Kelas "${namaKelas}" tidak ditemukan di sheet Kelas.`
-        });
+        return response(
+          400,
+          {
+
+            success:
+              false,
+
+            message:
+              `Kelas "${namaKelas}" tidak ditemukan di sheet Kelas.`
+
+          }
+        );
       }
     }
 
-    // =========================
+    // ===================================================
     // MAPPING KENAIKAN
-    // =========================
+    // ===================================================
 
     const mapping = {
-      "X A": "XI A",
-      "X B": "XI B",
-      "XI A": "XII A",
-      "XI B": "XII B",
-      "XII A": "LULUS",
-      "XII B": "LULUS"
+
+      "X A":
+        "XI A",
+
+      "X B":
+        "XI B",
+
+      "XI A":
+        "XII A",
+
+      "XI B":
+        "XII B",
+
+      "XII A":
+        "LULUS",
+
+      "XII B":
+        "LULUS"
+
     };
 
-    // =========================
-    // BACA SISWA
-    // =========================
+    // ===================================================
+    // CEK DATA SISWA
+    // ===================================================
 
-    const siswaResult =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "Siswa!A:F"
-      });
+    if (
+      siswaRows.length <= 1
+    ) {
 
-    const siswaRows =
-      siswaResult.data.values || [];
+      return response(
+        200,
+        {
 
-    if (siswaRows.length <= 1) {
+          success:
+            true,
 
-      return response(200, {
-        success: true,
-        message: "Tidak ada siswa aktif yang perlu diproses.",
-        diproses: 0,
-        naik: 0,
-        lulus: 0
-      });
+          message:
+            "Tidak ada siswa aktif yang perlu diproses.",
+
+          diproses:
+            0,
+
+          naik:
+            0,
+
+          lulus:
+            0
+
+        }
+      );
     }
 
-    // =========================
+    // ===================================================
     // HASIL
-    // =========================
+    // ===================================================
 
     const updates = [];
+
     const riwayatValues = [];
 
     let naik = 0;
+
     let lulus = 0;
 
-    // =========================
+    // Satu timestamp dasar untuk proses ini.
+    // Ditambah index agar ID riwayat tidak sama.
+    const timestamp =
+      Date.now();
+
+    const tanggal =
+      new Date()
+        .toLocaleDateString(
+          "id-ID",
+          {
+            timeZone:
+              "Asia/Jakarta"
+          }
+        );
+
+    // ===================================================
     // PROSES SISWA
-    // =========================
+    // ===================================================
 
-    for (let i = 1; i < siswaRows.length; i++) {
+    for (
+      let i = 1;
+      i < siswaRows.length;
+      i++
+    ) {
 
-      const row = siswaRows[i];
+      const row =
+        siswaRows[i];
 
       const siswaId =
-        String(row[0] || "").trim();
+        String(
+          row[0] || ""
+        ).trim();
 
       const nama =
-        String(row[2] || "").trim();
+        String(
+          row[2] || ""
+        ).trim();
 
       const kelasId =
-        String(row[3] || "").trim();
+        String(
+          row[3] || ""
+        ).trim();
 
       const password =
         row[4] || "";
 
       const status =
-        String(row[5] || "").trim();
+        String(
+          row[5] || ""
+        ).trim();
 
-      // Tidak ada ID
+      // =================================================
+      // ID WAJIB
+      // =================================================
+
       if (!siswaId) {
         continue;
       }
 
-      // Hanya siswa aktif
-      if (status.toLowerCase() !== "aktif") {
+      // =================================================
+      // HANYA SISWA AKTIF
+      // =================================================
+
+      if (
+        status.toLowerCase() !==
+        "aktif"
+      ) {
         continue;
       }
 
-      // =========================
-      // CARI KELAS LAMA
-      // =========================
+      // =================================================
+      // CARI NAMA KELAS LAMA
+      // =================================================
 
-      let kelasLama = null;
+      let kelasLama =
+        null;
 
-      for (const namaKelas of kelasWajib) {
+      for (
+        const namaKelas of kelasWajib
+      ) {
 
         if (
-          kelasMap[namaKelas] === kelasId
+          kelasMap[namaKelas] ===
+          kelasId
         ) {
 
-          kelasLama = namaKelas;
+          kelasLama =
+            namaKelas;
+
           break;
         }
       }
 
-      // Kalau kelas tidak termasuk
-      // X/XI/XII, lewati
+      // =================================================
+      // KELAS TIDAK TERMASUK X/XI/XII
+      // =================================================
+
       if (!kelasLama) {
         continue;
       }
@@ -248,38 +433,56 @@ exports.handler = async (event) => {
       const kelasBaru =
         mapping[kelasLama];
 
-      // =========================
+      // =================================================
       // XII → LULUS
-      // =========================
+      // =================================================
 
-      if (kelasBaru === "LULUS") {
+      if (
+        kelasBaru ===
+        "LULUS"
+      ) {
 
-        const rowNumber = i + 1;
+        const rowNumber =
+          i + 1;
 
-        // Kelas_ID dikosongkan
-        // Status menjadi Lulus
+        // D = Kelas_ID
+        // E = Password
+        // F = Status
+
         updates.push({
+
           range:
             `Siswa!D${rowNumber}:F${rowNumber}`,
 
-          values: [
-            [
-              "",
-              password,
-              "Lulus"
-            ]
-          ]
+          values: [[
+
+            "",
+
+            password,
+
+            "Lulus"
+
+          ]]
+
         });
 
         // Riwayat
         riwayatValues.push([
-          `RK${Date.now()}${i}`,
+
+          `RK${timestamp}${i}`,
+
           siswaId,
+
           kelasId,
+
           "Lulus",
+
           "Lulus",
-          new Date().toLocaleDateString("id-ID"),
+
+          tanggal,
+
           admin
+
         ]);
 
         lulus++;
@@ -287,53 +490,86 @@ exports.handler = async (event) => {
         continue;
       }
 
-      // =========================
-      // PINDAH KELAS
-      // =========================
+      // =================================================
+      // CARI KELAS TUJUAN
+      // =================================================
 
       const kelasBaruId =
-        kelasMap[kelasBaru];
+        kelasMap[
+          kelasBaru
+        ];
 
-      if (!kelasBaruId) {
+      if (
+        !kelasBaruId
+      ) {
 
-        return response(400, {
-          success: false,
-          message:
-            `Kelas tujuan "${kelasBaru}" tidak ditemukan.`
-        });
+        return response(
+          400,
+          {
+
+            success:
+              false,
+
+            message:
+              `Kelas tujuan "${kelasBaru}" tidak ditemukan.`
+
+          }
+        );
       }
 
-      const rowNumber = i + 1;
+      const rowNumber =
+        i + 1;
 
-      // Update Kelas_ID
+      // =================================================
+      // UPDATE KELAS
+      // =================================================
+
       updates.push({
+
         range:
           `Siswa!D${rowNumber}`,
 
-        values: [
-          [kelasBaruId]
-        ]
+        values: [[
+          kelasBaruId
+        ]]
+
       });
 
-      // Riwayat
+      // =================================================
+      // RIWAYAT KENAIKAN
+      // =================================================
+
       riwayatValues.push([
-        `RK${Date.now()}${i}`,
+
+        `RK${timestamp}${i}`,
+
         siswaId,
+
         kelasId,
+
         kelasBaruId,
+
         "Kenaikan Kelas",
-        new Date().toLocaleDateString("id-ID"),
+
+        tanggal,
+
         admin
+
       ]);
 
       naik++;
     }
 
-    // =========================
-    // UPDATE SISWA
-    // =========================
+    // ===================================================
+    // UPDATE SISWA MASSAL
+    //
+    // 100 / 500 / 1000 siswa
+    // tetap 1 Google Sheets request.
+    // ===================================================
 
-    if (updates.length > 0) {
+    if (
+      updates.length > 0
+    ) {
 
       await sheets.spreadsheets.values.batchUpdate({
 
@@ -341,69 +577,96 @@ exports.handler = async (event) => {
 
         requestBody: {
 
-          valueInputOption: "RAW",
+          valueInputOption:
+            "RAW",
 
-          data: updates
+          data:
+            updates
+
         }
+
       });
     }
 
-    // =========================
-    // SIMPAN RIWAYAT
-    // =========================
+    // ===================================================
+    // SIMPAN RIWAYAT MASSAL
+    //
+    // Semua riwayat masuk dalam 1 append request.
+    // ===================================================
 
-    if (riwayatValues.length > 0) {
+    if (
+      riwayatValues.length >
+      0
+    ) {
 
       await sheets.spreadsheets.values.append({
 
         spreadsheetId,
 
-        range: "Riwayat_Kelas!A:G",
+        range:
+          "Riwayat_Kelas!A:G",
 
-        valueInputOption: "RAW",
+        valueInputOption:
+          "RAW",
 
-        insertDataOption: "INSERT_ROWS",
+        insertDataOption:
+          "INSERT_ROWS",
 
         requestBody: {
 
-          values: riwayatValues
+          values:
+            riwayatValues
+
         }
+
       });
     }
 
-    // =========================
+    // ===================================================
     // HASIL
-    // =========================
+    // ===================================================
 
-    return response(200, {
+    return response(
+      200,
+      {
 
-      success: true,
+        success:
+          true,
 
-      message:
-        "Kenaikan kelas berhasil diproses.",
+        message:
+          "Kenaikan kelas berhasil diproses.",
 
-      diproses:
-        naik + lulus,
+        diproses:
+          naik + lulus,
 
-      naik,
+        naik,
 
-      lulus
-    });
+        lulus
 
-  } catch (error) {
+      }
+    );
+
+  } catch (
+    error
+  ) {
 
     console.error(
       "PROMOTION ERROR:",
       error
     );
 
-    return response(500, {
+    return response(
+      500,
+      {
 
-      success: false,
+        success:
+          false,
 
-      message:
-        error.message ||
-        "Gagal memproses kenaikan kelas."
-    });
+        message:
+          error.message ||
+          "Gagal memproses kenaikan kelas."
+
+      }
+    );
   }
 };
