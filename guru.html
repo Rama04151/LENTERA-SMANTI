@@ -10,67 +10,396 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Guru - LENTERA SMANTI</title>
+  <title>Panel Guru - LENTERA SMANTI</title>
 
   <link
     rel="stylesheet"
     href="style.css"
   >
 
+  <style>
+
+    body {
+      min-height: 100vh;
+    }
+
+    .guru-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .guru-header {
+      margin-bottom: 20px;
+    }
+
+    .guru-header h1 {
+      margin: 0;
+    }
+
+    .guru-header p {
+      margin-top: 6px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .guru-profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .guru-avatar {
+      width: 50px;
+      height: 50px;
+      min-width: 50px;
+      border-radius: 14px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 25px;
+
+      background: rgba(251,192,45,0.12);
+      border: 1px solid rgba(251,192,45,0.2);
+    }
+
+    .guru-profile strong {
+      display: block;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    .guru-profile span {
+      display: block;
+      margin-top: 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .guru-menu {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .guru-menu-button {
+      width: 100%;
+      min-height: 120px;
+
+      padding: 20px;
+
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.07);
+
+      background: rgba(255,255,255,0.04);
+
+      color: #fff;
+
+      cursor: pointer;
+
+      text-align: left;
+
+      transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .guru-menu-button:hover {
+      transform: translateY(-2px);
+
+      background:
+        rgba(255,255,255,0.07);
+
+      border-color:
+        rgba(251,192,45,0.25);
+    }
+
+    .guru-menu-button:active {
+      transform: scale(0.98);
+    }
+
+    .guru-menu-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .guru-menu-title {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .guru-menu-description {
+      display: block;
+      margin-top: 5px;
+
+      color: var(--text-muted);
+
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .guru-bottom {
+      margin-top: 20px;
+
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .guru-secondary-button {
+      width: 100%;
+      padding: 13px;
+
+      border-radius: 12px;
+
+      border: 1px solid rgba(255,255,255,0.08);
+
+      background:
+        rgba(255,255,255,0.04);
+
+      color: var(--text-muted);
+
+      cursor: pointer;
+
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .guru-secondary-button:hover {
+      background:
+        rgba(255,255,255,0.07);
+
+      color: #fff;
+    }
+
+    .guru-footer {
+      text-align: center;
+
+      margin-top: 25px;
+
+      color: var(--text-muted);
+
+      font-size: 10px;
+    }
+
+    @media (max-width: 600px) {
+
+      .guru-container {
+        padding: 14px;
+      }
+
+      .guru-menu {
+        grid-template-columns: 1fr;
+      }
+
+      .guru-menu-button {
+        min-height: 105px;
+      }
+
+      .guru-bottom {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+  </style>
+
 </head>
 
 <body>
 
-  <main class="container">
+  <main class="guru-container">
 
-    <section class="card">
+    <!-- HEADER -->
+
+    <header class="guru-header">
 
       <h1>
-        👨‍🏫 Panel Guru
+        LENTERA SMANTI
       </h1>
 
-      <p
-        id="guruWelcome"
-        class="subtitle"
-      ></p>
+      <p>
+        Panel Pengelolaan Guru
+      </p>
 
-      <div
-        style="
-          padding:15px;
-          border-radius:12px;
-          background:rgba(255,255,255,0.05);
-          margin-top:20px;
-        "
-      >
+    </header>
 
-        <strong>
-          ✅ Login Guru berhasil
+
+    <!-- PROFIL GURU -->
+
+    <section class="guru-profile">
+
+      <div class="guru-avatar">
+        👨‍🏫
+      </div>
+
+      <div>
+
+        <strong id="guruName">
+          Guru
         </strong>
 
-        <p
-          id="guruInfo"
-          style="
-            margin-top:8px;
-            line-height:1.7;
-          "
-        ></p>
+        <span id="guruUsername">
+          Username
+        </span>
 
       </div>
 
+    </section>
+
+
+    <!-- MENU UTAMA -->
+
+    <section class="guru-menu">
+
+      <!-- DATA SISWA -->
+
       <button
         type="button"
+        class="guru-menu-button"
+        onclick="openGuruStudents()"
+      >
+
+        <div class="guru-menu-icon">
+          👥
+        </div>
+
+        <span class="guru-menu-title">
+          Data Siswa
+        </span>
+
+        <span class="guru-menu-description">
+          Melihat siswa, kelas, serta jumlah
+          poin penghargaan dan pelanggaran.
+        </span>
+
+      </button>
+
+
+      <!-- PENGHARGAAN -->
+
+      <button
+        type="button"
+        class="guru-menu-button"
+        onclick="openGuruRewards()"
+      >
+
+        <div class="guru-menu-icon">
+          ⭐
+        </div>
+
+        <span class="guru-menu-title">
+          Penghargaan
+        </span>
+
+        <span class="guru-menu-description">
+          Memberikan poin penghargaan
+          kepada siswa.
+        </span>
+
+      </button>
+
+
+      <!-- PELANGGARAN -->
+
+      <button
+        type="button"
+        class="guru-menu-button"
+        onclick="openGuruViolations()"
+      >
+
+        <div class="guru-menu-icon">
+          ⚠️
+        </div>
+
+        <span class="guru-menu-title">
+          Pelanggaran
+        </span>
+
+        <span class="guru-menu-description">
+          Memberikan poin pelanggaran
+          kepada siswa.
+        </span>
+
+      </button>
+
+
+      <!-- INBOX -->
+
+      <button
+        type="button"
+        class="guru-menu-button"
+        onclick="openGuruInbox()"
+      >
+
+        <div class="guru-menu-icon">
+          📨
+        </div>
+
+        <span class="guru-menu-title">
+          Inbox Siswa
+        </span>
+
+        <span class="guru-menu-description">
+          Mengirim pesan kepada siswa
+          dan mengelola pesan yang dibuat.
+        </span>
+
+      </button>
+
+    </section>
+
+
+    <!-- MENU BAWAH -->
+
+    <section class="guru-bottom">
+
+      <button
+        type="button"
+        class="guru-secondary-button"
+        onclick="openGuruPassword()"
+      >
+        🔐 Ubah Password
+      </button>
+
+
+      <button
+        type="button"
+        class="guru-secondary-button"
         onclick="logoutGuru()"
-        style="margin-top:20px;"
       >
         🚪 Keluar
       </button>
 
     </section>
 
+
+    <footer class="guru-footer">
+
+      LENTERA SMANTI © 2026
+
+    </footer>
+
   </main>
 
 
   <script>
+
+    /*
+      ============================
+      CEK SESSION GURU
+      ============================
+    */
 
     const session =
       sessionStorage.getItem(
@@ -86,7 +415,8 @@
     }
 
 
-    let guru;
+    let guru = null;
+
 
     try {
 
@@ -106,30 +436,85 @@
     }
 
 
+    /*
+      ============================
+      TAMPILKAN DATA GURU
+      ============================
+    */
+
     if (guru) {
 
       document
-        .getElementById(
-          "guruWelcome"
-        )
+        .getElementById("guruName")
         .textContent =
-        "Selamat datang, " +
-        guru.nama;
+        guru.nama || "Guru";
 
 
       document
-        .getElementById(
-          "guruInfo"
-        )
-        .innerHTML = `
-          Nama: <strong>${guru.nama}</strong><br>
-          Username: <strong>${guru.username}</strong><br>
-          ID Guru: <strong>${guru.id}</strong><br>
-          Role: <strong>${guru.role}</strong>
-        `;
+        .getElementById("guruUsername")
+        .textContent =
+        "@" +
+        (guru.username || "");
 
     }
 
+
+    /*
+      ============================
+      MENU
+      ============================
+    */
+
+    function openGuruStudents() {
+
+      alert(
+        "Fitur Data Siswa akan dibuat pada tahap berikutnya."
+      );
+
+    }
+
+
+    function openGuruRewards() {
+
+      alert(
+        "Fitur Penghargaan akan dibuat pada tahap berikutnya."
+      );
+
+    }
+
+
+    function openGuruViolations() {
+
+      alert(
+        "Fitur Pelanggaran akan dibuat pada tahap berikutnya."
+      );
+
+    }
+
+
+    function openGuruInbox() {
+
+      alert(
+        "Fitur Inbox Guru akan dibuat pada tahap berikutnya."
+      );
+
+    }
+
+
+    function openGuruPassword() {
+
+      alert(
+        "Fitur ubah password Guru akan dibuat pada tahap berikutnya."
+      );
+
+    }
+
+
+    /*
+      ============================
+      LOGOUT
+      ============================
+    */
 
     function logoutGuru() {
 
