@@ -538,6 +538,20 @@
         padding: 18px;
       }
     }
+
+    .danger-button {
+  border: 0;
+  background: var(--danger-color);
+  color: white;
+  padding: 9px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.danger-button:hover {
+  opacity: 0.9;
+}
   </style>
 </head>
 
@@ -592,14 +606,19 @@
 </button>
 
       <button
-        type="button"
-        class="disabled"
-        onclick="alert('Fitur Inbox sedang dalam tahap berikutnya.')"
-      >
-        <div class="menu-icon">📥</div>
-        <div class="menu-title">Inbox Siswa</div>
-        <div class="menu-desc">Fitur akan diaktifkan pada tahap berikutnya.</div>
-      </button>
+  type="button"
+  onclick="openGuruInbox()"
+>
+  <div class="menu-icon">📨</div>
+
+  <div class="menu-title">
+    Inbox Siswa
+  </div>
+
+  <div class="menu-desc">
+    Kirim dan kelola pesan untuk siswa.
+  </div>
+</button>
 
     </div>
 
@@ -743,6 +762,168 @@
         🔐 Simpan Password
       </button>
 
+    </div>
+
+  </div>
+
+</div>
+
+  <div id="guruInboxModal" class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2>📨 Inbox Siswa</h2>
+
+      <button
+        type="button"
+        class="close"
+        onclick="closeGuruInbox()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div
+      id="guruInboxMessage"
+      class="message"
+    ></div>
+
+
+    <!-- KIRIM PESAN -->
+
+    <div class="form-group">
+
+      <label>
+        Pilih Siswa
+      </label>
+
+      <input
+        type="text"
+        id="inboxStudentSearch"
+        placeholder="Cari nama atau NISN..."
+        oninput="filterInboxStudents()"
+      >
+
+    </div>
+
+
+    <div
+      id="inboxStudentList"
+      class="student-list"
+    ></div>
+
+
+    <input
+      type="hidden"
+      id="inboxSelectedStudentId"
+    >
+
+
+    <div class="form-group">
+
+      <label>
+        Judul
+      </label>
+
+      <input
+        type="text"
+        id="inboxJudul"
+        maxlength="100"
+        placeholder="Judul pesan"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        Pesan
+      </label>
+
+      <textarea
+        id="inboxPesan"
+        maxlength="2000"
+        rows="5"
+        placeholder="Tulis pesan untuk siswa..."
+      ></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        Masa Aktif
+      </label>
+
+      <select id="inboxDurasi">
+
+        <option value="1h">
+          1 Jam
+        </option>
+
+        <option value="3h">
+          3 Jam
+        </option>
+
+        <option value="6h">
+          6 Jam
+        </option>
+
+        <option value="12h">
+          12 Jam
+        </option>
+
+        <option value="1d" selected>
+          1 Hari
+        </option>
+
+        <option value="3d">
+          3 Hari
+        </option>
+
+        <option value="7d">
+          7 Hari
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="submit"
+      onclick="sendGuruInbox()"
+    >
+      📨 Kirim Pesan
+    </button>
+
+
+    <hr style="
+      margin: 24px 0;
+      border: 0;
+      border-top: 1px solid var(--border-color);
+    ">
+
+
+    <h3 style="margin-bottom: 12px;">
+      Pesan Saya
+    </h3>
+
+
+    <div
+      id="guruInboxList"
+      class="student-list"
+    >
+      <div class="loading">
+        Memuat pesan...
+      </div>
     </div>
 
   </div>
@@ -1594,6 +1775,767 @@ function showPasswordMessage(
     "password-message show " + type;
 
 }
+
+let guruInboxMessages = [];
+
+let inboxStudents = [];
+
+let inboxSelectedStudent = null;
+
+
+// =====================================================
+// BUKA INBOX
+// =====================================================
+
+async function openGuruInbox() {
+
+  document
+    .getElementById("guruInboxModal")
+    .classList.add("show");
+
+  document
+    .getElementById("inboxSelectedStudentId")
+    .value = "";
+
+  document
+    .getElementById("inboxStudentSearch")
+    .value = "";
+
+  document
+    .getElementById("inboxJudul")
+    .value = "";
+
+  document
+    .getElementById("inboxPesan")
+    .value = "";
+
+  inboxSelectedStudent = null;
+
+  await loadInboxStudents();
+
+  await loadGuruInbox();
+}
+
+
+// =====================================================
+// TUTUP INBOX
+// =====================================================
+
+function closeGuruInbox() {
+
+  document
+    .getElementById("guruInboxModal")
+    .classList.remove("show");
+}
+
+
+// =====================================================
+// LOAD SISWA
+// =====================================================
+
+async function loadInboxStudents() {
+
+  const list =
+    document.getElementById(
+      "inboxStudentList"
+    );
+
+  list.innerHTML =
+    '<div class="loading">Memuat siswa...</div>';
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-students"
+      );
+
+    const result =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengambil data siswa."
+      );
+    }
+
+    inboxStudents =
+      result.siswa || [];
+
+    renderInboxStudents();
+
+  } catch (error) {
+
+    console.error(
+      "INBOX STUDENTS ERROR:",
+      error
+    );
+
+    list.innerHTML = `
+      <div class="empty-state">
+        ${escapeHtml(error.message)}
+      </div>
+    `;
+  }
+}
+
+
+// =====================================================
+// FILTER SISWA
+// =====================================================
+
+function filterInboxStudents() {
+
+  renderInboxStudents();
+}
+
+
+// =====================================================
+// RENDER SISWA
+// =====================================================
+
+function renderInboxStudents() {
+
+  const list =
+    document.getElementById(
+      "inboxStudentList"
+    );
+
+  const search =
+    document
+      .getElementById(
+        "inboxStudentSearch"
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+  const filtered =
+    inboxStudents.filter(
+      siswa => {
+
+        return (
+
+          siswa.nama
+            .toLowerCase()
+            .includes(search)
+
+          ||
+
+          siswa.nisn
+            .toLowerCase()
+            .includes(search)
+
+        );
+
+      }
+    );
+
+
+  if (!filtered.length) {
+
+    list.innerHTML =
+      '<div class="empty-state">Siswa tidak ditemukan.</div>';
+
+    return;
+  }
+
+
+  list.innerHTML =
+    filtered
+      .slice(0, 30)
+      .map(
+        siswa => `
+
+          <div
+            class="student-item ${
+              inboxSelectedStudent &&
+              inboxSelectedStudent.id ===
+              siswa.id
+                ? "selected"
+                : ""
+            }"
+            onclick="selectInboxStudent('${escapeHtml(siswa.id)}')"
+          >
+
+            <div>
+              <strong>
+                ${escapeHtml(siswa.nama)}
+              </strong>
+
+              <small>
+                ${escapeHtml(siswa.nisn)}
+                •
+                ${escapeHtml(siswa.kelas)}
+              </small>
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+}
+
+
+// =====================================================
+// PILIH SISWA
+// =====================================================
+
+function selectInboxStudent(
+  siswaId
+) {
+
+  const siswa =
+    inboxStudents.find(
+      item =>
+        item.id === siswaId
+    );
+
+  if (!siswa) {
+    return;
+  }
+
+  inboxSelectedStudent =
+    siswa;
+
+  document
+    .getElementById(
+      "inboxSelectedStudentId"
+    )
+    .value =
+    siswa.id;
+
+  document
+    .getElementById(
+      "inboxStudentSearch"
+    )
+    .value =
+    `${siswa.nama} - ${siswa.kelas}`;
+
+  renderInboxStudents();
+}
+
+
+// =====================================================
+// KIRIM PESAN
+// =====================================================
+
+async function sendGuruInbox() {
+
+  const siswaId =
+    document
+      .getElementById(
+        "inboxSelectedStudentId"
+      )
+      .value;
+
+  const judul =
+    document
+      .getElementById(
+        "inboxJudul"
+      )
+      .value
+      .trim();
+
+  const pesan =
+    document
+      .getElementById(
+        "inboxPesan"
+      )
+      .value
+      .trim();
+
+  const durasi =
+    document
+      .getElementById(
+        "inboxDurasi"
+      )
+      .value;
+
+
+  if (!siswaId) {
+
+    showGuruInboxMessage(
+      "Pilih siswa terlebih dahulu.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (!judul) {
+
+    showGuruInboxMessage(
+      "Judul wajib diisi.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (!pesan) {
+
+    showGuruInboxMessage(
+      "Pesan wajib diisi.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-inbox",
+        {
+
+          method:
+            "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              siswaId,
+
+              judul,
+
+              pesan,
+
+              durasi,
+
+              guruId:
+                guruSession.id,
+
+              guruUsername:
+                guruSession.username
+
+            })
+
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengirim pesan."
+      );
+    }
+
+
+    showGuruInboxMessage(
+      "Pesan berhasil dikirim.",
+      "success"
+    );
+
+
+    document
+      .getElementById(
+        "inboxJudul"
+      )
+      .value = "";
+
+    document
+      .getElementById(
+        "inboxPesan"
+      )
+      .value = "";
+
+    inboxSelectedStudent =
+      null;
+
+    document
+      .getElementById(
+        "inboxSelectedStudentId"
+      )
+      .value = "";
+
+    document
+      .getElementById(
+        "inboxStudentSearch"
+      )
+      .value = "";
+
+
+    renderInboxStudents();
+
+    await loadGuruInbox();
+
+
+  } catch (error) {
+
+    console.error(
+      "SEND GURU INBOX ERROR:",
+      error
+    );
+
+    showGuruInboxMessage(
+      error.message,
+      "error"
+    );
+  }
+}
+
+
+// =====================================================
+// LOAD PESAN SAYA
+// =====================================================
+
+async function loadGuruInbox() {
+
+  const list =
+    document.getElementById(
+      "guruInboxList"
+    );
+
+  list.innerHTML =
+    '<div class="loading">Memuat pesan...</div>';
+
+
+  try {
+
+    const params =
+      new URLSearchParams({
+
+        guruId:
+          guruSession.id
+
+      });
+
+
+    const response =
+      await fetch(
+        `/.netlify/functions/guru-inbox?${params.toString()}`
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengambil pesan."
+      );
+    }
+
+
+    guruInboxMessages =
+      result.pesan || [];
+
+
+    renderGuruInbox();
+
+
+  } catch (error) {
+
+    console.error(
+      "LOAD GURU INBOX ERROR:",
+      error
+    );
+
+    list.innerHTML = `
+      <div class="empty-state">
+        ${escapeHtml(error.message)}
+      </div>
+    `;
+  }
+}
+
+
+// =====================================================
+// FORMAT TANGGAL
+// =====================================================
+
+function formatInboxDate(
+  value
+) {
+
+  if (!value) {
+    return "-";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return value;
+  }
+
+
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+
+      timeZone:
+        "Asia/Jakarta",
+
+      day:
+        "2-digit",
+
+      month:
+        "long",
+
+      year:
+        "numeric"
+
+    }
+  ).format(date);
+}
+
+
+// =====================================================
+// RENDER PESAN
+// =====================================================
+
+function renderGuruInbox() {
+
+  const list =
+    document.getElementById(
+      "guruInboxList"
+    );
+
+
+  if (
+    !guruInboxMessages.length
+  ) {
+
+    list.innerHTML = `
+      <div class="empty-state">
+        Belum ada pesan yang Anda kirim.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  list.innerHTML =
+    guruInboxMessages
+      .map(
+        item => `
+
+          <div
+            class="student-item"
+            style="display:block;"
+          >
+
+            <strong>
+              ${escapeHtml(item.judul)}
+            </strong>
+
+            <small>
+              Kepada:
+              ${escapeHtml(item.siswaNama)}
+              •
+              ${escapeHtml(item.siswaKelas)}
+            </small>
+
+            <p style="
+              margin:10px 0;
+              color:var(--text-muted);
+              white-space:pre-wrap;
+              overflow-wrap:anywhere;
+            ">
+              ${escapeHtml(item.pesan)}
+            </p>
+
+            <small>
+              Dikirim:
+              ${formatInboxDate(item.dibuat)}
+            </small>
+
+            <div style="
+              margin-top:12px;
+              display:flex;
+              justify-content:flex-end;
+            ">
+
+              <button
+                type="button"
+                class="danger-button"
+                onclick="deleteGuruInbox('${escapeHtml(item.id)}')"
+              >
+                🗑️ Hapus
+              </button>
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+}
+
+
+// =====================================================
+// HAPUS PESAN
+// =====================================================
+
+async function deleteGuruInbox(
+  messageId
+) {
+
+  if (
+    !confirm(
+      "Hapus pesan ini?"
+    )
+  ) {
+
+    return;
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-inbox",
+        {
+
+          method:
+            "DELETE",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              id:
+                messageId,
+
+              guruId:
+                guruSession.id,
+
+              guruUsername:
+                guruSession.username
+
+            })
+
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal menghapus pesan."
+      );
+    }
+
+
+    await loadGuruInbox();
+
+
+    showGuruInboxMessage(
+      "Pesan berhasil dihapus.",
+      "success"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "DELETE GURU INBOX ERROR:",
+      error
+    );
+
+    showGuruInboxMessage(
+      error.message,
+      "error"
+    );
+  }
+}
+
+
+// =====================================================
+// MESSAGE
+// =====================================================
+
+function showGuruInboxMessage(
+  message,
+  type
+) {
+
+  const element =
+    document.getElementById(
+      "guruInboxMessage"
+    );
+
+  element.textContent =
+    message;
+
+  element.className =
+    `message ${type}`;
+}
+
+
+// =====================================================
+// TUTUP MODAL KETIKA KLIK LUAR
+// =====================================================
+
+document.addEventListener(
+  "click",
+  function(event) {
+
+    const modal =
+      document.getElementById(
+        "guruInboxModal"
+      );
+
+    if (
+      event.target === modal
+    ) {
+
+      closeGuruInbox();
+
+    }
+
+  }
+);
 
     function logoutGuru() {
       sessionStorage.removeItem("lentera_guru_session");
