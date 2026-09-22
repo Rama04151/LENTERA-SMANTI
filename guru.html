@@ -512,6 +512,237 @@
 
 }
 
+    .guru-reward-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  padding: 20px;
+
+  overflow-y: auto;
+
+  background:
+    rgba(0,0,0,0.72);
+
+  backdrop-filter:
+    blur(8px);
+}
+
+.guru-reward-modal {
+  width: 100%;
+
+  max-width: 550px;
+
+  margin: 40px auto;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  border-radius: 18px;
+
+  background: #111827;
+
+  border:
+    1px solid
+    rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 20px 60px
+    rgba(0,0,0,0.4);
+}
+
+.guru-reward-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+}
+
+.guru-reward-header h2 {
+  margin: 0;
+
+  color: #fff;
+
+  font-size: 18px;
+}
+
+.guru-reward-header p {
+  margin: 5px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 11px;
+}
+
+.guru-form-label {
+  display: block;
+
+  margin:
+    14px 0 7px;
+
+  color: #fff;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+.guru-form-input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px 13px;
+
+  border-radius: 10px;
+
+  border:
+    1px solid
+    rgba(255,255,255,0.08);
+
+  background:
+    rgba(255,255,255,0.05);
+
+  color: #fff;
+
+  outline: none;
+
+  font-family: inherit;
+
+  font-size: 12px;
+}
+
+.guru-form-input:focus {
+  border-color:
+    rgba(251,192,45,0.45);
+
+  background:
+    rgba(255,255,255,0.07);
+}
+
+.guru-form-input option {
+  background: #111827;
+
+  color: #fff;
+}
+
+.guru-form-textarea {
+  min-height: 110px;
+
+  resize: vertical;
+
+  line-height: 1.5;
+}
+
+.guru-reward-submit {
+  width: 100%;
+
+  margin-top: 18px;
+
+  padding: 13px;
+
+  border: none;
+
+  border-radius: 11px;
+
+  background:
+    var(--accent-gold);
+
+  color: #111827;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.guru-reward-submit:hover {
+  transform:
+    translateY(-1px);
+}
+
+.guru-reward-submit:active {
+  transform:
+    scale(0.98);
+}
+
+.guru-reward-submit:disabled {
+  opacity: 0.6;
+
+  cursor: wait;
+
+  transform: none;
+}
+
+.guru-reward-message {
+  margin-top: 12px;
+
+  padding: 10px;
+
+  border-radius: 9px;
+
+  display: none;
+
+  text-align: center;
+
+  font-size: 11px;
+
+  line-height: 1.4;
+}
+
+.guru-reward-message.success {
+  display: block;
+
+  color: #4ade80;
+
+  background:
+    rgba(74,222,128,0.08);
+
+  border:
+    1px solid
+    rgba(74,222,128,0.15);
+}
+
+.guru-reward-message.error {
+  display: block;
+
+  color: #f87171;
+
+  background:
+    rgba(248,113,113,0.08);
+
+  border:
+    1px solid
+    rgba(248,113,113,0.15);
+}
+
+@media (max-width: 600px) {
+
+  .guru-reward-overlay {
+    padding: 10px;
+  }
+
+  .guru-reward-modal {
+    margin: 15px auto;
+
+    padding: 15px;
+  }
+
+}
+
   </style>
 
 </head>
@@ -1145,13 +1376,478 @@ function closeGuruStudents() {
 }
 
 
-    function openGuruRewards() {
+    async function openGuruRewards() {
 
-      alert(
-        "Fitur Penghargaan akan dibuat pada tahap berikutnya."
+  const existing =
+    document.getElementById(
+      "guruRewardModal"
+    );
+
+  if (existing) {
+    existing.remove();
+  }
+
+  const modal =
+    document.createElement("div");
+
+  modal.id =
+    "guruRewardModal";
+
+  modal.className =
+    "guru-reward-overlay";
+
+  modal.innerHTML = `
+
+    <div class="guru-reward-modal">
+
+      <div class="guru-reward-header">
+
+        <div>
+          <h2>⭐ Poin Penghargaan</h2>
+
+          <p>
+            Berikan poin penghargaan kepada siswa
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="guru-close-button"
+          onclick="closeGuruRewards()"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <form
+        id="guruRewardForm"
+        onsubmit="submitGuruReward(event)"
+      >
+
+        <label class="guru-form-label">
+          Siswa
+        </label>
+
+        <select
+          id="guruRewardStudent"
+          class="guru-form-input"
+          required
+        >
+
+          <option value="">
+            Memuat siswa...
+          </option>
+
+        </select>
+
+        <label class="guru-form-label">
+          Jumlah Poin
+        </label>
+
+        <input
+          type="number"
+          id="guruRewardPoints"
+          class="guru-form-input"
+          min="1"
+          max="100"
+          placeholder="Contoh: 10"
+          required
+        >
+
+        <label class="guru-form-label">
+          Keterangan
+        </label>
+
+        <textarea
+          id="guruRewardDescription"
+          class="guru-form-input guru-form-textarea"
+          maxlength="500"
+          placeholder="Contoh: Aktif mengikuti kegiatan sekolah..."
+          required
+        ></textarea>
+
+        <button
+          type="submit"
+          id="guruRewardSubmit"
+          class="guru-reward-submit"
+        >
+          ⭐ Berikan Poin
+        </button>
+
+        <div
+          id="guruRewardMessage"
+          class="guru-reward-message"
+        ></div>
+
+      </form>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(modal);
+
+  await loadGuruRewardStudents();
+
+}
+
+    async function loadGuruRewardStudents() {
+
+  const select =
+    document.getElementById(
+      "guruRewardStudent"
+    );
+
+  if (!select) {
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-students"
+      );
+
+    const result =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengambil data siswa."
       );
 
     }
+
+    const siswa =
+      Array.isArray(result.siswa)
+        ? result.siswa
+        : [];
+
+    siswa.sort((a, b) => {
+
+      const kelasA =
+        String(a.kelas || "");
+
+      const kelasB =
+        String(b.kelas || "");
+
+      const kelasCompare =
+        kelasA.localeCompare(
+          kelasB,
+          "id"
+        );
+
+      if (kelasCompare !== 0) {
+        return kelasCompare;
+      }
+
+      return String(a.nama || "")
+        .localeCompare(
+          String(b.nama || ""),
+          "id"
+        );
+
+    });
+
+    select.innerHTML = `
+
+      <option value="">
+        Pilih siswa...
+      </option>
+
+      ${siswa.map(siswa => `
+
+        <option value="${escapeHtml(siswa.id)}">
+
+          ${escapeHtml(siswa.nama)}
+          — ${escapeHtml(siswa.kelas)}
+          — ${escapeHtml(siswa.nisn)}
+
+        </option>
+
+      `).join("")}
+
+    `;
+
+  }
+  catch (error) {
+
+    console.error(
+      "LOAD REWARD STUDENTS ERROR:",
+      error
+    );
+
+    select.innerHTML = `
+
+      <option value="">
+        Gagal memuat siswa
+      </option>
+
+    `;
+
+  }
+
+}
+
+    async function submitGuruReward(event) {
+
+  event.preventDefault();
+
+  const studentSelect =
+    document.getElementById(
+      "guruRewardStudent"
+    );
+
+  const pointsInput =
+    document.getElementById(
+      "guruRewardPoints"
+    );
+
+  const descriptionInput =
+    document.getElementById(
+      "guruRewardDescription"
+    );
+
+  const submitButton =
+    document.getElementById(
+      "guruRewardSubmit"
+    );
+
+  const message =
+    document.getElementById(
+      "guruRewardMessage"
+    );
+
+  const siswaId =
+    String(
+      studentSelect?.value || ""
+    ).trim();
+
+  const poin =
+    Number(
+      pointsInput?.value || 0
+    );
+
+  const keterangan =
+    String(
+      descriptionInput?.value || ""
+    ).trim();
+
+  if (!siswaId) {
+
+    showGuruRewardMessage(
+      "Silakan pilih siswa.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if (
+    !Number.isFinite(poin) ||
+    poin < 1 ||
+    poin > 100
+  ) {
+
+    showGuruRewardMessage(
+      "Poin harus antara 1 sampai 100.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if (!keterangan) {
+
+    showGuruRewardMessage(
+      "Keterangan wajib diisi.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const session =
+    sessionStorage.getItem(
+      "lentera_guru_session"
+    );
+
+  if (!session) {
+
+    window.location.href =
+      "guru-login.html";
+
+    return;
+
+  }
+
+  let guru;
+
+  try {
+
+    guru =
+      JSON.parse(session);
+
+  }
+  catch (error) {
+
+    sessionStorage.removeItem(
+      "lentera_guru_session"
+    );
+
+    window.location.href =
+      "guru-login.html";
+
+    return;
+
+  }
+
+  submitButton.disabled = true;
+
+  submitButton.textContent =
+    "Menyimpan...";
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-points",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            siswaId,
+
+            poin,
+
+            keterangan,
+
+            guruId:
+              guru.id || "",
+
+            guruUsername:
+              guru.username || ""
+
+          })
+
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal menyimpan poin."
+      );
+
+    }
+
+    showGuruRewardMessage(
+      "Poin penghargaan berhasil diberikan.",
+      "success"
+    );
+
+    document
+      .getElementById(
+        "guruRewardPoints"
+      )
+      .value = "";
+
+    document
+      .getElementById(
+        "guruRewardDescription"
+      )
+      .value = "";
+
+    setTimeout(() => {
+
+      closeGuruRewards();
+
+    }, 1200);
+
+  }
+  catch (error) {
+
+    console.error(
+      "SUBMIT GURU REWARD ERROR:",
+      error
+    );
+
+    showGuruRewardMessage(
+      error.message ||
+      "Terjadi kesalahan.",
+      "error"
+    );
+
+  }
+  finally {
+
+    submitButton.disabled = false;
+
+    submitButton.textContent =
+      "⭐ Berikan Poin";
+
+  }
+
+}
+
+function showGuruRewardMessage(
+  text,
+  type
+) {
+
+  const message =
+    document.getElementById(
+      "guruRewardMessage"
+    );
+
+  if (!message) {
+    return;
+  }
+
+  message.textContent =
+    text;
+
+  message.className =
+    "guru-reward-message " +
+    type;
+
+}
+
+function closeGuruRewards() {
+
+  const modal =
+    document.getElementById(
+      "guruRewardModal"
+    );
+
+  if (modal) {
+    modal.remove();
+  }
+
+}
 
 
     function openGuruViolations() {
