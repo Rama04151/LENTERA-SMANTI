@@ -743,6 +743,152 @@
 
 }
 
+    .guru-reward-student-search {
+  width: 100%;
+}
+
+.guru-reward-student-results {
+  margin-top: 8px;
+
+  max-height: 230px;
+
+  overflow-y: auto;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.guru-reward-student-item {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 11px 12px;
+
+  border-radius: 10px;
+
+  border:
+    1px solid
+    rgba(255,255,255,0.06);
+
+  background:
+    rgba(255,255,255,0.035);
+
+  color: #fff;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.guru-reward-student-item:hover {
+  background:
+    rgba(251,192,45,0.08);
+
+  border-color:
+    rgba(251,192,45,0.2);
+}
+
+.guru-reward-student-item strong {
+  display: block;
+
+  font-size: 12px;
+
+  margin-bottom: 3px;
+}
+
+.guru-reward-student-item span {
+  color: var(--text-muted);
+
+  font-size: 9px;
+}
+
+.guru-reward-select-icon {
+  flex-shrink: 0;
+
+  color: var(--accent-gold) !important;
+
+  font-weight: 700;
+
+  font-size: 10px !important;
+}
+
+.guru-reward-selected {
+  margin-top: 9px;
+
+  padding: 11px 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(74,222,128,0.07);
+
+  border:
+    1px solid
+    rgba(74,222,128,0.16);
+}
+
+.guru-reward-selected strong {
+  display: block;
+
+  color: #4ade80;
+
+  font-size: 12px;
+
+  margin-bottom: 3px;
+}
+
+.guru-reward-selected span {
+  color: var(--text-muted);
+
+  font-size: 9px;
+}
+
+.guru-reward-selected button {
+  width: 28px;
+  height: 28px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background:
+    rgba(239,68,68,0.08);
+
+  color: #f87171;
+
+  font-size: 18px;
+
+  cursor: pointer;
+}
+
+.guru-reward-loading {
+  padding: 15px;
+
+  text-align: center;
+
+  color: var(--text-muted);
+
+  font-size: 10px;
+}
+
   </style>
 
 </head>
@@ -1429,17 +1575,51 @@ function closeGuruStudents() {
           Siswa
         </label>
 
-        <select
-          id="guruRewardStudent"
-          class="guru-form-input"
-          required
-        >
+        <div class="guru-reward-student-search">
 
-          <option value="">
-            Memuat siswa...
-          </option>
+  <input
+    type="text"
+    id="guruRewardSearch"
+    class="guru-form-input"
+    placeholder="Cari nama atau NISN..."
+    oninput="filterGuruRewardStudents()"
+    autocomplete="off"
+  >
 
-        </select>
+  <select
+    id="guruRewardClassFilter"
+    class="guru-form-input"
+    onchange="filterGuruRewardStudents()"
+  >
+    <option value="">
+      Semua Kelas
+    </option>
+
+    <option value="X A">X A</option>
+    <option value="X B">X B</option>
+    <option value="XI A">XI A</option>
+    <option value="XI B">XI B</option>
+    <option value="XII A">XII A</option>
+    <option value="XII B">XII B</option>
+  </select>
+
+  <div
+    id="guruRewardStudentResults"
+    class="guru-reward-student-results"
+  ></div>
+
+  <input
+    type="hidden"
+    id="guruRewardStudent"
+  >
+
+  <div
+    id="guruRewardSelected"
+    class="guru-reward-selected"
+    style="display:none;"
+  ></div>
+
+</div>
 
         <label class="guru-form-label">
           Jumlah Poin
@@ -1492,15 +1672,20 @@ function closeGuruStudents() {
 
 }
 
-    async function loadGuruRewardStudents() {
+    let guruRewardStudents = [];
 
-  const select =
+async function loadGuruRewardStudents() {
+
+  const results =
     document.getElementById(
-      "guruRewardStudent"
+      "guruRewardStudentResults"
     );
 
-  if (!select) {
-    return;
+  if (results) {
+    results.innerHTML =
+      `<div class="guru-reward-loading">
+        Memuat siswa...
+      </div>`;
   }
 
   try {
@@ -1517,64 +1702,18 @@ function closeGuruStudents() {
       !response.ok ||
       !result.success
     ) {
-
       throw new Error(
         result.message ||
         "Gagal mengambil data siswa."
       );
-
     }
 
-    const siswa =
+    guruRewardStudents =
       Array.isArray(result.siswa)
         ? result.siswa
         : [];
 
-    siswa.sort((a, b) => {
-
-      const kelasA =
-        String(a.kelas || "");
-
-      const kelasB =
-        String(b.kelas || "");
-
-      const kelasCompare =
-        kelasA.localeCompare(
-          kelasB,
-          "id"
-        );
-
-      if (kelasCompare !== 0) {
-        return kelasCompare;
-      }
-
-      return String(a.nama || "")
-        .localeCompare(
-          String(b.nama || ""),
-          "id"
-        );
-
-    });
-
-    select.innerHTML = `
-
-      <option value="">
-        Pilih siswa...
-      </option>
-
-      ${siswa.map(siswa => `
-
-        <option value="${escapeHtml(siswa.id)}">
-
-          ${escapeHtml(siswa.nama)}
-          — ${escapeHtml(siswa.kelas)}
-          — ${escapeHtml(siswa.nisn)}
-
-        </option>
-
-      `).join("")}
-
-    `;
+    filterGuruRewardStudents();
 
   }
   catch (error) {
@@ -1584,15 +1723,125 @@ function closeGuruStudents() {
       error
     );
 
-    select.innerHTML = `
+    if (results) {
 
-      <option value="">
-        Gagal memuat siswa
-      </option>
+      results.innerHTML =
+        `<div class="guru-reward-loading">
+          Gagal memuat data siswa.
+        </div>`;
+
+    }
+
+  }
+
+}
+
+    function selectGuruRewardStudent(
+  siswaId
+) {
+
+  const siswa =
+    guruRewardStudents.find(
+      item =>
+        String(item.id) ===
+        String(siswaId)
+    );
+
+  if (!siswa) {
+    return;
+  }
+
+  const hiddenInput =
+    document.getElementById(
+      "guruRewardStudent"
+    );
+
+  const results =
+    document.getElementById(
+      "guruRewardStudentResults"
+    );
+
+  const selected =
+    document.getElementById(
+      "guruRewardSelected"
+    );
+
+  if (hiddenInput) {
+    hiddenInput.value =
+      siswa.id;
+  }
+
+  if (selected) {
+
+    selected.style.display =
+      "block";
+
+    selected.innerHTML = `
+
+      <div>
+        <strong>
+          ${escapeHtml(siswa.nama)}
+        </strong>
+
+        <span>
+          NISN: ${escapeHtml(siswa.nisn)}
+          • Kelas ${escapeHtml(siswa.kelas)}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        onclick="clearGuruRewardStudent()"
+      >
+        ×
+      </button>
 
     `;
 
   }
+
+  if (results) {
+    results.innerHTML = "";
+  }
+
+}
+
+function clearGuruRewardStudent() {
+
+  const hiddenInput =
+    document.getElementById(
+      "guruRewardStudent"
+    );
+
+  const selected =
+    document.getElementById(
+      "guruRewardSelected"
+    );
+
+  if (hiddenInput) {
+    hiddenInput.value = "";
+  }
+
+  if (selected) {
+
+    selected.style.display =
+      "none";
+
+    selected.innerHTML = "";
+
+  }
+
+  const search =
+    document.getElementById(
+      "guruRewardSearch"
+    );
+
+  if (search) {
+    search.value = "";
+    search.focus();
+  }
+
+  filterGuruRewardStudents();
 
 }
 
