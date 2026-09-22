@@ -213,6 +213,183 @@ exports.handler = async function (event) {
     }
 
     // ========================================
+// GET = POIN YANG DIBUAT GURU SENDIRI
+// ========================================
+
+if (event.httpMethod === "GET") {
+
+  const params =
+    event.queryStringParameters || {};
+
+  const guruUsername =
+    String(
+      params.guruUsername || ""
+    ).trim();
+
+  if (!guruUsername) {
+
+    return error(
+      400,
+      "Username guru tidak ditemukan."
+    );
+
+  }
+
+  const response =
+    await sheets.spreadsheets.values.get({
+
+      spreadsheetId,
+
+      range: "Poin!A:H"
+
+    });
+
+  const rows =
+    response.data.values || [];
+
+  // Ambil data siswa
+  const siswaResponse =
+    await sheets.spreadsheets.values.get({
+
+      spreadsheetId,
+
+      range: "Siswa!A:F"
+
+    });
+
+  const siswaRows =
+    siswaResponse.data.values || [];
+
+  const siswaMap = {};
+
+  siswaRows
+    .slice(1)
+    .forEach(row => {
+
+      siswaMap[
+        String(row[0] || "").trim()
+      ] = {
+
+        nama:
+          String(row[2] || "").trim(),
+
+        nisn:
+          String(row[1] || "").trim(),
+
+        kelasId:
+          String(row[3] || "").trim()
+
+      };
+
+    });
+
+  // Ambil kelas
+  const kelasResponse =
+    await sheets.spreadsheets.values.get({
+
+      spreadsheetId,
+
+      range: "Kelas!A:E"
+
+    });
+
+  const kelasRows =
+    kelasResponse.data.values || [];
+
+  const kelasMap = {};
+
+  kelasRows
+    .slice(1)
+    .forEach(row => {
+
+      kelasMap[
+        String(row[0] || "").trim()
+      ] =
+        String(row[1] || "").trim();
+
+    });
+
+  const points =
+    rows
+      .slice(1)
+      .filter(row => {
+
+        return (
+          String(row[6] || "").trim() ===
+          guruUsername
+        );
+
+      })
+      .map(row => {
+
+        const siswaId =
+          String(row[1] || "").trim();
+
+        const siswa =
+          siswaMap[siswaId] || {};
+
+        return {
+
+          id:
+            String(row[0] || "").trim(),
+
+          siswaId,
+
+          siswaNama:
+            siswa.nama || "-",
+
+          siswaNisn:
+            siswa.nisn || "-",
+
+          siswaKelas:
+            kelasMap[
+              siswa.kelasId
+            ] || "-",
+
+          jenis:
+            String(row[2] || "").trim(),
+
+          poin:
+            Number(row[3] || 0),
+
+          keterangan:
+            String(row[4] || "").trim(),
+
+          tanggal:
+            String(row[5] || "").trim(),
+
+          guruUsername
+
+        };
+
+      })
+      .sort((a, b) =>
+        new Date(b.tanggal) -
+        new Date(a.tanggal)
+      );
+
+  return {
+
+    statusCode: 200,
+
+    headers: {
+      "Content-Type":
+        "application/json"
+    },
+
+    body: JSON.stringify({
+
+      success: true,
+
+      points
+
+    })
+
+  };
+
+}
+
+    // ========================================
     // PUT = EDIT POIN SENDIRI
     // ========================================
 
