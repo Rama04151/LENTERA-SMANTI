@@ -2,33 +2,72 @@ const { google } = require("googleapis");
 
 exports.handler = async function (event) {
 
+  // =========================
+  // CEK METHOD
+  // =========================
+
   if (event.httpMethod !== "GET") {
+
     return {
       statusCode: 405,
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
       body: JSON.stringify({
         success: false,
         message: "Method tidak diizinkan."
       })
     };
+
   }
 
   try {
 
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email:
-          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    // =========================
+    // CEK ENV
+    // =========================
 
-        private_key:
-          process.env.GOOGLE_PRIVATE_KEY
-            .replace(/\\n/g, "\n")
-            .replace(/^"|"$/g, "")
-      },
+    if (
+      !process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ||
+      !process.env.GOOGLE_PRIVATE_KEY ||
+      !process.env.GOOGLE_SHEET_ID
+    ) {
 
-      scopes: [
-        "https://www.googleapis.com/auth/spreadsheets"
-      ]
-    });
+      throw new Error(
+        "Environment variable Google belum lengkap."
+      );
+
+    }
+
+    // =========================
+    // GOOGLE AUTH
+    // =========================
+
+    const privateKey =
+      process.env.GOOGLE_PRIVATE_KEY
+        .replace(/\\n/g, "\n")
+        .replace(/^"|"$/g, "");
+
+    const auth =
+      new google.auth.GoogleAuth({
+
+        credentials: {
+
+          client_email:
+            process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+
+          private_key:
+            privateKey
+
+        },
+
+        scopes: [
+          "https://www.googleapis.com/auth/spreadsheets"
+        ]
+
+      });
 
     const sheets =
       google.sheets({
@@ -45,8 +84,11 @@ exports.handler = async function (event) {
 
     const kelasResponse =
       await sheets.spreadsheets.values.get({
+
         spreadsheetId,
+
         range: "Kelas!A:E"
+
       });
 
     const kelasRows =
@@ -65,14 +107,18 @@ exports.handler = async function (event) {
           String(row[1] || "").trim();
 
         const status =
-          String(row[4] || "").trim();
+          String(row[4] || "")
+            .trim()
+            .toLowerCase();
 
         if (
           id &&
           nama &&
-          status.toLowerCase() !== "nonaktif"
+          status !== "nonaktif"
         ) {
+
           kelasMap[id] = nama;
+
         }
 
       });
@@ -83,8 +129,11 @@ exports.handler = async function (event) {
 
     const siswaResponse =
       await sheets.spreadsheets.values.get({
+
         spreadsheetId,
+
         range: "Siswa!A:F"
+
       });
 
     const siswaRows =
@@ -96,8 +145,11 @@ exports.handler = async function (event) {
 
     const poinResponse =
       await sheets.spreadsheets.values.get({
+
         spreadsheetId,
+
         range: "Poin!A:H"
+
       });
 
     const poinRows =
@@ -131,8 +183,11 @@ exports.handler = async function (event) {
         if (!poinMap[siswaId]) {
 
           poinMap[siswaId] = {
+
             penghargaan: 0,
+
             pelanggaran: 0
+
           };
 
         }
@@ -144,7 +199,7 @@ exports.handler = async function (event) {
 
         }
 
-        if (jenis === "pelanggaran") {
+        else if (jenis === "pelanggaran") {
 
           poinMap[siswaId].pelanggaran +=
             nilai;
@@ -154,7 +209,7 @@ exports.handler = async function (event) {
       });
 
     // =========================
-    // GABUNGKAN DATA
+    // GABUNGKAN SISWA
     // =========================
 
     const siswa = [];
@@ -176,32 +231,39 @@ exports.handler = async function (event) {
           String(row[3] || "").trim();
 
         const status =
-          String(row[5] || "").trim();
+          String(row[5] || "")
+            .trim()
+            .toLowerCase();
 
         // Guru hanya melihat siswa aktif
         if (
           !id ||
           !nama ||
-          status.toLowerCase() !== "aktif"
+          status !== "aktif"
         ) {
+
           return;
+
         }
 
         const poin =
           poinMap[id] || {
+
             penghargaan: 0,
+
             pelanggaran: 0
+
           };
 
         siswa.push({
 
-          id,
+          id: id,
 
-          nisn,
+          nisn: nisn,
 
-          nama,
+          nama: nama,
 
-          kelasId,
+          kelasId: kelasId,
 
           kelas:
             kelasMap[kelasId] || "-",
@@ -221,36 +283,54 @@ exports.handler = async function (event) {
       });
 
     // =========================
-    // URUTKAN NAMA
+    // URUTKAN BERDASARKAN NAMA
     // =========================
 
-    siswa.sort((a, b) =>
-      a.nama.localeCompare(
+    siswa.sort((a, b) => {
+
+      return a.nama.localeCompare(
         b.nama,
         "id"
-      )
+      );
+
+    });
+
+    console.log(
+      "GURU STUDENTS BERHASIL:",
+      siswa.length,
+      "siswa"
     );
+
+    // =========================
+    // RESPONSE
+    // =========================
 
     return {
 
       statusCode: 200,
 
       headers: {
+
         "Content-Type":
-          "application/json"
+          "application/json",
+
+        "Cache-Control":
+          "no-store"
+
       },
 
       body: JSON.stringify({
 
         success: true,
 
-        siswa
+        siswa: siswa
 
       })
 
     };
 
   }
+
   catch (error) {
 
     console.error(
@@ -263,8 +343,10 @@ exports.handler = async function (event) {
       statusCode: 500,
 
       headers: {
+
         "Content-Type":
           "application/json"
+
       },
 
       body: JSON.stringify({
@@ -272,6 +354,7 @@ exports.handler = async function (event) {
         success: false,
 
         message:
+          error.message ||
           "Gagal mengambil data siswa."
 
       })
