@@ -1,4 +1,3 @@
-```javascript
 const { google } = require("googleapis");
 
 // =====================================================
@@ -1039,4 +1038,3 @@ exports.handler = async (
     );
   }
 };
-```
