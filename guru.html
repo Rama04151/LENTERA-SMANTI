@@ -1644,59 +1644,60 @@ function closeMyPoints() {
 async function loadMyPoints() {
 
   const list =
-    document.getElementById(
-      "myPointsList"
-    );
+    document.getElementById("myPointsList");
 
   list.innerHTML =
-    `<div class="loading">
-      Memuat poin...
-    </div>`;
+    '<div class="loading">Memuat poin...</div>';
+
+  if (!guruSession || !guruSession.id) {
+
+    list.innerHTML =
+      '<div class="empty-state">Sesi guru tidak ditemukan.</div>';
+
+    return;
+  }
 
   try {
 
-    const params = new URLSearchParams({
-  guruId: guruSession.id,
-  guruUsername: guruSession.username
-});
+    const params =
+      new URLSearchParams({
+        guruId: guruSession.id
+      });
 
-const response = await fetch(
-  `/.netlify/functions/guru-points?${params.toString()}`
-);
+    const response =
+      await fetch(
+        `/.netlify/functions/guru-points?${params.toString()}`
+      );
 
     const result =
       await response.json();
 
-    if (
-      !response.ok ||
-      !result.success
-    ) {
+    if (!response.ok || !result.success) {
 
       throw new Error(
         result.message ||
         "Gagal mengambil poin."
       );
-
     }
 
     myPoints =
-      Array.isArray(result.points)
-        ? result.points
-        : [];
+      result.poin || [];
 
     renderMyPoints();
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "LOAD MY POINTS ERROR:",
+      error
+    );
 
-    list.innerHTML =
-      `<div class="loading">
+    list.innerHTML = `
+      <div class="empty-state">
         ${escapeHtml(error.message)}
-      </div>`;
-
+      </div>
+    `;
   }
-
 }
 
 
