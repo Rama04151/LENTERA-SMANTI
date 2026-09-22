@@ -1,7 +1,10 @@
 const { google } = require("googleapis");
 
 exports.handler = async (event) => {
-  // Hanya menerima POST
+
+  // =========================
+  // HANYA MENERIMA POST
+  // =========================
   if (event.httpMethod !== "POST") {
     return response(405, {
       success: false,
@@ -10,7 +13,9 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { nisn, password } = JSON.parse(event.body || "{}");
+
+    const { nisn, password } =
+      JSON.parse(event.body || "{}");
 
     if (!nisn || !password) {
       return response(400, {
@@ -23,13 +28,20 @@ exports.handler = async (event) => {
     // GOOGLE SHEETS AUTH
     // =========================
 
+    const privateKey =
+      process.env.GOOGLE_PRIVATE_KEY
+        .replace(/\\n/g, "\n")
+        .replace(/^"|"$/g, "");
+
     const auth = new google.auth.GoogleAuth({
       credentials: {
-        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY
-  .replace(/\\n/g, "\n")
-  .replace(/^"|"$/g, "")
+        client_email:
+          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+
+        private_key:
+          privateKey
       },
+
       scopes: [
         "https://www.googleapis.com/auth/spreadsheets"
       ]
@@ -40,37 +52,79 @@ exports.handler = async (event) => {
       auth
     });
 
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const spreadsheetId =
+      process.env.GOOGLE_SHEET_ID;
+
 
     // =========================
-    // AMBIL DATA SISWA
+    // AMBIL SEMUA DATA SEKALIGUS
     // =========================
 
-    const siswaResult = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "Siswa!A:F"
-    });
+    const batchResult =
+      await sheets.spreadsheets.values.batchGet({
 
-    const siswaRows = siswaResult.data.values || [];
+        spreadsheetId,
+
+        ranges: [
+          "Siswa!A:F",
+          "Login_Control!A:C",
+          "Kelas!A:E"
+        ]
+
+      });
+
+    const valueRanges =
+      batchResult.data.valueRanges || [];
+
+
+    const siswaRows =
+      valueRanges[0]?.values || [];
+
+    const loginRows =
+      valueRanges[1]?.values || [];
+
+    const kelasRows =
+      valueRanges[2]?.values || [];
+
 
     // =========================
-    // CARI SISWA BERDASARKAN NISN
+    // CARI SISWA
     // =========================
 
     let siswa = null;
     let siswaRowNumber = null;
 
+    const targetNisn =
+      String(nisn).trim();
+
     for (let i = 1; i < siswaRows.length; i++) {
+
       const row = siswaRows[i];
 
-      const id = row[0] || "";
-      const rowNisn = row[1] || "";
-      const nama = row[2] || "";
-      const kelasId = row[3] || "";
-      const rowPassword = row[4] || "";
-      const status = row[5] || "";
+      const id =
+        row[0] || "";
 
-      if (String(rowNisn) === String(nisn)) {
+      const rowNisn =
+        row[1] || "";
+
+      const nama =
+        row[2] || "";
+
+      const kelasId =
+        row[3] || "";
+
+      const rowPassword =
+        row[4] || "";
+
+      const status =
+        row[5] || "";
+
+
+      if (
+        String(rowNisn).trim() ===
+        targetNisn
+      ) {
+
         siswa = {
           id,
           nisn: rowNisn,
@@ -81,93 +135,134 @@ exports.handler = async (event) => {
         };
 
         siswaRowNumber = i + 1;
+
         break;
       }
     }
+
 
     // =========================
     // NISN TIDAK DITEMUKAN
     // =========================
 
     if (!siswa) {
+
       return response(401, {
         success: false,
         message: "NISN atau password salah"
       });
+
     }
+
 
     // =========================
     // CEK STATUS SISWA
     // =========================
 
-    if (String(siswa.status).toLowerCase() !== "aktif") {
+    if (
+      String(siswa.status)
+        .toLowerCase() !== "aktif"
+    ) {
+
       return response(403, {
         success: false,
         message: "Akun siswa tidak aktif"
       });
+
     }
 
-    // =========================
-    // AMBIL LOGIN CONTROL
-    // =========================
 
-    const loginControlResult = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "Login_Control!A:C"
-    });
-
-    const loginRows = loginControlResult.data.values || [];
+    // =========================
+    // CARI LOGIN CONTROL
+    // =========================
 
     let loginRowNumber = null;
     let failedAttempts = 0;
     let lockedUntil = "";
 
     for (let i = 1; i < loginRows.length; i++) {
-      const row = loginRows[i];
 
-      const rowNisn = row[0] || "";
+      const row =
+        loginRows[i];
 
-      if (String(rowNisn) === String(nisn)) {
+      const rowNisn =
+        row[0] || "";
+
+      if (
+        String(rowNisn).trim() ===
+        targetNisn
+      ) {
+
         loginRowNumber = i + 1;
-        failedAttempts = parseInt(row[1] || "0", 10);
-        lockedUntil = row[2] || "";
+
+        failedAttempts =
+          parseInt(
+            row[1] || "0",
+            10
+          );
+
+        if (Number.isNaN(failedAttempts)) {
+          failedAttempts = 0;
+        }
+
+        lockedUntil =
+          String(row[2] || "").trim();
+
         break;
       }
     }
+
 
     // =========================
     // CEK LOCK
     // =========================
 
     if (lockedUntil) {
-      const lockedTime = new Date(lockedUntil);
-      const now = new Date();
 
-      if (lockedTime > now) {
-        const remainingSeconds = Math.ceil(
-          (lockedTime - now) / 1000
-        );
+      const lockedTime =
+        new Date(lockedUntil);
 
-        const remainingMinutes = Math.ceil(
-          remainingSeconds / 60
-        );
+      const now =
+        new Date();
+
+      if (
+        !Number.isNaN(lockedTime.getTime()) &&
+        lockedTime > now
+      ) {
+
+        const remainingSeconds =
+          Math.ceil(
+            (lockedTime - now) / 1000
+          );
+
+        const remainingMinutes =
+          Math.ceil(
+            remainingSeconds / 60
+          );
 
         return response(429, {
           success: false,
-          message: `Terlalu banyak percobaan. Coba lagi dalam ${remainingMinutes} menit.`
+          message:
+            `Terlalu banyak percobaan. Coba lagi dalam ${remainingMinutes} menit.`
         });
+
       }
 
-      // Masa lock sudah habis
+      // Lock sudah habis
       failedAttempts = 0;
       lockedUntil = "";
     }
+
 
     // =========================
     // CEK PASSWORD
     // =========================
 
-    if (String(siswa.password) !== String(password)) {
+    if (
+      String(siswa.password) !==
+      String(password)
+    ) {
+
       failedAttempts++;
 
       // =========================
@@ -175,123 +270,210 @@ exports.handler = async (event) => {
       // =========================
 
       if (failedAttempts >= 3) {
-        const lockUntilDate = new Date(
-          Date.now() + 5 * 60 * 1000
-        );
 
-        lockedUntil = lockUntilDate.toISOString();
+        const lockUntilDate =
+          new Date(
+            Date.now() +
+            5 * 60 * 1000
+          );
+
+        lockedUntil =
+          lockUntilDate.toISOString();
+
         failedAttempts = 3;
       }
+
 
       // =========================
       // UPDATE LOGIN CONTROL
       // =========================
 
       if (loginRowNumber) {
+
         await sheets.spreadsheets.values.update({
+
           spreadsheetId,
-          range: `Login_Control!A${loginRowNumber}:C${loginRowNumber}`,
+
+          range:
+            `Login_Control!A${loginRowNumber}:C${loginRowNumber}`,
+
           valueInputOption: "RAW",
+
           requestBody: {
             values: [[
-              nisn,
+              targetNisn,
               failedAttempts,
               lockedUntil
             ]]
           }
+
         });
+
       } else {
+
         await sheets.spreadsheets.values.append({
+
           spreadsheetId,
-          range: "Login_Control!A:C",
+
+          range:
+            "Login_Control!A:C",
+
           valueInputOption: "RAW",
+
           requestBody: {
             values: [[
-              nisn,
+              targetNisn,
               failedAttempts,
               lockedUntil
             ]]
           }
+
         });
+
       }
 
+
+      // =========================
+      // JIKA SUDAH 3 KALI
+      // =========================
+
       if (failedAttempts >= 3) {
+
         return response(429, {
           success: false,
-          message: "Gagal 3 kali. Login dikunci selama 5 menit."
+          message:
+            "Gagal 3 kali. Login dikunci selama 5 menit."
         });
+
       }
+
 
       return response(401, {
         success: false,
-        message: `NISN atau password salah. Percobaan ${failedAttempts}/3.`
+        message:
+          `NISN atau password salah. Percobaan ${failedAttempts}/3.`
       });
+
     }
+
 
     // =========================
     // LOGIN BERHASIL
     // =========================
 
     if (loginRowNumber) {
+
       await sheets.spreadsheets.values.update({
+
         spreadsheetId,
-        range: `Login_Control!A${loginRowNumber}:C${loginRowNumber}`,
+
+        range:
+          `Login_Control!A${loginRowNumber}:C${loginRowNumber}`,
+
         valueInputOption: "RAW",
+
         requestBody: {
           values: [[
-            nisn,
+            targetNisn,
             0,
             ""
           ]]
         }
+
       });
+
     }
 
-    // Ambil data kelas
-const kelasResult = await sheets.spreadsheets.values.get({
-  spreadsheetId,
-  range: "Kelas!A:E"
-});
 
-const kelasRows = kelasResult.data.values || [];
+    // =========================
+    // CARI NAMA KELAS
+    // =========================
 
-let namaKelas = "-";
+    let namaKelas = "-";
 
-for (let i = 1; i < kelasRows.length; i++) {
-  const row = kelasRows[i];
+    for (
+      let i = 1;
+      i < kelasRows.length;
+      i++
+    ) {
 
-  const idKelas = row[0] || "";
-  const nama = row[1] || "";
-  const status = row[4] || "";
+      const row =
+        kelasRows[i];
 
-  if (
-    String(idKelas) === String(siswa.kelasId) &&
-    String(status).toLowerCase() === "aktif"
-  ) {
-    namaKelas = nama;
-    break;
-  }
-}
+      const idKelas =
+        row[0] || "";
 
-return response(200, {
-  success: true,
-  message: "Login berhasil",
-  siswa: {
-    id: siswa.id,
-    nisn: siswa.nisn,
-    nama: siswa.nama,
-    kelasId: siswa.kelasId,
-    kelas: namaKelas
-  }
-});
+      const nama =
+        row[1] || "";
+
+      const status =
+        row[4] || "";
+
+
+      if (
+        String(idKelas) ===
+          String(siswa.kelasId) &&
+        String(status).toLowerCase() ===
+          "aktif"
+      ) {
+
+        namaKelas =
+          nama;
+
+        break;
+      }
+    }
+
+
+    // =========================
+    // RESPONSE LOGIN BERHASIL
+    // =========================
+
+    return response(200, {
+
+      success: true,
+
+      message:
+        "Login berhasil",
+
+      siswa: {
+
+        id:
+          siswa.id,
+
+        nisn:
+          siswa.nisn,
+
+        nama:
+          siswa.nama,
+
+        kelasId:
+          siswa.kelasId,
+
+        kelas:
+          namaKelas
+
+      }
+
+    });
+
 
   } catch (error) {
-    console.error("LOGIN ERROR:", error);
+
+    console.error(
+      "LOGIN ERROR:",
+      error
+    );
 
     return response(500, {
+
       success: false,
-      message: "Terjadi kesalahan pada server"
+
+      message:
+        "Terjadi kesalahan pada server"
+
     });
+
   }
 };
 
@@ -300,13 +482,28 @@ return response(200, {
 // RESPONSE HELPER
 // =========================
 
-function response(statusCode, body) {
+function response(
+  statusCode,
+  body
+) {
+
   return {
+
     statusCode,
+
     headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-store"
+
+      "Content-Type":
+        "application/json",
+
+      "Cache-Control":
+        "no-store"
+
     },
-    body: JSON.stringify(body)
+
+    body:
+      JSON.stringify(body)
+
   };
+
 }
