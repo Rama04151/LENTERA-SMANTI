@@ -19,6 +19,31 @@ function response(statusCode, body) {
 
 
 // =====================================================
+// TANGGAL ASIA/JAKARTA
+// Format: YYYY-MM-DD
+// =====================================================
+
+function getTanggalJakarta() {
+
+  const parts =
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Jakarta",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(new Date());
+
+  const map = {};
+
+  for (const part of parts) {
+    map[part.type] = part.value;
+  }
+
+  return `${map.year}-${map.month}-${map.day}`;
+}
+
+
+// =====================================================
 // HANDLER
 // =====================================================
 
@@ -47,6 +72,7 @@ exports.handler = async (event) => {
     const body =
       JSON.parse(event.body || "{}");
 
+
     const admin =
       String(
         body.admin || "Admin"
@@ -67,7 +93,10 @@ exports.handler = async (event) => {
         nama_kelas,
         tingkat,
         status
-      `);
+      `)
+      .order("id", {
+        ascending: true
+      });
 
 
     if (kelasError) {
@@ -86,7 +115,7 @@ exports.handler = async (event) => {
 
 
     // ===================================================
-    // VALIDASI KELAS
+    // VALIDASI DATA KELAS
     // ===================================================
 
     if (
@@ -95,8 +124,12 @@ exports.handler = async (event) => {
     ) {
 
       return response(400, {
+
         success: false,
-        message: "Data kelas tidak ditemukan."
+
+        message:
+          "Data kelas tidak ditemukan."
+
       });
 
     }
@@ -108,37 +141,45 @@ exports.handler = async (event) => {
 
     const kelasMap = {};
 
-    for (const kelas of kelasRows) {
+
+    for (const row of kelasRows) {
 
       const id =
         String(
-          kelas.id || ""
+          row.id || ""
         ).trim();
 
       const nama =
         String(
-          kelas.nama_kelas || ""
+          row.nama_kelas || ""
         ).trim();
+
 
       if (!id || !nama) {
         continue;
       }
 
+
       kelasMap[nama] = id;
+
     }
 
 
     // ===================================================
-    // KELAS WAJIB
+    // VALIDASI 6 KELAS
     // ===================================================
 
     const kelasWajib = [
+
       "X A",
       "X B",
+
       "XI A",
       "XI B",
+
       "XII A",
       "XII B"
+
     ];
 
 
@@ -166,14 +207,23 @@ exports.handler = async (event) => {
 
     const mapping = {
 
-      "X A": "XI A",
-      "X B": "XI B",
+      "X A":
+        "XI A",
 
-      "XI A": "XII A",
-      "XI B": "XII B",
+      "X B":
+        "XI B",
 
-      "XII A": "LULUS",
-      "XII B": "LULUS"
+      "XI A":
+        "XII A",
+
+      "XI B":
+        "XII B",
+
+      "XII A":
+        "LULUS",
+
+      "XII B":
+        "LULUS"
 
     };
 
@@ -194,10 +244,7 @@ exports.handler = async (event) => {
         password,
         status
       `)
-      .eq(
-        "status",
-        "Aktif"
-      );
+      .eq("status", "Aktif");
 
 
     if (siswaError) {
@@ -247,201 +294,268 @@ exports.handler = async (event) => {
 
 
     // ===================================================
-    // TANGGAL
+    // HASIL
     // ===================================================
 
+    let naik = 0;
+
+    let lulus = 0;
+
+    const riwayatValues = [];
+
+    const siswaUpdates = [];
+
+
+    // ID dasar riwayat
+    const timestamp =
+      Date.now();
+
+
+    // Tanggal Jakarta
     const tanggal =
-      new Intl.DateTimeFormat(
-        "en-CA",
-        {
-          timeZone: "Asia/Jakarta",
-
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit"
-        }
-      ).format(
-        new Date()
-      );
+      getTanggalJakarta();
 
 
     // ===================================================
-    // KELOMPOKKAN SISWA
+    // PROSES SISWA
     // ===================================================
 
-    const kelompok = {
+    for (
+      let i = 0;
+      i < siswaRows.length;
+      i++
+    ) {
 
-      "X A": [],
-      "X B": [],
+      const siswa =
+        siswaRows[i];
 
-      "XI A": [],
-      "XI B": [],
-
-      "XII A": [],
-      "XII B": []
-
-    };
-
-
-    for (const siswa of siswaRows) {
 
       const siswaId =
         String(
           siswa.id || ""
         ).trim();
 
+
       const kelasId =
         String(
           siswa.kelas_id || ""
         ).trim();
 
-      if (!siswaId || !kelasId) {
+
+      // =================================================
+      // ID WAJIB
+      // =================================================
+
+      if (!siswaId) {
         continue;
       }
 
 
-      for (const namaKelas of kelasWajib) {
+      // =================================================
+      // CARI NAMA KELAS LAMA
+      // =================================================
+
+      let kelasLama = null;
+
+
+      for (
+        const namaKelas of kelasWajib
+      ) {
 
         if (
           kelasMap[namaKelas] ===
           kelasId
         ) {
 
-          kelompok[namaKelas].push(
-            siswa
-          );
+          kelasLama =
+            namaKelas;
 
           break;
+
         }
 
       }
 
-    }
 
+      // =================================================
+      // KELAS TIDAK TERMASUK X/XI/XII
+      // =================================================
 
-    // ===================================================
-    // HITUNG
-    // ===================================================
-
-    const jumlahXA =
-      kelompok["X A"].length;
-
-    const jumlahXB =
-      kelompok["X B"].length;
-
-    const jumlahXIA =
-      kelompok["XI A"].length;
-
-    const jumlahXIB =
-      kelompok["XI B"].length;
-
-    const jumlahXIIA =
-      kelompok["XII A"].length;
-
-    const jumlahXIIB =
-      kelompok["XII B"].length;
-
-
-    const naik =
-      jumlahXA +
-      jumlahXB +
-      jumlahXIA +
-      jumlahXIB;
-
-
-    const lulus =
-      jumlahXIIA +
-      jumlahXIIB;
-
-
-    const diproses =
-      naik +
-      lulus;
-
-
-    // ===================================================
-    // TIDAK ADA YANG DIPROSES
-    // ===================================================
-
-    if (diproses === 0) {
-
-      return response(200, {
-
-        success: true,
-
-        message:
-          "Tidak ada siswa aktif yang dapat diproses.",
-
-        diproses: 0,
-
-        naik: 0,
-
-        lulus: 0
-
-      });
-
-    }
-
-
-    // ===================================================
-    // RIWAYAT
-    // ===================================================
-
-    const riwayatRows = [];
-
-    let riwayatIndex = 0;
-
-
-    for (const namaKelas of kelasWajib) {
-
-      const daftarSiswa =
-        kelompok[namaKelas];
-
-      if (
-        !daftarSiswa ||
-        daftarSiswa.length === 0
-      ) {
+      if (!kelasLama) {
         continue;
       }
 
 
-      const kelasLamaId =
-        kelasMap[namaKelas];
-
       const kelasBaru =
-        mapping[namaKelas];
+        mapping[kelasLama];
 
-      const kelasBaruId =
+
+      // =================================================
+      // XII → LULUS
+      // =================================================
+
+      if (
         kelasBaru === "LULUS"
-          ? null
-          : kelasMap[kelasBaru];
+      ) {
+
+        siswaUpdates.push({
+
+          id: siswaId,
+
+          kelas_id: null,
+
+          status: "Lulus"
+
+        });
 
 
-      for (const siswa of daftarSiswa) {
-
-        riwayatRows.push({
+        riwayatValues.push({
 
           id:
-            `RK${Date.now()}${riwayatIndex++}`,
+            `RK${timestamp}${i}`,
 
           siswa_id:
-            siswa.id,
+            siswaId,
 
           dari_kelas_id:
-            kelasLamaId,
+            kelasId,
 
           ke_kelas_id:
-            kelasBaruId,
+            "Lulus",
 
-          keterangan:
-            kelasBaru === "LULUS"
-              ? "Lulus"
-              : "Kenaikan Kelas",
+          alasan:
+            "Lulus",
 
           tanggal,
 
-          dilakukan_oleh:
-            admin
+          admin
+
+        });
+
+
+        lulus++;
+
+        continue;
+
+      }
+
+
+      // =================================================
+      // CARI KELAS TUJUAN
+      // =================================================
+
+      const kelasBaruId =
+        kelasMap[kelasBaru];
+
+
+      if (!kelasBaruId) {
+
+        return response(400, {
+
+          success: false,
+
+          message:
+            `Kelas tujuan "${kelasBaru}" tidak ditemukan.`
+
+        });
+
+      }
+
+
+      // =================================================
+      // UPDATE KELAS
+      // =================================================
+
+      siswaUpdates.push({
+
+        id:
+          siswaId,
+
+        kelas_id:
+          kelasBaruId
+
+      });
+
+
+      // =================================================
+      // RIWAYAT KENAIKAN
+      // =================================================
+
+      riwayatValues.push({
+
+        id:
+          `RK${timestamp}${i}`,
+
+        siswa_id:
+          siswaId,
+
+        dari_kelas_id:
+          kelasId,
+
+        ke_kelas_id:
+          kelasBaruId,
+
+        alasan:
+          "Kenaikan Kelas",
+
+        tanggal,
+
+        admin
+
+      });
+
+
+      naik++;
+
+    }
+
+
+    // ===================================================
+    // UPDATE SISWA
+    // ===================================================
+
+    for (const update of siswaUpdates) {
+
+      const updateData = {
+
+        kelas_id:
+          update.kelas_id
+
+      };
+
+
+      // Untuk siswa XII → Lulus
+      if (
+        update.status === "Lulus"
+      ) {
+
+        updateData.status =
+          "Lulus";
+
+      }
+
+
+      const {
+        error: updateError
+      } = await supabase
+        .from("siswa")
+        .update(updateData)
+        .eq("id", update.id);
+
+
+      if (updateError) {
+
+        console.error(
+          "SUPABASE PROMOTION UPDATE ERROR:",
+          updateError
+        );
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            `Gagal memperbarui siswa ${update.id}.`
 
         });
 
@@ -451,204 +565,25 @@ exports.handler = async (event) => {
 
 
     // ===================================================
-    // UPDATE X A → XI A
-    // ===================================================
-
-    if (jumlahXA > 0) {
-
-      const {
-        error
-      } = await supabase
-        .from("siswa")
-        .update({
-          kelas_id:
-            kelasMap["XI A"]
-        })
-        .eq(
-          "kelas_id",
-          kelasMap["X A"]
-        )
-        .eq(
-          "status",
-          "Aktif"
-        );
-
-      if (error) {
-        throw error;
-      }
-
-    }
-
-
-    // ===================================================
-    // UPDATE X B → XI B
-    // ===================================================
-
-    if (jumlahXB > 0) {
-
-      const {
-        error
-      } = await supabase
-        .from("siswa")
-        .update({
-          kelas_id:
-            kelasMap["XI B"]
-        })
-        .eq(
-          "kelas_id",
-          kelasMap["X B"]
-        )
-        .eq(
-          "status",
-          "Aktif"
-        );
-
-      if (error) {
-        throw error;
-      }
-
-    }
-
-
-    // ===================================================
-    // UPDATE XI A → XII A
-    // ===================================================
-
-    if (jumlahXIA > 0) {
-
-      const {
-        error
-      } = await supabase
-        .from("siswa")
-        .update({
-          kelas_id:
-            kelasMap["XII A"]
-        })
-        .eq(
-          "kelas_id",
-          kelasMap["XI A"]
-        )
-        .eq(
-          "status",
-          "Aktif"
-        );
-
-      if (error) {
-        throw error;
-      }
-
-    }
-
-
-    // ===================================================
-    // UPDATE XI B → XII B
-    // ===================================================
-
-    if (jumlahXIB > 0) {
-
-      const {
-        error
-      } = await supabase
-        .from("siswa")
-        .update({
-          kelas_id:
-            kelasMap["XII B"]
-        })
-        .eq(
-          "kelas_id",
-          kelasMap["XI B"]
-        )
-        .eq(
-          "status",
-          "Aktif"
-        );
-
-      if (error) {
-        throw error;
-      }
-
-    }
-
-
-    // ===================================================
-    // XII A → LULUS
-    // ===================================================
-
-    if (jumlahXIIA > 0) {
-
-      const {
-        error
-      } = await supabase
-        .from("siswa")
-        .update({
-          status: "Lulus"
-        })
-        .eq(
-          "kelas_id",
-          kelasMap["XII A"]
-        )
-        .eq(
-          "status",
-          "Aktif"
-        );
-
-      if (error) {
-        throw error;
-      }
-
-    }
-
-
-    // ===================================================
-    // XII B → LULUS
-    // ===================================================
-
-    if (jumlahXIIB > 0) {
-
-      const {
-        error
-      } = await supabase
-        .from("siswa")
-        .update({
-          status: "Lulus"
-        })
-        .eq(
-          "kelas_id",
-          kelasMap["XII B"]
-        )
-        .eq(
-          "status",
-          "Aktif"
-        );
-
-      if (error) {
-        throw error;
-      }
-
-    }
-
-
-    // ===================================================
-    // SIMPAN RIWAYAT SEKALIGUS
+    // SIMPAN RIWAYAT
     // ===================================================
 
     if (
-      riwayatRows.length > 0
+      riwayatValues.length > 0
     ) {
 
       const {
-        error
+        error: riwayatError
       } = await supabase
         .from("riwayat_kelas")
-        .insert(
-          riwayatRows
-        );
+        .insert(riwayatValues);
 
-      if (error) {
+
+      if (riwayatError) {
 
         console.error(
-          "SUPABASE PROMOTION RIWAYAT ERROR:",
-          error
+          "SUPABASE RIWAYAT KELAS ERROR:",
+          riwayatError
         );
 
         return response(500, {
@@ -659,7 +594,7 @@ exports.handler = async (event) => {
             "Kenaikan siswa berhasil diproses, tetapi riwayat gagal disimpan.",
 
           error:
-            error.message
+            riwayatError.message
 
         });
 
@@ -679,7 +614,8 @@ exports.handler = async (event) => {
       message:
         "Kenaikan kelas berhasil diproses.",
 
-      diproses,
+      diproses:
+        naik + lulus,
 
       naik,
 
@@ -687,7 +623,9 @@ exports.handler = async (event) => {
 
     });
 
-  } catch (error) {
+  }
+
+  catch (error) {
 
     console.error(
       "PROMOTION ERROR:",
