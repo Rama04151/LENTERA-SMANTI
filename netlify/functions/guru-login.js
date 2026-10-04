@@ -1,18 +1,23 @@
-const { google } = require("googleapis");
+const supabase = require("./_supabase");
 
-exports.handler = async function (event) {
+function response(statusCode, body) {
+  return {
+    statusCode,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store"
+    },
+    body: JSON.stringify(body)
+  };
+}
+
+exports.handler = async (event) => {
 
   if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        success: false,
-        message: "Method tidak diizinkan."
-      })
-    };
+    return response(405, {
+      success: false,
+      message: "Method tidak diizinkan."
+    });
   }
 
   try {
@@ -23,171 +28,108 @@ exports.handler = async function (event) {
     } = JSON.parse(event.body || "{}");
 
     if (!username || !password) {
-      return {
-        statusCode: 400,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          success: false,
-          message: "Username dan password wajib diisi."
-        })
-      };
+      return response(400, {
+        success: false,
+        message: "Username dan password wajib diisi."
+      });
     }
 
-    const privateKey =
-      process.env.GOOGLE_PRIVATE_KEY
-        .replace(/\\n/g, "\n")
-        .replace(/^"|"$/g, "");
+    const cleanUsername =
+      String(username).trim();
 
-    const auth =
-      new google.auth.GoogleAuth({
-        credentials: {
-          client_email:
-            process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    const cleanPassword =
+      String(password);
 
-          private_key:
-            privateKey
-        },
+    // ============================================================
+    // Cari akun Guru berdasarkan username
+    // ============================================================
 
-        scopes: [
-          "https://www.googleapis.com/auth/spreadsheets"
-        ]
+    const {
+      data: guruData,
+      error
+    } = await supabase
+      .from("guru")
+      .select(`
+        id,
+        username,
+        password,
+        nama,
+        status
+      `)
+      .eq("username", cleanUsername)
+      .maybeSingle();
+
+    if (error) {
+      console.error(
+        "SUPABASE GURU LOGIN ERROR:",
+        error
+      );
+
+      return response(500, {
+        success: false,
+        message: "Gagal mengakses database."
       });
+    }
 
-    const sheets =
-      google.sheets({
-        version: "v4",
-        auth
-      });
+    // ============================================================
+    // Username tidak ditemukan / password salah
+    // ============================================================
 
-    const spreadsheetId =
-      process.env.GOOGLE_SHEET_ID;
-
-    const response =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "Guru!A:E"
-      });
-
-    const rows =
-      response.data.values || [];
-
-    let guru = null;
-
-    for (
-      let i = 1;
-      i < rows.length;
-      i++
+    if (
+      !guruData ||
+      guruData.password !== cleanPassword
     ) {
-
-      const row = rows[i];
-
-      const id =
-        String(row[0] || "").trim();
-
-      const rowUsername =
-        String(row[1] || "").trim();
-
-      const rowPassword =
-        String(row[2] || "");
-
-      const nama =
-        String(row[3] || "").trim();
-
-      const status =
-        String(row[4] || "").trim();
-
-      if (
-        rowUsername === username &&
-        rowPassword === password
-      ) {
-
-        if (
-          status.toLowerCase() !==
-          "aktif"
-        ) {
-
-          return {
-            statusCode: 403,
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-            body: JSON.stringify({
-              success: false,
-              message:
-                "Akun Guru sedang tidak aktif."
-            })
-          };
-
-        }
-
-        guru = {
-          id,
-          username: rowUsername,
-          nama,
-          role: "guru"
-        };
-
-        break;
-      }
-    }
-
-    if (!guru) {
-
-      return {
-        statusCode: 401,
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-        body: JSON.stringify({
-          success: false,
-          message:
-            "Username atau password salah."
-        })
-      };
-
-    }
-
-    return {
-      statusCode: 200,
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
-      body: JSON.stringify({
-        success: true,
+      return response(401, {
+        success: false,
         message:
-          "Login Guru berhasil.",
-        guru
-      })
+          "Username atau password salah."
+      });
+    }
+
+    // ============================================================
+    // Cek status akun
+    // ============================================================
+
+    if (
+      String(guruData.status || "")
+        .trim()
+        .toLowerCase() !== "aktif"
+    ) {
+      return response(403, {
+        success: false,
+        message:
+          "Akun Guru sedang tidak aktif."
+      });
+    }
+
+    // ============================================================
+    // Data session Guru
+    // ============================================================
+
+    const guru = {
+      id: guruData.id,
+      username: guruData.username,
+      nama: guruData.nama,
+      role: "guru"
     };
 
-  }
-  catch (error) {
+    return response(200, {
+      success: true,
+      message: "Login Guru berhasil.",
+      guru
+    });
+
+  } catch (error) {
 
     console.error(
       "GURU LOGIN ERROR:",
       error
     );
 
-    return {
-      statusCode: 500,
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
-      body: JSON.stringify({
-        success: false,
-        message:
-          "Terjadi kesalahan server.",
-        error:
-          error.message
-      })
-    };
-
+    return response(500, {
+      success: false,
+      message: "Terjadi kesalahan server.",
+      error: error.message
+    });
   }
-
 };
