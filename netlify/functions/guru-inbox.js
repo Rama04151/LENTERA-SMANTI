@@ -1,41 +1,12 @@
-const { google } = require("googleapis");
-
-function getSheets() {
-
-  const auth =
-    new google.auth.GoogleAuth({
-      credentials: {
-
-        client_email:
-          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-
-        private_key:
-          process.env.GOOGLE_PRIVATE_KEY
-            .replace(/\\n/g, "\n")
-            .replace(/^"|"$/g, "")
-      },
-
-      scopes: [
-        "https://www.googleapis.com/auth/spreadsheets"
-      ]
-    });
-
-  return google.sheets({
-    version: "v4",
-    auth
-  });
-}
+const supabase = require("./_supabase");
 
 function success(data = {}) {
-
   return {
     statusCode: 200,
-
     headers: {
-      "Content-Type":
-        "application/json"
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store"
     },
-
     body: JSON.stringify({
       success: true,
       ...data
@@ -44,15 +15,12 @@ function success(data = {}) {
 }
 
 function error(message, statusCode = 400) {
-
   return {
     statusCode,
-
     headers: {
-      "Content-Type":
-        "application/json"
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store"
     },
-
     body: JSON.stringify({
       success: false,
       message
@@ -60,894 +28,714 @@ function error(message, statusCode = 400) {
   };
 }
 
-
-// =====================================================
+// ============================================================
 // CARI GURU
-// =====================================================
+// ============================================================
 
-async function getGuru(
-  sheets,
-  spreadsheetId,
-  guruId,
-  guruUsername
-) {
+async function getGuru(guruId, guruUsername) {
 
-  const response =
-    await sheets.spreadsheets.values.get({
+  let query = supabase
+    .from("guru")
+    .select(`
+      id,
+      username,
+      nama,
+      status
+    `);
 
-      spreadsheetId,
-
-      range:
-        "Guru!A:E"
-
-    });
-
-  const rows =
-    response.data.values || [];
-
-  for (
-    const row of rows.slice(1)
-  ) {
-
-    const id =
-      String(
-        row[0] || ""
-      ).trim();
-
-    const username =
-      String(
-        row[1] || ""
-      ).trim();
-
-    const nama =
-      String(
-        row[3] || ""
-      ).trim();
-
-    const status =
-      String(
-        row[4] || ""
-      ).trim();
-
-    if (
-      status.toLowerCase() !==
-      "aktif"
-    ) {
-      continue;
-    }
-
-    // Utamakan ID
-    if (
-      guruId &&
-      id === String(guruId).trim()
-    ) {
-
-      return {
-        id,
-        username,
-        nama
-      };
-    }
-
-    // Fallback username
-    if (
-      guruUsername &&
-      username.toLowerCase() ===
-      String(guruUsername)
-        .trim()
-        .toLowerCase()
-    ) {
-
-      return {
-        id,
-        username,
-        nama
-      };
-    }
+  if (guruId) {
+    query = query.eq("id", guruId);
+  } else if (guruUsername) {
+    query = query.eq(
+      "username",
+      guruUsername
+    );
+  } else {
+    return null;
   }
 
-  return null;
+  const {
+    data,
+    error: queryError
+  } = await query.maybeSingle();
+
+  if (queryError) {
+    throw queryError;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  if (
+    String(data.status || "")
+      .trim()
+      .toLowerCase() !== "aktif"
+  ) {
+    return null;
+  }
+
+  return {
+    id: data.id,
+    username: data.username,
+    nama: data.nama
+  };
 }
 
-
-// =====================================================
-// SHEET ID
-// =====================================================
-
-async function getSheetId(
-  sheets,
-  spreadsheetId,
-  sheetName
-) {
-
-  const response =
-    await sheets.spreadsheets.get({
-
-      spreadsheetId,
-
-      fields:
-        "sheets.properties"
-
-    });
-
-  const sheet =
-    response.data.sheets.find(
-      item =>
-        item.properties.title ===
-        sheetName
-    );
-
-  return sheet
-    ? sheet.properties.sheetId
-    : null;
-}
-
-
-// =====================================================
+// ============================================================
 // HANDLER
-// =====================================================
+// ============================================================
 
-exports.handler =
-  async function (event) {
+exports.handler = async function (event) {
 
-    const sheets =
-      getSheets();
+  try {
 
-    const spreadsheetId =
-      process.env.GOOGLE_SHEET_ID;
+    // ==========================================================
+    // GET — PESAN YANG DIKIRIM GURU
+    // ==========================================================
 
-    try {
+    if (event.httpMethod === "GET") {
 
-      // =================================================
-      // GET — PESAN YANG DIKIRIM GURU
-      // =================================================
+      const params =
+        event.queryStringParameters || {};
+
+      const guruId =
+        String(
+          params.guruId || ""
+        ).trim();
+
+      const guruUsername =
+        String(
+          params.guruUsername || ""
+        ).trim();
 
       if (
-        event.httpMethod ===
-        "GET"
+        !guruId &&
+        !guruUsername
       ) {
-
-        const params =
-          event.queryStringParameters ||
-          {};
-
-        const guruId =
-          String(
-            params.guruId || ""
-          ).trim();
-
-        const guruUsername =
-          String(
-            params.guruUsername || ""
-          ).trim();
-
-        const guru =
-          await getGuru(
-            sheets,
-            spreadsheetId,
-            guruId,
-            guruUsername
-          );
-
-        if (!guru) {
-
-          return error(
-            "Akun guru tidak ditemukan.",
-            404
-          );
-        }
-
-        const [
-          inboxResponse,
-          siswaResponse,
-          kelasResponse
-        ] =
-          await Promise.all([
-
-            sheets.spreadsheets.values.get({
-              spreadsheetId,
-              range:
-                "Inbox!A:H"
-            }),
-
-            sheets.spreadsheets.values.get({
-              spreadsheetId,
-              range:
-                "Siswa!A:F"
-            }),
-
-            sheets.spreadsheets.values.get({
-              spreadsheetId,
-              range:
-                "Kelas!A:E"
-            })
-
-          ]);
-
-        const inboxRows =
-          inboxResponse.data.values ||
-          [];
-
-        const siswaRows =
-          siswaResponse.data.values ||
-          [];
-
-        const kelasRows =
-          kelasResponse.data.values ||
-          [];
-
-
-        // ================================
-        // MAP SISWA
-        // ================================
-
-        const siswaMap = {};
-
-        siswaRows
-          .slice(1)
-          .forEach(row => {
-
-            const id =
-              String(
-                row[0] || ""
-              ).trim();
-
-            if (!id) {
-              return;
-            }
-
-            siswaMap[id] = {
-
-              nama:
-                String(
-                  row[2] || ""
-                ).trim(),
-
-              nisn:
-                String(
-                  row[1] || ""
-                ).trim(),
-
-              kelasId:
-                String(
-                  row[3] || ""
-                ).trim()
-
-            };
-
-          });
-
-
-        // ================================
-        // MAP KELAS
-        // ================================
-
-        const kelasMap = {};
-
-        kelasRows
-          .slice(1)
-          .forEach(row => {
-
-            const id =
-              String(
-                row[0] || ""
-              ).trim();
-
-            const nama =
-              String(
-                row[1] || ""
-              ).trim();
-
-            if (id) {
-
-              kelasMap[id] =
-                nama;
-
-            }
-
-          });
-
-
-        // ================================
-        // FILTER PESAN GURU
-        // ================================
-
-        const pesanSaya = [];
-
-        inboxRows
-          .slice(1)
-          .forEach(row => {
-
-            const id =
-              String(
-                row[0] || ""
-              ).trim();
-
-            const siswaId =
-              String(
-                row[1] || ""
-              ).trim();
-
-            const judul =
-              String(
-                row[2] || ""
-              ).trim();
-
-            const pesan =
-              String(
-                row[3] || ""
-              ).trim();
-
-            const dibuat =
-              String(
-                row[4] || ""
-              ).trim();
-
-            const kedaluwarsa =
-              String(
-                row[5] || ""
-              ).trim();
-
-            const dibuatOleh =
-              String(
-                row[6] || ""
-              ).trim();
-
-            const status =
-              String(
-                row[7] || ""
-              ).trim();
-
-
-            if (
-              dibuatOleh.toLowerCase() !==
-              guru.username.toLowerCase()
-            ) {
-
-              return;
-            }
-
-
-            const siswa =
-              siswaMap[siswaId] ||
-              {};
-
-
-            pesanSaya.push({
-
-              id,
-
-              siswaId,
-
-              siswaNama:
-                siswa.nama || "-",
-
-              siswaNisn:
-                siswa.nisn || "-",
-
-              siswaKelas:
-                kelasMap[
-                  siswa.kelasId
-                ] || "-",
-
-              judul,
-
-              pesan,
-
-              dibuat,
-
-              kedaluwarsa,
-
-              status,
-
-              guruUsername:
-                guru.username
-
-            });
-
-          });
-
-
-        // Terbaru di atas
-        pesanSaya.sort(
-          (a, b) =>
-            new Date(b.dibuat) -
-            new Date(a.dibuat)
+        return error(
+          "Identitas guru tidak ditemukan.",
+          401
         );
-
-
-        return success({
-
-          guru: {
-
-            id:
-              guru.id,
-
-            username:
-              guru.username,
-
-            nama:
-              guru.nama
-
-          },
-
-          pesan:
-            pesanSaya
-
-        });
-
       }
 
+      // --------------------------------------------------------
+      // Cari Guru
+      // --------------------------------------------------------
 
-      // =================================================
-      // POST — KIRIM PESAN
-      // =================================================
+      const guru =
+        await getGuru(
+          guruId,
+          guruUsername
+        );
 
-      if (
-        event.httpMethod ===
-        "POST"
-      ) {
+      if (!guru) {
+        return error(
+          "Akun guru tidak ditemukan.",
+          404
+        );
+      }
 
-        const body =
-          JSON.parse(
-            event.body || "{}"
-          );
+      // --------------------------------------------------------
+      // Ambil pesan milik Guru
+      // --------------------------------------------------------
 
+      const {
+        data: inboxRows,
+        error: inboxError
+      } = await supabase
+        .from("inbox")
+        .select(`
+          id,
+          siswa_id,
+          judul,
+          pesan,
+          dibuat,
+          kedaluwarsa,
+          dibuat_oleh,
+          status
+        `)
+        .ilike(
+          "dibuat_oleh",
+          guru.username
+        )
+        .order(
+          "dibuat",
+          {
+            ascending: false
+          }
+        );
+
+      if (inboxError) {
+        console.error(
+          "SUPABASE GURU INBOX GET ERROR:",
+          inboxError
+        );
+
+        return error(
+          "Gagal mengambil data pesan.",
+          500
+        );
+      }
+
+      // --------------------------------------------------------
+      // Ambil siswa
+      // --------------------------------------------------------
+
+      const {
+        data: siswaRows,
+        error: siswaError
+      } = await supabase
+        .from("siswa")
+        .select(`
+          id,
+          nama,
+          nisn,
+          kelas_id
+        `);
+
+      if (siswaError) {
+        console.error(
+          "SUPABASE GURU INBOX SISWA ERROR:",
+          siswaError
+        );
+
+        return error(
+          "Gagal mengambil data siswa.",
+          500
+        );
+      }
+
+      // --------------------------------------------------------
+      // Ambil kelas
+      // --------------------------------------------------------
+
+      const {
+        data: kelasRows,
+        error: kelasError
+      } = await supabase
+        .from("kelas")
+        .select(`
+          id,
+          nama_kelas
+        `);
+
+      if (kelasError) {
+        console.error(
+          "SUPABASE GURU INBOX KELAS ERROR:",
+          kelasError
+        );
+
+        return error(
+          "Gagal mengambil data kelas.",
+          500
+        );
+      }
+
+      // --------------------------------------------------------
+      // Map siswa
+      // --------------------------------------------------------
+
+      const siswaMap = {};
+
+      for (const row of siswaRows || []) {
+
+        const id =
+          String(
+            row.id || ""
+          ).trim();
+
+        if (!id) {
+          continue;
+        }
+
+        siswaMap[id] = {
+          nama:
+            String(
+              row.nama || ""
+            ).trim(),
+
+          nisn:
+            String(
+              row.nisn || ""
+            ).trim(),
+
+          kelasId:
+            String(
+              row.kelas_id || ""
+            ).trim()
+        };
+      }
+
+      // --------------------------------------------------------
+      // Map kelas
+      // --------------------------------------------------------
+
+      const kelasMap = {};
+
+      for (const row of kelasRows || []) {
+
+        const id =
+          String(
+            row.id || ""
+          ).trim();
+
+        const nama =
+          String(
+            row.nama_kelas || ""
+          ).trim();
+
+        if (id) {
+          kelasMap[id] = nama;
+        }
+      }
+
+      // --------------------------------------------------------
+      // Bentuk response pesan
+      // --------------------------------------------------------
+
+      const pesanSaya = [];
+
+      for (const row of inboxRows || []) {
 
         const siswaId =
           String(
-            body.siswaId || ""
+            row.siswa_id || ""
           ).trim();
 
-        const judul =
-          String(
-            body.judul || ""
-          ).trim();
+        const siswa =
+          siswaMap[siswaId] || {};
 
-        const pesan =
-          String(
-            body.pesan || ""
-          ).trim();
-
-        const durasi =
-          String(
-            body.durasi || "1d"
-          ).trim();
-
-        const guruId =
-          String(
-            body.guruId || ""
-          ).trim();
-
-        const guruUsername =
-          String(
-            body.guruUsername || ""
-          ).trim();
-
-
-        if (!siswaId) {
-
-          return error(
-            "Siswa belum dipilih."
-          );
-        }
-
-        if (!judul) {
-
-          return error(
-            "Judul pesan wajib diisi."
-          );
-        }
-
-        if (!pesan) {
-
-          return error(
-            "Pesan wajib diisi."
-          );
-        }
-
-
-        if (
-          judul.length >
-          100
-        ) {
-
-          return error(
-            "Judul maksimal 100 karakter."
-          );
-        }
-
-
-        if (
-          pesan.length >
-          2000
-        ) {
-
-          return error(
-            "Pesan maksimal 2000 karakter."
-          );
-        }
-
-
-        const guru =
-          await getGuru(
-            sheets,
-            spreadsheetId,
-            guruId,
-            guruUsername
-          );
-
-
-        if (!guru) {
-
-          return error(
-            "Akun guru tidak ditemukan.",
-            404
-          );
-        }
-
-
-        // =================================================
-        // CEK SISWA
-        // =================================================
-
-        const siswaResponse =
-          await sheets.spreadsheets.values.get({
-
-            spreadsheetId,
-
-            range:
-              "Siswa!A:F"
-
-          });
-
-        const siswaRows =
-          siswaResponse.data.values ||
-          [];
-
-        let siswaDitemukan =
-          false;
-
-        for (
-          const row of siswaRows.slice(1)
-        ) {
-
-          const id =
+        pesanSaya.push({
+          id:
             String(
-              row[0] || ""
-            ).trim();
+              row.id || ""
+            ).trim(),
 
-          const status =
+          siswaId,
+
+          siswaNama:
+            siswa.nama || "-",
+
+          siswaNisn:
+            siswa.nisn || "-",
+
+          siswaKelas:
+            kelasMap[
+              siswa.kelasId
+            ] || "-",
+
+          judul:
             String(
-              row[5] || ""
-            ).trim();
+              row.judul || ""
+            ).trim(),
 
-          if (
-            id === siswaId &&
-            status.toLowerCase() ===
-            "aktif"
-          ) {
+          pesan:
+            String(
+              row.pesan || ""
+            ).trim(),
 
-            siswaDitemukan =
-              true;
+          dibuat:
+            row.dibuat || "",
 
-            break;
-          }
-        }
+          kedaluwarsa:
+            row.kedaluwarsa || "",
 
+          status:
+            String(
+              row.status || ""
+            ).trim(),
 
-        if (!siswaDitemukan) {
-
-          return error(
-            "Siswa tidak ditemukan atau tidak aktif."
-          );
-        }
-
-
-        // =================================================
-        // DURASI
-        // =================================================
-
-        const durations = {
-
-          "1h":
-            1 * 60 * 60 * 1000,
-
-          "3h":
-            3 * 60 * 60 * 1000,
-
-          "6h":
-            6 * 60 * 60 * 1000,
-
-          "12h":
-            12 * 60 * 60 * 1000,
-
-          "1d":
-            24 * 60 * 60 * 1000,
-
-          "3d":
-            3 * 24 * 60 * 60 * 1000,
-
-          "7d":
-            7 * 24 * 60 * 60 * 1000
-
-        };
-
-
-        if (
-          !durations[durasi]
-        ) {
-
-          return error(
-            "Durasi pesan tidak valid."
-          );
-        }
-
-
-        const now =
-          new Date();
-
-        const expiredAt =
-          new Date(
-            now.getTime() +
-            durations[durasi]
-          );
-
-
-        const messageId =
-          "MSG" +
-          Date.now();
-
-
-        await sheets.spreadsheets.values.append({
-
-          spreadsheetId,
-
-          range:
-            "Inbox!A:H",
-
-          valueInputOption:
-            "USER_ENTERED",
-
-          insertDataOption:
-            "INSERT_ROWS",
-
-          requestBody: {
-
-            values: [[
-
-              messageId,
-
-              siswaId,
-
-              judul,
-
-              pesan,
-
-              now.toISOString(),
-
-              expiredAt.toISOString(),
-
-              guru.username,
-
-              "Aktif"
-
-            ]]
-
-          }
-
+          guruUsername:
+            guru.username
         });
-
-
-        return success({
-
-          message:
-            "Pesan berhasil dikirim."
-
-        });
-
       }
 
+      return success({
+        guru: {
+          id: guru.id,
+          username: guru.username,
+          nama: guru.nama
+        },
 
-      // =================================================
-      // DELETE — HAPUS PESAN SENDIRI
-      // =================================================
+        pesan: pesanSaya
+      });
+    }
+
+    // ==========================================================
+    // POST — KIRIM PESAN
+    // ==========================================================
+
+    if (event.httpMethod === "POST") {
+
+      const body =
+        JSON.parse(
+          event.body || "{}"
+        );
+
+      const siswaId =
+        String(
+          body.siswaId || ""
+        ).trim();
+
+      const judul =
+        String(
+          body.judul || ""
+        ).trim();
+
+      const pesan =
+        String(
+          body.pesan || ""
+        ).trim();
+
+      const durasi =
+        String(
+          body.durasi || "1d"
+        ).trim();
+
+      const guruId =
+        String(
+          body.guruId || ""
+        ).trim();
+
+      const guruUsername =
+        String(
+          body.guruUsername || ""
+        ).trim();
+
+      // --------------------------------------------------------
+      // Validasi
+      // --------------------------------------------------------
+
+      if (!siswaId) {
+        return error(
+          "Siswa belum dipilih."
+        );
+      }
+
+      if (!judul) {
+        return error(
+          "Judul pesan wajib diisi."
+        );
+      }
+
+      if (!pesan) {
+        return error(
+          "Pesan wajib diisi."
+        );
+      }
+
+      if (judul.length > 100) {
+        return error(
+          "Judul maksimal 100 karakter."
+        );
+      }
+
+      if (pesan.length > 2000) {
+        return error(
+          "Pesan maksimal 2000 karakter."
+        );
+      }
+
+      // --------------------------------------------------------
+      // Validasi Guru
+      // --------------------------------------------------------
+
+      const guru =
+        await getGuru(
+          guruId,
+          guruUsername
+        );
+
+      if (!guru) {
+        return error(
+          "Akun guru tidak ditemukan.",
+          404
+        );
+      }
+
+      // --------------------------------------------------------
+      // Cek siswa
+      // --------------------------------------------------------
+
+      const {
+        data: siswa,
+        error: siswaError
+      } = await supabase
+        .from("siswa")
+        .select(`
+          id,
+          status
+        `)
+        .eq("id", siswaId)
+        .maybeSingle();
+
+      if (siswaError) {
+        console.error(
+          "SUPABASE GURU INBOX CHECK SISWA ERROR:",
+          siswaError
+        );
+
+        return error(
+          "Gagal memeriksa siswa.",
+          500
+        );
+      }
 
       if (
-        event.httpMethod ===
-        "DELETE"
+        !siswa ||
+        String(siswa.status || "")
+          .trim()
+          .toLowerCase() !== "aktif"
       ) {
-
-        const body =
-          JSON.parse(
-            event.body || "{}"
-          );
-
-
-        const messageId =
-          String(
-            body.id || ""
-          ).trim();
-
-        const guruId =
-          String(
-            body.guruId || ""
-          ).trim();
-
-        const guruUsername =
-          String(
-            body.guruUsername || ""
-          ).trim();
-
-
-        if (!messageId) {
-
-          return error(
-            "ID pesan tidak ditemukan."
-          );
-        }
-
-
-        const guru =
-          await getGuru(
-            sheets,
-            spreadsheetId,
-            guruId,
-            guruUsername
-          );
-
-
-        if (!guru) {
-
-          return error(
-            "Akun guru tidak ditemukan.",
-            404
-          );
-        }
-
-
-        const response =
-          await sheets.spreadsheets.values.get({
-
-            spreadsheetId,
-
-            range:
-              "Inbox!A:H"
-
-          });
-
-
-        const rows =
-          response.data.values ||
-          [];
-
-
-        let rowNumber =
-          -1;
-
-
-        for (
-          let i = 1;
-          i < rows.length;
-          i++
-        ) {
-
-          const id =
-            String(
-              rows[i][0] || ""
-            ).trim();
-
-          const dibuatOleh =
-            String(
-              rows[i][6] || ""
-            ).trim();
-
-
-          if (
-            id === messageId &&
-            dibuatOleh.toLowerCase() ===
-            guru.username.toLowerCase()
-          ) {
-
-            rowNumber =
-              i + 1;
-
-            break;
-          }
-
-        }
-
-
-        if (
-          rowNumber === -1
-        ) {
-
-          return error(
-            "Pesan tidak ditemukan atau bukan pesan Anda.",
-            403
-          );
-        }
-
-
-        const sheetId =
-          await getSheetId(
-            sheets,
-            spreadsheetId,
-            "Inbox"
-          );
-
-
-        if (
-          sheetId === null
-        ) {
-
-          return error(
-            "Sheet Inbox tidak ditemukan.",
-            500
-          );
-        }
-
-
-        await sheets.spreadsheets.batchUpdate({
-
-          spreadsheetId,
-
-          requestBody: {
-
-            requests: [{
-
-              deleteDimension: {
-
-                range: {
-
-                  sheetId,
-
-                  dimension:
-                    "ROWS",
-
-                  startIndex:
-                    rowNumber - 1,
-
-                  endIndex:
-                    rowNumber
-
-                }
-
-              }
-
-            }]
-
-          }
-
-        });
-
-
-        return success({
-
-          message:
-            "Pesan berhasil dihapus."
-
-        });
-
+        return error(
+          "Siswa tidak ditemukan atau tidak aktif."
+        );
       }
 
+      // --------------------------------------------------------
+      // Durasi
+      // --------------------------------------------------------
 
-      return error(
-        "Method tidak diizinkan.",
-        405
-      );
+      const durations = {
 
+        "1h":
+          1 * 60 * 60 * 1000,
 
-    } catch (err) {
+        "3h":
+          3 * 60 * 60 * 1000,
 
-      console.error(
-        "GURU INBOX ERROR:",
-        err
-      );
+        "6h":
+          6 * 60 * 60 * 1000,
 
-      return error(
-        "Terjadi kesalahan pada server.",
-        500
-      );
+        "12h":
+          12 * 60 * 60 * 1000,
+
+        "1d":
+          24 * 60 * 60 * 1000,
+
+        "3d":
+          3 * 24 * 60 * 60 * 1000,
+
+        "7d":
+          7 * 24 * 60 * 60 * 1000
+      };
+
+      if (!durations[durasi]) {
+        return error(
+          "Durasi pesan tidak valid."
+        );
+      }
+
+      // --------------------------------------------------------
+      // Waktu
+      // --------------------------------------------------------
+
+      const now =
+        new Date();
+
+      const expiredAt =
+        new Date(
+          now.getTime() +
+          durations[durasi]
+        );
+
+      // --------------------------------------------------------
+      // ID pesan
+      // --------------------------------------------------------
+
+      const messageId =
+        "MSG" +
+        Date.now();
+
+      // --------------------------------------------------------
+      // Insert
+      // --------------------------------------------------------
+
+      const {
+        error: insertError
+      } = await supabase
+        .from("inbox")
+        .insert({
+          id: messageId,
+          siswa_id: siswaId,
+          judul,
+          pesan,
+          dibuat:
+            now.toISOString(),
+          kedaluwarsa:
+            expiredAt.toISOString(),
+          dibuat_oleh:
+            guru.username,
+          status: "Aktif"
+        });
+
+      if (insertError) {
+        console.error(
+          "SUPABASE GURU INBOX INSERT ERROR:",
+          insertError
+        );
+
+        return error(
+          "Gagal mengirim pesan.",
+          500
+        );
+      }
+
+      return success({
+        message:
+          "Pesan berhasil dikirim."
+      });
     }
-  };
+
+    // ==========================================================
+    // DELETE — HAPUS PESAN SENDIRI
+    // ==========================================================
+
+    if (event.httpMethod === "DELETE") {
+
+      const body =
+        JSON.parse(
+          event.body || "{}"
+        );
+
+      const messageId =
+        String(
+          body.id || ""
+        ).trim();
+
+      const guruId =
+        String(
+          body.guruId || ""
+        ).trim();
+
+      const guruUsername =
+        String(
+          body.guruUsername || ""
+        ).trim();
+
+      if (!messageId) {
+        return error(
+          "ID pesan tidak ditemukan."
+        );
+      }
+
+      // --------------------------------------------------------
+      // Validasi Guru
+      // --------------------------------------------------------
+
+      const guru =
+        await getGuru(
+          guruId,
+          guruUsername
+        );
+
+      if (!guru) {
+        return error(
+          "Akun guru tidak ditemukan.",
+          404
+        );
+      }
+
+      // --------------------------------------------------------
+      // Cari pesan dan pastikan milik Guru
+      // --------------------------------------------------------
+
+      const {
+        data: existingMessage,
+        error: messageError
+      } = await supabase
+        .from("inbox")
+        .select(`
+          id,
+          dibuat_oleh
+        `)
+        .eq("id", messageId)
+        .maybeSingle();
+
+      if (messageError) {
+        console.error(
+          "SUPABASE GURU INBOX DELETE GET ERROR:",
+          messageError
+        );
+
+        return error(
+          "Gagal mengambil data pesan.",
+          500
+        );
+      }
+
+      if (!existingMessage) {
+        return error(
+          "Pesan tidak ditemukan atau bukan pesan Anda.",
+          403
+        );
+      }
+
+      if (
+        String(
+          existingMessage.dibuat_oleh || ""
+        ).toLowerCase() !==
+        guru.username.toLowerCase()
+      ) {
+        return error(
+          "Pesan tidak ditemukan atau bukan pesan Anda.",
+          403
+        );
+      }
+
+      // --------------------------------------------------------
+      // Hapus
+      // --------------------------------------------------------
+
+      const {
+        error: deleteError
+      } = await supabase
+        .from("inbox")
+        .delete()
+        .eq("id", messageId)
+        .eq(
+          "dibuat_oleh",
+          guru.username
+        );
+
+      if (deleteError) {
+        console.error(
+          "SUPABASE GURU INBOX DELETE ERROR:",
+          deleteError
+        );
+
+        return error(
+          "Gagal menghapus pesan.",
+          500
+        );
+      }
+
+      return success({
+        message:
+          "Pesan berhasil dihapus."
+      });
+    }
+
+    // ==========================================================
+    // METHOD TIDAK DIIZINKAN
+    // ==========================================================
+
+    return error(
+      "Method tidak diizinkan.",
+      405
+    );
+
+  } catch (err) {
+
+    console.error(
+      "GURU INBOX ERROR:",
+      err
+    );
+
+    return error(
+      "Terjadi kesalahan pada server.",
+      500
+    );
+  }
+};
