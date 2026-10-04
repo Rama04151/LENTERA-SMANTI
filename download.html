@@ -2,9 +2,10 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
   >
 
   <title>Download Aplikasi - LENTERA SMANTI</title>
@@ -18,6 +19,7 @@
   >
 
   <style>
+
     :root {
       --bg: #0b132b;
       --card: #1c2541;
@@ -28,22 +30,40 @@
 
       --text: #ffffff;
       --muted: #94a3b8;
+
       --border: rgba(255,255,255,.08);
 
-      --green: #22c55e;
       --blue: #3b82f6;
       --purple: #a855f7;
+      --green: #22c55e;
     }
+
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: "Plus Jakarta Sans", sans-serif;
+
+      font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
     }
 
+
+    html {
+      width: 100%;
+      min-height: 100%;
+
+      overflow-x: hidden;
+    }
+
+
     body {
+      width: 100%;
       min-height: 100vh;
+
+      overflow-x: hidden;
+
       padding: 20px;
 
       background:
@@ -62,32 +82,46 @@
       color: var(--text);
     }
 
+
+    /* =========================
+       CONTAINER
+    ========================== */
+
     .container {
       width: 100%;
-      max-width: 1000px;
-      margin: auto;
+
+      max-width: 980px;
+
+      margin: 0 auto;
     }
+
 
     /* =========================
        HEADER
     ========================== */
 
     .header {
+      width: 100%;
+
       text-align: center;
-      padding: 40px 20px 30px;
+
+      padding:
+        25px 10px 28px;
     }
 
-    .logo {
-      width: 68px;
-      height: 68px;
 
-      margin: 0 auto 18px;
+    .logo {
+      width: 62px;
+      height: 62px;
+
+      margin: 0 auto 16px;
 
       display: flex;
+
       align-items: center;
       justify-content: center;
 
-      border-radius: 20px;
+      border-radius: 18px;
 
       background:
         linear-gradient(
@@ -98,112 +132,155 @@
 
       color: var(--bg);
 
-      font-size: 30px;
+      font-size: 27px;
+
       font-weight: 800;
 
       box-shadow:
-        0 10px 30px rgba(251,192,45,.2);
+        0 10px 30px
+        rgba(251,192,45,.2);
     }
 
+
     .header h1 {
-      font-size: 28px;
+      font-size: 25px;
+
+      line-height: 1.3;
+
       font-weight: 800;
     }
 
+
     .header p {
-      margin-top: 8px;
+      margin-top: 7px;
 
       color: var(--muted);
 
-      font-size: 13px;
+      font-size: 12px;
     }
 
-    .back {
-      display: inline-block;
 
-      margin-top: 18px;
+    .back {
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      margin-top: 16px;
+
+      padding:
+        9px 14px;
+
+      border:
+        1px solid
+        rgba(255,255,255,.08);
+
+      border-radius: 10px;
+
+      background:
+        rgba(255,255,255,.04);
 
       color: var(--gold);
 
       text-decoration: none;
 
-      font-size: 13px;
+      font-size: 12px;
+
       font-weight: 700;
+
+      transition: .2s ease;
     }
+
 
     .back:hover {
-      text-decoration: underline;
+      background:
+        rgba(255,255,255,.08);
     }
 
+
     /* =========================
-       GRID
+       DOWNLOAD GRID
     ========================== */
 
     .download-grid {
+      width: 100%;
+
       display: grid;
 
       grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-      gap: 18px;
-
-      margin-top: 10px;
+      gap: 16px;
     }
+
 
     /* =========================
        CARD
     ========================== */
 
     .download-card {
-      position: relative;
+      width: 100%;
+
+      min-width: 0;
 
       background: var(--card);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid
+        var(--border);
 
-      border-radius: 22px;
+      border-radius: 20px;
 
-      padding: 26px 20px;
+      padding: 22px 18px;
 
       text-align: center;
+
+      box-shadow:
+        0 15px 35px
+        rgba(0,0,0,.22);
 
       transition:
         transform .2s ease,
         background .2s ease,
         border-color .2s ease;
-
-      box-shadow:
-        0 15px 35px rgba(0,0,0,.25);
     }
+
 
     .download-card:hover {
-      transform: translateY(-5px);
+      transform:
+        translateY(-4px);
 
-      background: var(--card-hover);
+      background:
+        var(--card-hover);
 
       border-color:
-        rgba(251,192,45,.25);
+        rgba(251,192,45,.2);
     }
+
 
     /* =========================
        ICON
     ========================== */
 
     .app-icon {
-      width: 76px;
-      height: 76px;
+      width: 68px;
+      height: 68px;
 
-      margin: 0 auto 18px;
-
-      border-radius: 20px;
+      margin: 0 auto 15px;
 
       display: flex;
+
       align-items: center;
       justify-content: center;
 
-      font-size: 34px;
+      border-radius: 18px;
+
+      font-size: 29px;
+
       font-weight: 800;
     }
+
 
     .admin-icon {
       background:
@@ -212,8 +289,10 @@
       color: var(--gold);
 
       border:
-        1px solid rgba(251,192,45,.2);
+        1px solid
+        rgba(251,192,45,.2);
     }
+
 
     .guru-icon {
       background:
@@ -222,8 +301,10 @@
       color: var(--blue);
 
       border:
-        1px solid rgba(59,130,246,.2);
+        1px solid
+        rgba(59,130,246,.2);
     }
+
 
     .siswa-icon {
       background:
@@ -232,92 +313,105 @@
       color: var(--purple);
 
       border:
-        1px solid rgba(168,85,247,.2);
+        1px solid
+        rgba(168,85,247,.2);
     }
+
 
     /* =========================
        TEXT
     ========================== */
 
     .download-card h2 {
-      font-size: 18px;
+      font-size: 17px;
 
       font-weight: 800;
 
       margin-bottom: 7px;
     }
 
-    .download-card > p {
-      min-height: 42px;
 
-      color: var(--muted);
+    .description {
+      min-height: 40px;
 
-      font-size: 12px;
-
-      line-height: 1.6;
-
-      margin-bottom: 18px;
-    }
-
-    /* =========================
-       LINK DOWNLOAD
-    ========================== */
-
-    .link-label {
-      display: block;
-
-      text-align: left;
-
-      margin-bottom: 7px;
+      margin-bottom: 17px;
 
       color: var(--muted);
 
       font-size: 11px;
 
+      line-height: 1.55;
+    }
+
+
+    /* =========================
+       LINK
+    ========================== */
+
+    .link-label {
+      display: block;
+
+      margin-bottom: 6px;
+
+      color: var(--muted);
+
+      text-align: left;
+
+      font-size: 10px;
+
       font-weight: 700;
     }
 
+
     .download-link-box {
-      display: flex;
-
-      align-items: center;
-
       width: 100%;
 
-      margin-bottom: 12px;
+      min-width: 0;
+
+      display: flex;
+
+      align-items: stretch;
 
       overflow: hidden;
 
+      margin-bottom: 10px;
+
       border:
-        1px solid rgba(255,255,255,.08);
+        1px solid
+        rgba(255,255,255,.08);
+
+      border-radius: 9px;
 
       background:
         rgba(0,0,0,.18);
-
-      border-radius: 10px;
     }
+
 
     .download-link {
       flex: 1;
 
       min-width: 0;
 
-      padding: 10px 11px;
+      overflow: hidden;
 
-      color: #dbeafe;
+      padding:
+        9px 9px;
 
-      font-size: 11px;
+      color: #cbd5e1;
 
       text-align: left;
 
       white-space: nowrap;
 
-      overflow: hidden;
-
       text-overflow: ellipsis;
+
+      font-size: 9px;
+
+      line-height: 1.4;
 
       user-select: all;
     }
+
 
     .copy-button {
       flex-shrink: 0;
@@ -325,16 +419,18 @@
       border: none;
 
       border-left:
-        1px solid rgba(255,255,255,.08);
+        1px solid
+        rgba(255,255,255,.08);
+
+      padding:
+        0 10px;
 
       background:
         rgba(255,255,255,.05);
 
       color: #ffffff;
 
-      padding: 10px 12px;
-
-      font-size: 11px;
+      font-size: 10px;
 
       font-weight: 700;
 
@@ -343,45 +439,56 @@
       transition: .2s ease;
     }
 
+
     .copy-button:hover {
       background:
         rgba(255,255,255,.12);
     }
 
+
     .copy-button.copied {
-      background: var(--green);
+      background:
+        var(--green);
 
       color: #ffffff;
     }
+
 
     /* =========================
        DOWNLOAD BUTTON
     ========================== */
 
     .download-button {
+      width: 100%;
+
       display: flex;
 
       align-items: center;
+
       justify-content: center;
 
-      width: 100%;
+      min-height: 42px;
 
-      padding: 12px 15px;
+      padding:
+        10px 12px;
 
-      border-radius: 11px;
+      border-radius: 10px;
 
       text-decoration: none;
 
-      font-size: 13px;
+      font-size: 11px;
 
       font-weight: 800;
 
       transition: .2s ease;
     }
 
+
     .download-button:hover {
-      transform: translateY(-1px);
+      transform:
+        translateY(-1px);
     }
+
 
     .admin-button {
       background:
@@ -394,85 +501,232 @@
       color: var(--bg);
     }
 
+
     .guru-button {
-      background: var(--blue);
+      background:
+        var(--blue);
 
       color: #fff;
     }
+
 
     .siswa-button {
-      background: var(--purple);
+      background:
+        var(--purple);
 
       color: #fff;
     }
+
 
     /* =========================
        FOOTER
     ========================== */
 
     .footer {
+      width: 100%;
+
       text-align: center;
 
-      padding: 35px 10px 15px;
+      padding:
+        30px 10px 10px;
 
       color: var(--muted);
 
-      font-size: 11px;
+      font-size: 10px;
+
+      line-height: 1.7;
     }
+
 
     .footer strong {
       color: var(--gold);
     }
 
+
     /* =========================
-       MOBILE
+       TABLET
     ========================== */
 
-    @media (max-width: 800px) {
+    @media (max-width: 850px) {
 
       body {
-        padding: 10px;
+        padding: 14px;
       }
+
+
+      .container {
+        max-width: 700px;
+      }
+
+
+      .download-grid {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+    }
+
+
+    /* =========================
+       HP
+    ========================== */
+
+    @media (max-width: 600px) {
+
+      body {
+        padding:
+          10px;
+      }
+
+
+      .container {
+        width: 100%;
+
+        max-width: 430px;
+      }
+
 
       .header {
         padding:
-          30px 15px 25px;
+          18px 5px 22px;
       }
+
+
+      .logo {
+        width: 56px;
+        height: 56px;
+
+        border-radius: 16px;
+
+        font-size: 24px;
+      }
+
 
       .header h1 {
-        font-size: 23px;
+        font-size: 21px;
       }
+
+
+      .header p {
+        font-size: 11px;
+      }
+
 
       .download-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+          1fr;
 
-        gap: 14px;
+        gap: 12px;
       }
+
 
       .download-card {
-        padding: 22px 18px;
-      }
-
-      .app-icon {
-        width: 65px;
-        height: 65px;
-
-        font-size: 28px;
+        padding:
+          20px 16px;
 
         border-radius: 17px;
       }
 
+
+      .app-icon {
+        width: 60px;
+        height: 60px;
+
+        margin-bottom: 13px;
+
+        border-radius: 16px;
+
+        font-size: 26px;
+      }
+
+
+      .download-card h2 {
+        font-size: 16px;
+      }
+
+
+      .description {
+        min-height: auto;
+
+        margin-bottom: 15px;
+
+        font-size: 11px;
+      }
+
+
+      .download-link {
+        font-size: 9px;
+      }
+
+
+      .copy-button {
+        padding:
+          0 9px;
+      }
+
+
+      .download-button {
+        min-height: 40px;
+
+        font-size: 11px;
+      }
+
     }
+
+
+    /* =========================
+       HP KECIL
+    ========================== */
+
+    @media (max-width: 360px) {
+
+      body {
+        padding:
+          8px;
+      }
+
+
+      .container {
+        max-width: 100%;
+      }
+
+
+      .header h1 {
+        font-size: 19px;
+      }
+
+
+      .download-card {
+        padding:
+          18px 13px;
+      }
+
+
+      .download-link {
+        font-size: 8px;
+      }
+
+
+      .copy-button {
+        font-size: 9px;
+
+        padding:
+          0 8px;
+      }
+
+    }
+
   </style>
 </head>
 
+
 <body>
+
 
   <main class="container">
 
-    <!-- =========================
-         HEADER
-    ========================== -->
+
+    <!-- HEADER -->
 
     <header class="header">
 
@@ -480,34 +734,34 @@
         L
       </div>
 
+
       <h1>
         Download Aplikasi
       </h1>
+
 
       <p>
         LENTERA SMANTI
       </p>
 
+
       <a
-        href="index.html"
+        href="admin.html"
         class="back"
       >
-        ← Kembali ke Beranda
+        ← Kembali ke Admin
       </a>
 
     </header>
 
 
-    <!-- =========================
-         DOWNLOAD CARDS
-    ========================== -->
+
+    <!-- DOWNLOAD -->
 
     <section class="download-grid">
 
 
-      <!-- =====================
-           ADMIN
-      ====================== -->
+      <!-- ADMIN -->
 
       <div class="download-card">
 
@@ -515,13 +769,16 @@
           A
         </div>
 
+
         <h2>
           APK ADMIN
         </h2>
 
-        <p>
+
+        <p class="description">
           Aplikasi khusus administrator
-          untuk mengelola sistem LENTERA SMANTI.
+          untuk mengelola sistem
+          LENTERA SMANTI.
         </p>
 
 
@@ -529,16 +786,17 @@
           Link Download
         </span>
 
+
         <div class="download-link-box">
 
           <span
             class="download-link"
             id="adminLink"
-          >
-            https://contoh.com/admin.apk
-          </span>
+          ></span>
+
 
           <button
+            type="button"
             class="copy-button"
             onclick="copyLink('adminLink', this)"
           >
@@ -550,8 +808,8 @@
 
         <a
           id="adminDownload"
-          href="https://contoh.com/admin.apk"
           class="download-button admin-button"
+          href="#"
         >
           ⬇ Download APK
         </a>
@@ -560,9 +818,7 @@
 
 
 
-      <!-- =====================
-           GURU
-      ====================== -->
+      <!-- GURU -->
 
       <div class="download-card">
 
@@ -570,11 +826,13 @@
           G
         </div>
 
+
         <h2>
           APK GURU
         </h2>
 
-        <p>
+
+        <p class="description">
           Aplikasi untuk guru dalam
           mengelola poin dan data siswa.
         </p>
@@ -584,16 +842,17 @@
           Link Download
         </span>
 
+
         <div class="download-link-box">
 
           <span
             class="download-link"
             id="guruLink"
-          >
-            https://contoh.com/guru.apk
-          </span>
+          ></span>
+
 
           <button
+            type="button"
             class="copy-button"
             onclick="copyLink('guruLink', this)"
           >
@@ -605,8 +864,8 @@
 
         <a
           id="guruDownload"
-          href="https://contoh.com/guru.apk"
           class="download-button guru-button"
+          href="#"
         >
           ⬇ Download APK
         </a>
@@ -615,9 +874,7 @@
 
 
 
-      <!-- =====================
-           SISWA
-      ====================== -->
+      <!-- SISWA -->
 
       <div class="download-card">
 
@@ -625,13 +882,16 @@
           S
         </div>
 
+
         <h2>
           APK SISWA
         </h2>
 
-        <p>
+
+        <p class="description">
           Aplikasi siswa untuk melihat
-          poin, informasi, dan akun LENTERA SMANTI.
+          poin, informasi, dan akun
+          LENTERA SMANTI.
         </p>
 
 
@@ -639,16 +899,17 @@
           Link Download
         </span>
 
+
         <div class="download-link-box">
 
           <span
             class="download-link"
             id="siswaLink"
-          >
-            https://contoh.com/siswa.apk
-          </span>
+          ></span>
+
 
           <button
+            type="button"
             class="copy-button"
             onclick="copyLink('siswaLink', this)"
           >
@@ -660,8 +921,8 @@
 
         <a
           id="siswaDownload"
-          href="https://contoh.com/siswa.apk"
           class="download-button siswa-button"
+          href="#"
         >
           ⬇ Download APK
         </a>
@@ -672,9 +933,8 @@
     </section>
 
 
-    <!-- =========================
-         FOOTER
-    ========================== -->
+
+    <!-- FOOTER -->
 
     <footer class="footer">
 
@@ -692,20 +952,37 @@
 
     </footer>
 
+
   </main>
 
 
-  <!-- =========================
-       JAVASCRIPT
-  ========================== -->
 
   <script>
 
-    /*
-     * =========================================
-     * ATUR LINK APK DI SINI
-     * =========================================
-     */
+    /* =========================================
+       CEK SESSION ADMIN
+    ========================================== */
+
+    const adminSession =
+      sessionStorage.getItem(
+        "lentera_admin_session"
+      );
+
+
+    if (!adminSession) {
+
+      window.location.replace(
+        "admin-login.html"
+      );
+
+    }
+
+
+    /* =========================================
+       LINK APK
+       
+       UBAH LINK DI SINI
+    ========================================== */
 
     const APK_LINKS = {
 
@@ -721,39 +998,50 @@
     };
 
 
-    /*
-     * =========================================
-     * PASANG LINK OTOMATIS
-     * =========================================
-     */
+    /* =========================================
+       PASANG LINK
+    ========================================== */
 
-    document.getElementById("adminLink").textContent =
-      APK_LINKS.admin;
-
-    document.getElementById("adminDownload").href =
+    document.getElementById(
+      "adminLink"
+    ).textContent =
       APK_LINKS.admin;
 
 
-    document.getElementById("guruLink").textContent =
+    document.getElementById(
+      "adminDownload"
+    ).href =
+      APK_LINKS.admin;
+
+
+    document.getElementById(
+      "guruLink"
+    ).textContent =
       APK_LINKS.guru;
 
-    document.getElementById("guruDownload").href =
+
+    document.getElementById(
+      "guruDownload"
+    ).href =
       APK_LINKS.guru;
 
 
-    document.getElementById("siswaLink").textContent =
+    document.getElementById(
+      "siswaLink"
+    ).textContent =
       APK_LINKS.siswa;
 
-    document.getElementById("siswaDownload").href =
+
+    document.getElementById(
+      "siswaDownload"
+    ).href =
       APK_LINKS.siswa;
 
 
 
-    /*
-     * =========================================
-     * FUNGSI SALIN LINK
-     * =========================================
-     */
+    /* =========================================
+       COPY LINK
+    ========================================== */
 
     async function copyLink(
       elementId,
@@ -761,83 +1049,88 @@
     ) {
 
       const element =
-        document.getElementById(elementId);
+        document.getElementById(
+          elementId
+        );
+
 
       const link =
         element.textContent.trim();
 
 
+      if (!link) {
+        return;
+      }
+
+
       try {
 
-        await navigator.clipboard.writeText(link);
-
-        const originalText =
-          button.textContent;
-
-        button.textContent =
-          "✓ Tersalin";
-
-        button.classList.add("copied");
-
-
-        setTimeout(() => {
-
-          button.textContent =
-            originalText;
-
-          button.classList.remove("copied");
-
-        }, 1800);
-
+        await navigator.clipboard.writeText(
+          link
+        );
 
       } catch (error) {
 
-        /*
-         * Fallback jika Clipboard API
-         * tidak tersedia.
-         */
-
         const textarea =
-          document.createElement("textarea");
+          document.createElement(
+            "textarea"
+          );
 
-        textarea.value = link;
+
+        textarea.value =
+          link;
+
 
         textarea.style.position =
           "fixed";
 
+
         textarea.style.opacity =
           "0";
+
 
         document.body.appendChild(
           textarea
         );
 
+
         textarea.select();
 
-        document.execCommand("copy");
+
+        document.execCommand(
+          "copy"
+        );
+
 
         textarea.remove();
 
+      }
 
-        const originalText =
-          button.textContent;
+
+      const originalText =
+        button.textContent;
+
+
+      button.textContent =
+        "✓ Tersalin";
+
+
+      button.classList.add(
+        "copied"
+      );
+
+
+      setTimeout(() => {
 
         button.textContent =
-          "✓ Tersalin";
-
-        button.classList.add("copied");
+          originalText;
 
 
-        setTimeout(() => {
+        button.classList.remove(
+          "copied"
+        );
 
-          button.textContent =
-            originalText;
-
-          button.classList.remove("copied");
-
-        }, 1800);
-
-      }
+      }, 1800);
 
     }
 
