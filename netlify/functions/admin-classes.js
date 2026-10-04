@@ -1,4 +1,4 @@
-const { google } = require("googleapis");
+const supabase = require("./_supabase");
 
 exports.handler = async function (event) {
 
@@ -21,64 +21,91 @@ exports.handler = async function (event) {
   try {
 
     // =========================
-    // GOOGLE AUTH
+    // AMBIL DATA KELAS
     // =========================
-    const privateKey = process.env.GOOGLE_PRIVATE_KEY
-      .replace(/\\n/g, "\n")
-      .replace(/^"|"$/g, "");
-
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email:
-          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-
-        private_key:
-          privateKey
-      },
-
-      scopes: [
-        "https://www.googleapis.com/auth/spreadsheets"
-      ]
-    });
-
-    const sheets = google.sheets({
-      version: "v4",
-      auth
-    });
-
-    const spreadsheetId =
-      process.env.GOOGLE_SHEET_ID;
-
-
-    // =========================
-    // AMBIL SEMUA DATA SEKALIGUS
-    // =========================
-    const response =
-      await sheets.spreadsheets.values.batchGet({
-
-        spreadsheetId,
-
-        ranges: [
-          "Kelas!A:E",
-          "Siswa!A:F",
-          "Poin!A:G"
-        ]
-
+    const {
+      data: kelasRows,
+      error: kelasError
+    } = await supabase
+      .from("kelas")
+      .select(`
+        id,
+        nama_kelas,
+        tingkat,
+        status
+      `)
+      .order("id", {
+        ascending: true
       });
 
+    if (kelasError) {
+      console.error(
+        "SUPABASE KELAS ERROR:",
+        kelasError
+      );
 
-    const valueRanges =
-      response.data.valueRanges || [];
+      return response(500, {
+        success: false,
+        message: "Gagal mengambil data kelas."
+      });
+    }
 
 
-    const kelasRows =
-      valueRanges[0]?.values || [];
+    // =========================
+    // AMBIL DATA SISWA
+    // =========================
+    const {
+      data: siswaRows,
+      error: siswaError
+    } = await supabase
+      .from("siswa")
+      .select(`
+        id,
+        nisn,
+        nama,
+        kelas_id,
+        status
+      `)
+      .eq("status", "Aktif");
 
-    const siswaRows =
-      valueRanges[1]?.values || [];
+    if (siswaError) {
+      console.error(
+        "SUPABASE SISWA ERROR:",
+        siswaError
+      );
 
-    const poinRows =
-      valueRanges[2]?.values || [];
+      return response(500, {
+        success: false,
+        message: "Gagal mengambil data siswa."
+      });
+    }
+
+
+    // =========================
+    // AMBIL SEMUA POIN
+    // =========================
+    const {
+      data: poinRows,
+      error: poinError
+    } = await supabase
+      .from("poin")
+      .select(`
+        siswa_id,
+        jenis,
+        poin
+      `);
+
+    if (poinError) {
+      console.error(
+        "SUPABASE POIN ERROR:",
+        poinError
+      );
+
+      return response(500, {
+        success: false,
+        message: "Gagal mengambil data poin."
+      });
+    }
 
 
     // =========================
@@ -87,20 +114,18 @@ exports.handler = async function (event) {
     const poinMap = {};
 
 
-    for (let i = 1; i < poinRows.length; i++) {
-
-      const row = poinRows[i];
+    for (const row of poinRows || []) {
 
       const siswaId =
-        String(row[1] || "").trim();
+        String(row.siswa_id || "").trim();
 
       const jenis =
-        String(row[2] || "")
+        String(row.jenis || "")
           .trim()
           .toLowerCase();
 
       const nilai =
-        Number(row[3] || 0);
+        Number(row.poin || 0);
 
 
       if (!siswaId) {
@@ -111,11 +136,8 @@ exports.handler = async function (event) {
       if (!poinMap[siswaId]) {
 
         poinMap[siswaId] = {
-
           penghargaan: 0,
-
           pelanggaran: 0
-
         };
 
       }
@@ -137,27 +159,15 @@ exports.handler = async function (event) {
 
 
     // =========================
-    // MAP NAMA KELAS
+    // MAP KELAS
     // =========================
     const kelasMap = {};
 
 
-    for (let i = 1; i < kelasRows.length; i++) {
-
-      const row = kelasRows[i];
+    for (const row of kelasRows || []) {
 
       const id =
-        String(row[0] || "").trim();
-
-      const nama =
-        String(row[1] || "").trim();
-
-      const tingkat =
-        String(row[2] || "").trim();
-
-      const status =
-        String(row[4] || "").trim();
-
+        String(row.id || "").trim();
 
       if (!id) {
         continue;
@@ -168,11 +178,14 @@ exports.handler = async function (event) {
 
         id,
 
-        nama,
+        nama:
+          String(row.nama_kelas || "").trim(),
 
-        tingkat,
+        tingkat:
+          String(row.tingkat || "").trim(),
 
-        status
+        status:
+          String(row.status || "").trim()
 
       };
 
@@ -180,35 +193,24 @@ exports.handler = async function (event) {
 
 
     // =========================
-    // BUAT DATA SISWA
+    // BUAT DATA SISWA PER KELAS
     // =========================
     const siswaPerKelas = {};
 
 
-    for (let i = 1; i < siswaRows.length; i++) {
-
-      const row = siswaRows[i];
+    for (const row of siswaRows || []) {
 
       const id =
-        String(row[0] || "").trim();
+        String(row.id || "").trim();
 
       const nisn =
-        String(row[1] || "").trim();
+        String(row.nisn || "").trim();
 
       const nama =
-        String(row[2] || "").trim();
+        String(row.nama || "").trim();
 
       const kelasId =
-        String(row[3] || "").trim();
-
-      const status =
-        String(row[5] || "").trim();
-
-
-      // Hanya siswa aktif
-      if (status !== "Aktif") {
-        continue;
-      }
+        String(row.kelas_id || "").trim();
 
 
       if (!kelasId) {
@@ -294,29 +296,13 @@ exports.handler = async function (event) {
     // =========================
     // RESPONSE
     // =========================
-    return {
+    return response(200, {
 
-      statusCode: 200,
+      success: true,
 
-      headers: {
+      kelas
 
-        "Content-Type":
-          "application/json",
-
-        "Cache-Control":
-          "no-store"
-
-      },
-
-      body: JSON.stringify({
-
-        success: true,
-
-        kelas
-
-      })
-
-    };
+    });
 
   }
 
@@ -327,34 +313,45 @@ exports.handler = async function (event) {
       error
     );
 
-    return {
+    return response(500, {
 
-      statusCode: 500,
+      success: false,
 
-      headers: {
+      message:
+        "Gagal mengambil data kelas.",
 
-        "Content-Type":
-          "application/json",
+      error:
+        error.message
 
-        "Cache-Control":
-          "no-store"
-
-      },
-
-      body: JSON.stringify({
-
-        success: false,
-
-        message:
-          "Gagal mengambil data kelas.",
-
-        error:
-          error.message
-
-      })
-
-    };
+    });
 
   }
 
 };
+
+
+// =========================
+// RESPONSE HELPER
+// =========================
+function response(statusCode, body) {
+
+  return {
+
+    statusCode,
+
+    headers: {
+
+      "Content-Type":
+        "application/json",
+
+      "Cache-Control":
+        "no-store"
+
+    },
+
+    body:
+      JSON.stringify(body)
+
+  };
+
+}
