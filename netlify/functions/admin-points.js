@@ -1,298 +1,194 @@
-const { google } = require("googleapis");
-
-// =====================================================
-// GOOGLE SHEETS AUTH
-// =====================================================
-
-async function getSheets() {
-  const privateKey =
-    process.env.GOOGLE_PRIVATE_KEY
-      .replace(/\\n/g, "\n")
-      .replace(/^"|"$/g, "");
-
-  const auth =
-    new google.auth.GoogleAuth({
-      credentials: {
-        client_email:
-          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-
-        private_key:
-          privateKey
-      },
-
-      scopes: [
-        "https://www.googleapis.com/auth/spreadsheets"
-      ]
-    });
-
-  return google.sheets({
-    version: "v4",
-    auth
-  });
-}
-
-// =====================================================
-// BATCH GET
-//
-// Beberapa range dibaca dalam 1 request.
-// =====================================================
-
-async function batchGet(
-  sheets,
-  spreadsheetId,
-  ranges
-) {
-  const result =
-    await sheets.spreadsheets.values.batchGet({
-      spreadsheetId,
-      ranges
-    });
-
-  const valueRanges =
-    result.data.valueRanges || [];
-
-  const data = {};
-
-  for (
-    let i = 0;
-    i < ranges.length;
-    i++
-  ) {
-    data[ranges[i]] =
-      valueRanges[i]?.values || [];
-  }
-
-  return data;
-}
+const supabase = require("./_supabase");
 
 // =====================================================
 // RESPONSE
 // =====================================================
 
-function response(
-  statusCode,
-  body
-) {
+function response(statusCode, body) {
   return {
     statusCode,
 
     headers: {
-      "Content-Type":
-        "application/json",
-
-      "Cache-Control":
-        "no-store"
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store"
     },
 
-    body:
-      JSON.stringify(body)
+    body: JSON.stringify(body)
   };
 }
+
 
 // =====================================================
 // HANDLER
 // =====================================================
 
-exports.handler = async (
-  event
-) => {
+exports.handler = async (event) => {
 
   try {
 
-    const sheets =
-      await getSheets();
-
-    const spreadsheetId =
-      process.env.GOOGLE_SHEET_ID;
-
     // ===================================================
     // GET — DATA POIN
-    //
-    // SEBELUM:
-    // Poin GET  = 1
-    // Siswa GET = 1
-    //
-    // SEKARANG:
-    // batchGet = 1
     // ===================================================
 
-    if (
-      event.httpMethod ===
-      "GET"
-    ) {
+    if (event.httpMethod === "GET") {
 
-      const data =
-        await batchGet(
-          sheets,
-          spreadsheetId,
-          [
-            "Poin!A:H",
-            "Siswa!A:F"
-          ]
+      // Ambil siswa
+      const {
+        data: siswaRows,
+        error: siswaError
+      } = await supabase
+        .from("siswa")
+        .select(`
+          id,
+          nama,
+          nisn,
+          kelas_id
+        `);
+
+      if (siswaError) {
+        console.error(
+          "SUPABASE ADMIN POINTS SISWA ERROR:",
+          siswaError
         );
 
-      const poinRows =
-        data["Poin!A:H"] || [];
+        return response(500, {
+          success: false,
+          message: "Gagal mengambil data siswa."
+        });
+      }
 
-      const siswaRows =
-        data["Siswa!A:F"] || [];
 
-      // =================================================
-      // MAP SISWA
-      // =================================================
-
+      // Map siswa
       const siswaMap = {};
 
-      for (
-        let i = 1;
-        i < siswaRows.length;
-        i++
-      ) {
+      for (const siswa of siswaRows || []) {
 
         const id =
-          String(
-            siswaRows[i][0] ||
-            ""
-          ).trim();
+          String(siswa.id || "").trim();
 
         if (!id) {
           continue;
         }
 
         siswaMap[id] = {
-
           nama:
-            String(
-              siswaRows[i][2] ||
-              ""
-            ).trim(),
+            String(siswa.nama || "").trim(),
 
           nisn:
-            String(
-              siswaRows[i][1] ||
-              ""
-            ).trim(),
+            String(siswa.nisn || "").trim(),
 
           kelasId:
-            String(
-              siswaRows[i][3] ||
-              ""
-            ).trim()
-
+            String(siswa.kelas_id || "").trim()
         };
+
       }
 
-      // =================================================
-      // DATA POIN
-      // =================================================
 
+      // Ambil poin
+      const {
+        data: poinRows,
+        error: poinError
+      } = await supabase
+        .from("poin")
+        .select(`
+          id,
+          siswa_id,
+          jenis,
+          poin,
+          keterangan,
+          tanggal,
+          dibuat_oleh,
+          peran
+        `)
+        .order("tanggal", {
+          ascending: false
+        });
+
+      if (poinError) {
+        console.error(
+          "SUPABASE ADMIN POINTS ERROR:",
+          poinError
+        );
+
+        return response(500, {
+          success: false,
+          message: "Gagal mengambil data poin."
+        });
+      }
+
+
+      // Bentuk response
       const poin = [];
 
-      for (
-        let i = 1;
-        i < poinRows.length;
-        i++
-      ) {
-
-        const row =
-          poinRows[i];
-
-        const siswaId =
-          String(
-            row[1] || ""
-          ).trim();
-
-        /*
-         * Lewati baris benar-benar kosong.
-         * Ini penting karena DELETE menggunakan clear,
-         * sehingga sheet bisa memiliki baris kosong.
-         */
+      for (const row of poinRows || []) {
 
         const pointId =
-          String(
-            row[0] || ""
-          ).trim();
+          String(row.id || "").trim();
 
         if (!pointId) {
           continue;
         }
 
+
+        const siswaId =
+          String(row.siswa_id || "").trim();
+
+
         poin.push({
 
-          id:
-            pointId,
+          id: pointId,
 
           siswaId,
 
           nama:
-            siswaMap[siswaId]
-              ?.nama || "-",
+            siswaMap[siswaId]?.nama || "-",
 
           nisn:
-            siswaMap[siswaId]
-              ?.nisn || "-",
+            siswaMap[siswaId]?.nisn || "-",
 
           jenis:
-            String(
-              row[2] || ""
-            ).trim(),
+            String(row.jenis || "").trim(),
 
           poin:
-            Number(
-              row[3] || 0
-            ),
+            Number(row.poin || 0),
 
           keterangan:
-            String(
-              row[4] || ""
-            ).trim(),
+            String(row.keterangan || "").trim(),
 
           tanggal:
-            String(
-              row[5] || ""
-            ).trim(),
+            String(row.tanggal || "").trim(),
 
           dibuatOleh:
-            String(
-              row[6] || ""
-            ).trim(),
+            String(row.dibuat_oleh || "").trim(),
 
           peran:
-            String(
-              row[7] || ""
-            ).trim()
+            String(row.peran || "").trim()
 
         });
+
       }
 
-      return response(
-        200,
-        {
-          success:
-            true,
 
-          poin
-        }
-      );
+      return response(200, {
+
+        success: true,
+
+        poin
+
+      });
+
     }
+
 
     // ===================================================
     // POST — TAMBAH POIN
-    //
-    // 1 read siswa
-    // + 1 append
-    // = 2 request
     // ===================================================
 
-    if (
-      event.httpMethod ===
-      "POST"
-    ) {
+    if (event.httpMethod === "POST") {
 
       const body =
-        JSON.parse(
-          event.body || "{}"
-        );
+        JSON.parse(event.body || "{}");
+
 
       const {
         siswaId,
@@ -302,6 +198,7 @@ exports.handler = async (
         tanggal,
         admin
       } = body;
+
 
       // =================================================
       // VALIDASI DATA
@@ -315,126 +212,112 @@ exports.handler = async (
         !keterangan
       ) {
 
-        return response(
-          400,
-          {
-            success:
-              false,
+        return response(400, {
 
-            message:
-              "Data poin belum lengkap."
-          }
-        );
+          success: false,
+
+          message:
+            "Data poin belum lengkap."
+
+        });
+
       }
+
 
       const jenisNormal =
         String(jenis)
           .trim()
           .toLowerCase();
 
+
       if (
-        jenisNormal !==
-          "penghargaan" &&
-        jenisNormal !==
-          "pelanggaran"
+        jenisNormal !== "penghargaan" &&
+        jenisNormal !== "pelanggaran"
       ) {
 
-        return response(
-          400,
-          {
-            success:
-              false,
+        return response(400, {
 
-            message:
-              "Jenis poin tidak valid."
-          }
-        );
+          success: false,
+
+          message:
+            "Jenis poin tidak valid."
+
+        });
+
       }
+
 
       const nilaiPoin =
         Number(poin);
 
+
       if (
-        !Number.isFinite(
-          nilaiPoin
-        ) ||
+        !Number.isFinite(nilaiPoin) ||
         nilaiPoin <= 0
       ) {
 
-        return response(
-          400,
-          {
-            success:
-              false,
+        return response(400, {
 
-            message:
-              "Nilai poin harus lebih dari 0."
-          }
-        );
+          success: false,
+
+          message:
+            "Nilai poin harus lebih dari 0."
+
+        });
+
       }
+
 
       // =================================================
       // CEK SISWA
       // =================================================
 
-      const siswaResult =
-        await sheets.spreadsheets.values.get({
+      const siswaIdNormal =
+        String(siswaId).trim();
 
-          spreadsheetId,
 
-          range:
-            "Siswa!A:F"
+      const {
+        data: siswa,
+        error: siswaError
+      } = await supabase
+        .from("siswa")
+        .select("id")
+        .eq("id", siswaIdNormal)
+        .maybeSingle();
+
+
+      if (siswaError) {
+
+        console.error(
+          "SUPABASE CHECK SISWA ERROR:",
+          siswaError
+        );
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            "Gagal memeriksa siswa."
 
         });
 
-      const siswaRows =
-        siswaResult.data.values ||
-        [];
-
-      const siswaIdNormal =
-        String(
-          siswaId
-        ).trim();
-
-      let siswaDitemukan =
-        false;
-
-      for (
-        let i = 1;
-        i < siswaRows.length;
-        i++
-      ) {
-
-        if (
-          String(
-            siswaRows[i][0] ||
-            ""
-          ).trim() ===
-          siswaIdNormal
-        ) {
-
-          siswaDitemukan =
-            true;
-
-          break;
-        }
       }
 
-      if (
-        !siswaDitemukan
-      ) {
 
-        return response(
-          404,
-          {
-            success:
-              false,
+      if (!siswa) {
 
-            message:
-              "Siswa tidak ditemukan."
-          }
-        );
+        return response(404, {
+
+          success: false,
+
+          message:
+            "Siswa tidak ditemukan."
+
+        });
+
       }
+
 
       // =================================================
       // ID POIN
@@ -442,161 +325,147 @@ exports.handler = async (
 
       const pointId =
         "P" +
-        String(
-          Date.now()
-        ).slice(-8);
+        String(Date.now()).slice(-8);
+
 
       // =================================================
       // TANGGAL
+      //
+      // Supabase menggunakan DATE.
+      // Format yang disimpan:
+      // YYYY-MM-DD
       // =================================================
 
       let tanggalFinal =
-        String(
-          tanggal || ""
-        ).trim();
+        String(tanggal || "").trim();
 
-      if (
-        !tanggalFinal
-      ) {
+
+      if (!tanggalFinal) {
 
         const now =
           new Date();
 
+
         tanggalFinal =
-          String(
-            now.getDate()
-          ).padStart(
-            2,
-            "0"
-          ) +
-          "/" +
-          String(
-            now.getMonth() + 1
-          ).padStart(
-            2,
-            "0"
-          ) +
-          "/" +
-          now.getFullYear();
+          now.toISOString()
+            .slice(0, 10);
+
       }
 
+
+      // =================================================
+      // PEMBUAT
+      // =================================================
+
       const dibuatOleh =
-        String(
-          admin || ""
-        ).trim();
+        String(admin || "").trim();
+
+
+      const peran =
+        "Admin";
+
 
       // =================================================
-      // SIMPAN POIN
-      //
-      // G = Dibuat_Oleh
-      // H = Peran
+      // INSERT POIN
       // =================================================
 
-      await sheets.spreadsheets.values.append({
+      const {
+        error: insertError
+      } = await supabase
+        .from("poin")
+        .insert({
 
-        spreadsheetId,
+          id: pointId,
 
-        range:
-          "Poin!A:H",
-
-        valueInputOption:
-          "RAW",
-
-        requestBody: {
-
-          values: [[
-
-            pointId,
-
+          siswa_id:
             siswaIdNormal,
 
+          jenis:
             jenisNormal,
 
+          poin:
             nilaiPoin,
 
-            String(
-              keterangan
-            ).trim(),
+          keterangan:
+            String(keterangan).trim(),
 
+          tanggal:
             tanggalFinal,
 
+          dibuat_oleh:
             dibuatOleh,
 
-            "Admin"
+          peran
 
-          ]]
+        });
+
+
+      if (insertError) {
+
+        console.error(
+          "SUPABASE INSERT POINT ERROR:",
+          insertError
+        );
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            "Gagal menambahkan poin."
+
+        });
+
+      }
+
+
+      return response(201, {
+
+        success: true,
+
+        message:
+          "Poin berhasil ditambahkan.",
+
+        poin: {
+
+          id:
+            pointId,
+
+          siswaId:
+            siswaIdNormal,
+
+          jenis:
+            jenisNormal,
+
+          poin:
+            nilaiPoin,
+
+          keterangan:
+            String(keterangan).trim(),
+
+          tanggal:
+            tanggalFinal,
+
+          dibuatOleh,
+
+          peran
 
         }
 
       });
 
-      return response(
-        201,
-        {
-
-          success:
-            true,
-
-          message:
-            "Poin berhasil ditambahkan.",
-
-          poin: {
-
-            id:
-              pointId,
-
-            siswaId:
-              siswaIdNormal,
-
-            jenis:
-              jenisNormal,
-
-            poin:
-              nilaiPoin,
-
-            keterangan:
-              String(
-                keterangan
-              ).trim(),
-
-            tanggal:
-              tanggalFinal,
-
-            dibuatOleh,
-
-            peran:
-              "Admin"
-
-          }
-
-        }
-      );
     }
+
 
     // ===================================================
     // PUT — EDIT POIN
-    //
-    // SEBELUM:
-    // Siswa GET = 1
-    // Poin GET  = 1
-    // Update    = 1
-    // TOTAL     = 3
-    //
-    // SEKARANG:
-    // batchGet Siswa + Poin = 1
-    // Update                  = 1
-    // TOTAL                   = 2
     // ===================================================
 
-    if (
-      event.httpMethod ===
-      "PUT"
-    ) {
+    if (event.httpMethod === "PUT") {
 
       const body =
-        JSON.parse(
-          event.body || "{}"
-        );
+        JSON.parse(event.body || "{}");
+
 
       const {
         id,
@@ -607,6 +476,11 @@ exports.handler = async (
         tanggal
       } = body;
 
+
+      // =================================================
+      // VALIDASI
+      // =================================================
+
       if (
         !id ||
         !siswaId ||
@@ -616,425 +490,403 @@ exports.handler = async (
         !keterangan
       ) {
 
-        return response(
-          400,
-          {
-            success:
-              false,
+        return response(400, {
 
-            message:
-              "Semua data wajib diisi."
-          }
-        );
+          success: false,
+
+          message:
+            "Semua data wajib diisi."
+
+        });
+
       }
+
 
       const jenisNormal =
         String(jenis)
           .trim()
           .toLowerCase();
 
+
       if (
-        jenisNormal !==
-          "penghargaan" &&
-        jenisNormal !==
-          "pelanggaran"
+        jenisNormal !== "penghargaan" &&
+        jenisNormal !== "pelanggaran"
       ) {
 
-        return response(
-          400,
-          {
-            success:
-              false,
+        return response(400, {
 
-            message:
-              "Jenis poin tidak valid."
-          }
-        );
+          success: false,
+
+          message:
+            "Jenis poin tidak valid."
+
+        });
+
       }
+
 
       const nilaiPoin =
         Number(poin);
 
+
       if (
-        !Number.isFinite(
-          nilaiPoin
-        ) ||
+        !Number.isFinite(nilaiPoin) ||
         nilaiPoin <= 0
       ) {
 
-        return response(
-          400,
-          {
-            success:
-              false,
+        return response(400, {
 
-            message:
-              "Jumlah poin harus lebih dari 0."
-          }
-        );
+          success: false,
+
+          message:
+            "Jumlah poin harus lebih dari 0."
+
+        });
+
       }
 
-      // =================================================
-      // BACA SISWA + POIN SEKALIGUS
-      // =================================================
 
-      const data =
-        await batchGet(
-          sheets,
-          spreadsheetId,
-          [
-            "Siswa!A:F",
-            "Poin!A:H"
-          ]
-        );
+      const pointIdNormal =
+        String(id).trim();
 
-      const siswaRows =
-        data["Siswa!A:F"] || [];
 
-      const pointRows =
-        data["Poin!A:H"] || [];
+      const siswaIdNormal =
+        String(siswaId).trim();
+
 
       // =================================================
       // CEK SISWA
       // =================================================
 
-      const siswaIdNormal =
-        String(
-          siswaId
-        ).trim();
+      const {
+        data: siswa,
+        error: siswaError
+      } = await supabase
+        .from("siswa")
+        .select("id")
+        .eq("id", siswaIdNormal)
+        .maybeSingle();
 
-      const siswaAda =
-        siswaRows.some(
-          (
-            row,
-            index
-          ) =>
-            index > 0 &&
-            String(
-              row[0] || ""
-            ).trim() ===
-            siswaIdNormal
+
+      if (siswaError) {
+
+        console.error(
+          "SUPABASE CHECK SISWA ERROR:",
+          siswaError
         );
 
-      if (!siswaAda) {
+        return response(500, {
 
-        return response(
-          404,
-          {
-            success:
-              false,
+          success: false,
 
-            message:
-              "Siswa tidak ditemukan."
-          }
-        );
+          message:
+            "Gagal memeriksa siswa."
+
+        });
+
       }
+
+
+      if (!siswa) {
+
+        return response(404, {
+
+          success: false,
+
+          message:
+            "Siswa tidak ditemukan."
+
+        });
+
+      }
+
 
       // =================================================
-      // CARI BARIS POIN
+      // CEK POIN
       // =================================================
 
-      const pointIdNormal =
-        String(
-          id
-        ).trim();
+      const {
+        data: existingPoint,
+        error: pointError
+      } = await supabase
+        .from("poin")
+        .select(`
+          id,
+          dibuat_oleh,
+          peran
+        `)
+        .eq("id", pointIdNormal)
+        .maybeSingle();
 
-      let rowNumber =
-        -1;
 
-      for (
-        let i = 1;
-        i < pointRows.length;
-        i++
-      ) {
+      if (pointError) {
 
-        const rowId =
-          String(
-            pointRows[i][0] ||
-            ""
-          ).trim();
-
-        if (
-          rowId ===
-          pointIdNormal
-        ) {
-
-          rowNumber =
-            i + 1;
-
-          break;
-        }
-      }
-
-      if (
-        rowNumber ===
-        -1
-      ) {
-
-        return response(
-          404,
-          {
-            success:
-              false,
-
-            message:
-              "Data poin tidak ditemukan."
-          }
+        console.error(
+          "SUPABASE CHECK POINT ERROR:",
+          pointError
         );
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            "Gagal memeriksa data poin."
+
+        });
+
       }
+
+
+      if (!existingPoint) {
+
+        return response(404, {
+
+          success: false,
+
+          message:
+            "Data poin tidak ditemukan."
+
+        });
+
+      }
+
 
       // =================================================
       // TANGGAL
       // =================================================
 
       let tanggalFinal =
-        String(
-          tanggal || ""
-        ).trim();
+        String(tanggal || "").trim();
 
-      if (
-        !tanggalFinal
-      ) {
+
+      if (!tanggalFinal) {
 
         const sekarang =
           new Date();
 
+
         tanggalFinal =
-          String(
-            sekarang.getDate()
-          ).padStart(
-            2,
-            "0"
-          ) +
-          "/" +
-          String(
-            sekarang.getMonth() + 1
-          ).padStart(
-            2,
-            "0"
-          ) +
-          "/" +
-          sekarang.getFullYear();
+          sekarang.toISOString()
+            .slice(0, 10);
+
       }
 
+
       // =================================================
-      // UPDATE B:F SAJA
+      // UPDATE
       //
-      // G = Dibuat_Oleh
-      // H = Peran
+      // HANYA DATA POIN.
       //
-      // Metadata pembuat TETAP.
+      // dibuat_oleh dan peran TIDAK DIUBAH.
       // =================================================
 
-      await sheets.spreadsheets.values.update({
+      const {
+        error: updateError
+      } = await supabase
+        .from("poin")
+        .update({
 
-        spreadsheetId,
-
-        range:
-          `Poin!B${rowNumber}:F${rowNumber}`,
-
-        valueInputOption:
-          "RAW",
-
-        requestBody: {
-
-          values: [[
-
+          siswa_id:
             siswaIdNormal,
 
+          jenis:
             jenisNormal,
 
+          poin:
             nilaiPoin,
 
-            String(
-              keterangan
-            ).trim(),
+          keterangan:
+            String(keterangan).trim(),
 
+          tanggal:
             tanggalFinal
 
-          ]]
+        })
+        .eq("id", pointIdNormal);
 
-        }
 
-      });
+      if (updateError) {
 
-      return response(
-        200,
-        {
+        console.error(
+          "SUPABASE UPDATE POINT ERROR:",
+          updateError
+        );
 
-          success:
-            true,
+        return response(500, {
+
+          success: false,
 
           message:
-            "Poin berhasil diperbarui."
-
-        }
-      );
-    }
-
-    // ===================================================
-    // DELETE — HAPUS POIN
-    //
-    // 1 read
-    // + 1 clear
-    // = 2 request
-    // ===================================================
-
-    if (
-      event.httpMethod ===
-      "DELETE"
-    ) {
-
-      const body =
-        JSON.parse(
-          event.body || "{}"
-        );
-
-      const id =
-        String(
-          body.id || ""
-        ).trim();
-
-      if (!id) {
-
-        return response(
-          400,
-          {
-
-            success:
-              false,
-
-            message:
-              "ID poin wajib diisi."
-
-          }
-        );
-      }
-
-      // =================================================
-      // CARI POIN
-      // =================================================
-
-      const result =
-        await sheets.spreadsheets.values.get({
-
-          spreadsheetId,
-
-          range:
-            "Poin!A:H"
+            "Gagal memperbarui poin."
 
         });
 
-      const rows =
-        result.data.values ||
-        [];
-
-      let rowNumber =
-        null;
-
-      for (
-        let i = 1;
-        i < rows.length;
-        i++
-      ) {
-
-        if (
-          String(
-            rows[i][0] || ""
-          ).trim() ===
-          id
-        ) {
-
-          rowNumber =
-            i + 1;
-
-          break;
-        }
       }
 
-      if (!rowNumber) {
 
-        return response(
-          404,
-          {
+      return response(200, {
 
-            success:
-              false,
+        success: true,
 
-            message:
-              "Poin tidak ditemukan."
-
-          }
-        );
-      }
-
-      // =================================================
-      // CLEAR A:H
-      //
-      // Tidak membuat Riwayat_Poin.
-      // =================================================
-
-      await sheets.spreadsheets.values.clear({
-
-        spreadsheetId,
-
-        range:
-          `Poin!A${rowNumber}:H${rowNumber}`
+        message:
+          "Poin berhasil diperbarui."
 
       });
 
-      return response(
-        200,
-        {
+    }
 
-          success:
-            true,
+
+    // ===================================================
+    // DELETE — HAPUS POIN
+    // ===================================================
+
+    if (event.httpMethod === "DELETE") {
+
+      const body =
+        JSON.parse(event.body || "{}");
+
+
+      const id =
+        String(body.id || "").trim();
+
+
+      if (!id) {
+
+        return response(400, {
+
+          success: false,
 
           message:
-            "Poin berhasil dihapus."
+            "ID poin wajib diisi."
 
-        }
-      );
+        });
+
+      }
+
+
+      // =================================================
+      // CEK POIN
+      // =================================================
+
+      const {
+        data: existingPoint,
+        error: pointError
+      } = await supabase
+        .from("poin")
+        .select("id")
+        .eq("id", id)
+        .maybeSingle();
+
+
+      if (pointError) {
+
+        console.error(
+          "SUPABASE CHECK DELETE POINT ERROR:",
+          pointError
+        );
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            "Gagal memeriksa data poin."
+
+        });
+
+      }
+
+
+      if (!existingPoint) {
+
+        return response(404, {
+
+          success: false,
+
+          message:
+            "Poin tidak ditemukan."
+
+        });
+
+      }
+
+
+      // =================================================
+      // DELETE
+      // =================================================
+
+      const {
+        error: deleteError
+      } = await supabase
+        .from("poin")
+        .delete()
+        .eq("id", id);
+
+
+      if (deleteError) {
+
+        console.error(
+          "SUPABASE DELETE POINT ERROR:",
+          deleteError
+        );
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            "Gagal menghapus poin."
+
+        });
+
+      }
+
+
+      return response(200, {
+
+        success: true,
+
+        message:
+          "Poin berhasil dihapus."
+
+      });
+
     }
+
 
     // ===================================================
     // METHOD TIDAK DIIZINKAN
     // ===================================================
 
-    return response(
-      405,
-      {
+    return response(405, {
 
-        success:
-          false,
+      success: false,
 
-        message:
-          "Method tidak diizinkan."
+      message:
+        "Method tidak diizinkan."
 
-      }
-    );
+    });
 
-  } catch (
-    error
-  ) {
+  }
+
+  catch (error) {
 
     console.error(
       "ADMIN POINTS ERROR:",
       error
     );
 
-    return response(
-      500,
-      {
+    return response(500, {
 
-        success:
-          false,
+      success: false,
 
-        message:
-          error.message ||
-          "Terjadi kesalahan pada server."
+      message:
+        error.message ||
+        "Terjadi kesalahan pada server."
 
-      }
-    );
+    });
+
   }
+
 };
