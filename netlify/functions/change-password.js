@@ -1,15 +1,23 @@
-const { google } = require("googleapis");
+const supabase = require("./_supabase");
+
+function response(statusCode, body) {
+  return {
+    statusCode,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store"
+    },
+    body: JSON.stringify(body)
+  };
+}
 
 exports.handler = async function (event) {
 
   if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({
-        success: false,
-        message: "Method tidak diizinkan."
-      })
-    };
+    return response(405, {
+      success: false,
+      message: "Method tidak diizinkan."
+    });
   }
 
   try {
@@ -20,174 +28,136 @@ exports.handler = async function (event) {
       newPassword
     } = JSON.parse(event.body || "{}");
 
+    // =========================
+    // VALIDASI INPUT
+    // =========================
+
     if (!siswaId || !currentPassword || !newPassword) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          message: "Semua data wajib diisi."
-        })
-      };
+      return response(400, {
+        success: false,
+        message: "Semua data wajib diisi."
+      });
     }
 
-    if (newPassword.length < 6) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          message: "Password baru minimal 6 karakter."
-        })
-      };
+    if (String(newPassword).length < 6) {
+      return response(400, {
+        success: false,
+        message: "Password baru minimal 6 karakter."
+      });
     }
 
-    const privateKey = process.env.GOOGLE_PRIVATE_KEY
-      .replace(/\\n/g, "\n")
-      .replace(/^"|"$/g, "");
-
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email:
-          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-
-        private_key:
-          privateKey
-      },
-
-      scopes: [
-        "https://www.googleapis.com/auth/spreadsheets"
-      ]
-    });
-
-    const sheets = google.sheets({
-      version: "v4",
-      auth
-    });
-
-    const spreadsheetId =
-      process.env.GOOGLE_SHEET_ID;
+    const targetSiswaId = String(siswaId).trim();
+    const currentPass = String(currentPassword);
+    const newPass = String(newPassword);
 
     // =========================
     // AMBIL DATA SISWA
     // =========================
 
-    const response =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "Siswa!A:F"
+    const {
+      data: student,
+      error: studentError
+    } = await supabase
+      .from("siswa")
+      .select(`
+        id,
+        password,
+        status
+      `)
+      .eq("id", targetSiswaId)
+      .maybeSingle();
+
+    if (studentError) {
+      console.error(
+        "SUPABASE CHANGE PASSWORD GET ERROR:",
+        studentError
+      );
+
+      return response(500, {
+        success: false,
+        message: "Gagal mengambil data siswa.",
+        error: studentError.message
       });
-
-    const rows =
-      response.data.values || [];
-
-    let studentRowIndex = -1;
-    let studentRow = null;
-
-    for (let i = 1; i < rows.length; i++) {
-
-      const row = rows[i];
-
-      const id =
-        String(row[0] || "").trim();
-
-      if (id === String(siswaId).trim()) {
-        studentRowIndex = i + 1;
-        studentRow = row;
-        break;
-      }
     }
 
-    if (!studentRow) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({
-          success: false,
-          message: "Data siswa tidak ditemukan."
-        })
-      };
+    if (!student) {
+      return response(404, {
+        success: false,
+        message: "Data siswa tidak ditemukan."
+      });
     }
 
-    const storedPassword =
-      String(studentRow[4] || "").trim();
+    // =========================
+    // CEK STATUS AKUN
+    // =========================
 
-    const status =
-      String(studentRow[5] || "").trim();
-
-    if (status !== "Aktif") {
-      return {
-        statusCode: 403,
-        body: JSON.stringify({
-          success: false,
-          message: "Akun siswa tidak aktif."
-        })
-      };
+    if (String(student.status || "").trim() !== "Aktif") {
+      return response(403, {
+        success: false,
+        message: "Akun siswa tidak aktif."
+      });
     }
 
     // =========================
     // CEK PASSWORD SEKARANG
     // =========================
 
-    if (storedPassword !== String(currentPassword)) {
+    const storedPassword =
+      String(student.password || "");
 
-      return {
-        statusCode: 401,
-        body: JSON.stringify({
-          success: false,
-          message: "Password sekarang salah."
-        })
-      };
+    if (storedPassword !== currentPass) {
+      return response(401, {
+        success: false,
+        message: "Password sekarang salah."
+      });
     }
 
     // =========================
     // PASSWORD BARU TIDAK BOLEH SAMA
     // =========================
 
-    if (storedPassword === String(newPassword)) {
-
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          message:
-            "Password baru harus berbeda dari password sekarang."
-        })
-      };
+    if (storedPassword === newPass) {
+      return response(400, {
+        success: false,
+        message:
+          "Password baru harus berbeda dari password sekarang."
+      });
     }
 
     // =========================
     // UPDATE PASSWORD
-    // Kolom E = Password
     // =========================
 
-    await sheets.spreadsheets.values.update({
-
-      spreadsheetId,
-
-      range: `Siswa!E${studentRowIndex}`,
-
-      valueInputOption: "RAW",
-
-      requestBody: {
-        values: [
-          [String(newPassword)]
-        ]
-      }
-
-    });
-
-    return {
-      statusCode: 200,
-
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
-
-      body: JSON.stringify({
-        success: true,
-        message:
-          "Password berhasil diubah."
+    const {
+      error: updateError
+    } = await supabase
+      .from("siswa")
+      .update({
+        password: newPass
       })
-    };
+      .eq("id", targetSiswaId);
+
+    if (updateError) {
+      console.error(
+        "SUPABASE CHANGE PASSWORD UPDATE ERROR:",
+        updateError
+      );
+
+      return response(500, {
+        success: false,
+        message: "Gagal mengubah password.",
+        error: updateError.message
+      });
+    }
+
+    // =========================
+    // BERHASIL
+    // =========================
+
+    return response(200, {
+      success: true,
+      message: "Password berhasil diubah."
+    });
 
   } catch (error) {
 
@@ -196,21 +166,10 @@ exports.handler = async function (event) {
       error
     );
 
-    return {
-      statusCode: 500,
-
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
-
-      body: JSON.stringify({
-        success: false,
-        message:
-          "Terjadi kesalahan server.",
-        error:
-          error.message
-      })
-    };
+    return response(500, {
+      success: false,
+      message: "Terjadi kesalahan server.",
+      error: error.message
+    });
   }
 };
