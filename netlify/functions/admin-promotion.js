@@ -1,3 +1,4 @@
+```javascript
 const supabase = require("./_supabase");
 
 // =====================================================
@@ -581,11 +582,7 @@ exports.handler = async (event) => {
       } = await supabase
         .from("siswa")
         .update({
-
-          kelas_id: null,
-
           status: "Lulus"
-
         })
         .eq(
           "kelas_id",
@@ -614,11 +611,7 @@ exports.handler = async (event) => {
       } = await supabase
         .from("siswa")
         .update({
-
-          kelas_id: null,
-
           status: "Lulus"
-
         })
         .eq(
           "kelas_id",
@@ -715,3 +708,4 @@ exports.handler = async (event) => {
   }
 
 };
+```
