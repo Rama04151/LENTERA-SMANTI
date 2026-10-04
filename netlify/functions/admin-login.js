@@ -1,4 +1,4 @@
-const { google } = require("googleapis");
+const supabase = require("./_supabase");
 
 exports.handler = async (event) => {
 
@@ -21,82 +21,46 @@ exports.handler = async (event) => {
       });
     }
 
-    const privateKey = process.env.GOOGLE_PRIVATE_KEY
-      .replace(/\\n/g, "\n")
-      .replace(/^"|"$/g, "");
+    // Cari admin berdasarkan username
+    const { data: adminData, error } = await supabase
+      .from("admin")
+      .select("id, username, password, status")
+      .eq("username", username)
+      .maybeSingle();
 
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email:
-          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    if (error) {
+      console.error("SUPABASE ADMIN LOGIN ERROR:", error);
 
-        private_key: privateKey
-      },
-
-      scopes: [
-        "https://www.googleapis.com/auth/spreadsheets"
-      ]
-    });
-
-    const sheets = google.sheets({
-      version: "v4",
-      auth
-    });
-
-    const result =
-      await sheets.spreadsheets.values.get({
-        spreadsheetId: process.env.GOOGLE_SHEET_ID,
-        range: "Admin!A:D"
+      return response(500, {
+        success: false,
+        message: "Gagal mengakses database"
       });
-
-    const rows = result.data.values || [];
-
-    let admin = null;
-
-    for (let i = 1; i < rows.length; i++) {
-
-      const row = rows[i];
-
-      const id = String(row[0] || "").trim();
-      const rowUsername =
-        String(row[1] || "").trim();
-
-      const rowPassword =
-        String(row[2] || "");
-
-      const status =
-        String(row[3] || "").trim();
-
-      if (
-        rowUsername === username &&
-        rowPassword === password
-      ) {
-
-        admin = {
-          id,
-          username: rowUsername,
-          status
-        };
-
-        break;
-      }
     }
 
-    if (!admin) {
+    // Username tidak ditemukan atau password salah
+    if (!adminData || adminData.password !== password) {
       return response(401, {
         success: false,
         message: "Username atau password salah."
       });
     }
 
+    // Cek status akun
     if (
-      admin.status.toLowerCase() !== "aktif"
+      String(adminData.status || "").toLowerCase() !== "aktif"
     ) {
       return response(403, {
         success: false,
         message: "Akun admin tidak aktif."
       });
     }
+
+    // Jangan kirim password ke frontend
+    const admin = {
+      id: adminData.id,
+      username: adminData.username,
+      status: adminData.status
+    };
 
     return response(200, {
       success: true,
@@ -106,10 +70,7 @@ exports.handler = async (event) => {
 
   } catch (error) {
 
-    console.error(
-      "ADMIN LOGIN ERROR:",
-      error
-    );
+    console.error("ADMIN LOGIN ERROR:", error);
 
     return response(500, {
       success: false,
