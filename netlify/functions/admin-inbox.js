@@ -1,278 +1,193 @@
-const { google } = require("googleapis");
+const supabase = require("./_supabase");
+
+// =====================================================
+// RESPONSE
+// =====================================================
+
+function response(statusCode, body) {
+  return {
+    statusCode,
+
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store"
+    },
+
+    body: JSON.stringify(body)
+  };
+}
+
+
+// =====================================================
+// HANDLER
+// =====================================================
 
 exports.handler = async function (event) {
 
   try {
 
-    // =========================
-    // GOOGLE AUTH
-    // =========================
-
-    const privateKey =
-      process.env.GOOGLE_PRIVATE_KEY
-        .replace(/\\n/g, "\n")
-        .replace(/^"|"$/g, "");
-
-    const auth =
-      new google.auth.GoogleAuth({
-
-        credentials: {
-
-          client_email:
-            process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-
-          private_key:
-            privateKey
-
-        },
-
-        scopes: [
-          "https://www.googleapis.com/auth/spreadsheets"
-        ]
-
-      });
-
-    const sheets =
-      google.sheets({
-        version: "v4",
-        auth
-      });
-
-    const spreadsheetId =
-      process.env.GOOGLE_SHEET_ID;
-
-
-    // =========================
+    // ===================================================
     // GET
     // DATA PESAN
-    // =========================
+    // ===================================================
 
-    if (
-      event.httpMethod === "GET"
-    ) {
+    if (event.httpMethod === "GET") {
 
-      // Ambil Inbox
-      const inboxResponse =
-        await sheets.spreadsheets.values.get({
+      // =================================================
+      // AMBIL DATA INBOX + SISWA + KELAS
+      // =================================================
 
-          spreadsheetId,
-
-          range: "Inbox!A:H"
-
+      const {
+        data: inboxRows,
+        error: inboxError
+      } = await supabase
+        .from("inbox")
+        .select(`
+          id,
+          siswa_id,
+          judul,
+          pesan,
+          dibuat,
+          kedaluwarsa,
+          dibuat_oleh,
+          status,
+          siswa:siswa_id (
+            id,
+            nama,
+            nisn,
+            kelas_id,
+            status,
+            kelas:kelas_id (
+              id,
+              nama_kelas
+            )
+          )
+        `)
+        .order("dibuat", {
+          ascending: false
         });
 
-      const inboxRows =
-        inboxResponse.data.values || [];
 
+      if (inboxError) {
 
-      // Ambil data siswa
-      const siswaResponse =
-        await sheets.spreadsheets.values.get({
+        console.error(
+          "SUPABASE ADMIN INBOX GET ERROR:",
+          inboxError
+        );
 
-          spreadsheetId,
+        return response(500, {
 
-          range: "Siswa!A:F"
+          success: false,
 
-        });
+          message:
+            "Gagal mengambil data pesan.",
 
-      const siswaRows =
-        siswaResponse.data.values || [];
-
-
-      // Ambil data kelas
-      const kelasResponse =
-        await sheets.spreadsheets.values.get({
-
-          spreadsheetId,
-
-          range: "Kelas!A:E"
+          error:
+            inboxError.message
 
         });
-
-      const kelasRows =
-        kelasResponse.data.values || [];
-
-
-      // =========================
-      // MAP KELAS
-      // =========================
-
-      const kelasMap = {};
-
-      for (
-        let i = 1;
-        i < kelasRows.length;
-        i++
-      ) {
-
-        const row =
-          kelasRows[i];
-
-        const id =
-          String(row[0] || "").trim();
-
-        const nama =
-          String(row[1] || "").trim();
-
-        if (!id) {
-          continue;
-        }
-
-        kelasMap[id] =
-          nama || "-";
 
       }
 
 
-      // =========================
-      // MAP SISWA
-      // =========================
-
-      const siswaMap = {};
-
-      for (
-        let i = 1;
-        i < siswaRows.length;
-        i++
-      ) {
-
-        const row =
-          siswaRows[i];
-
-        const id =
-          String(row[0] || "").trim();
-
-        if (!id) {
-          continue;
-        }
-
-        siswaMap[id] = {
-
-          nama:
-            String(row[2] || "").trim(),
-
-          nisn:
-            String(row[1] || "").trim(),
-
-          kelas:
-            kelasMap[
-              String(row[3] || "").trim()
-            ] || "-",
-
-          status:
-            String(row[5] || "").trim()
-
-        };
-
-      }
-
-
-      // =========================
-      // DATA INBOX
-      // =========================
+      // =================================================
+      // BENTUK DATA INBOX
+      // =================================================
 
       const inbox = [];
 
-      for (
-        let i = 1;
-        i < inboxRows.length;
-        i++
-      ) {
 
-        const row =
-          inboxRows[i];
-
-        const id =
-          String(row[0] || "").trim();
-
-        const siswaId =
-          String(row[1] || "").trim();
+      for (const row of inboxRows || []) {
 
         const siswa =
-          siswaMap[siswaId] || {};
+          row.siswa || {};
+
+
+        const kelas =
+          siswa.kelas || {};
 
 
         inbox.push({
 
-          id,
+          id:
+            String(row.id || "").trim(),
 
-          siswaId,
+          siswaId:
+            String(row.siswa_id || "").trim(),
 
           siswaNama:
-            siswa.nama || "-",
+            String(
+              siswa.nama || "-"
+            ).trim(),
 
           siswaNisn:
-            siswa.nisn || "-",
+            String(
+              siswa.nisn || "-"
+            ).trim(),
 
           siswaKelas:
-            siswa.kelas || "-",
+            String(
+              kelas.nama_kelas || "-"
+            ).trim(),
 
           judul:
-            String(row[2] || "").trim(),
+            String(
+              row.judul || ""
+            ).trim(),
 
           pesan:
-            String(row[3] || "").trim(),
+            String(
+              row.pesan || ""
+            ).trim(),
 
           dibuat:
-            String(row[4] || "").trim(),
+            row.dibuat || "",
 
           kedaluwarsa:
-            String(row[5] || "").trim(),
+            row.kedaluwarsa || "",
 
           admin:
-            String(row[6] || "").trim(),
+            String(
+              row.dibuat_oleh || ""
+            ).trim(),
 
           status:
-            String(row[7] || "").trim()
+            String(
+              row.status || ""
+            ).trim()
 
         });
 
       }
 
 
-      // Pesan terbaru di atas
-      inbox.sort(
-        (a, b) =>
-          new Date(b.dibuat) -
-          new Date(a.dibuat)
-      );
+      // =================================================
+      // RESPONSE
+      // =================================================
 
+      return response(200, {
 
-      return {
+        success: true,
 
-        statusCode: 200,
+        inbox
 
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-
-          success: true,
-
-          inbox
-
-        })
-
-      };
+      });
 
     }
 
 
-    // =========================
+    // ===================================================
     // POST
     // KIRIM PESAN
-    // =========================
+    // ===================================================
 
-    if (
-      event.httpMethod === "POST"
-    ) {
+    if (event.httpMethod === "POST") {
 
       const data =
         JSON.parse(
           event.body || "{}"
         );
+
 
       const {
         siswaId,
@@ -283,6 +198,10 @@ exports.handler = async function (event) {
       } = data;
 
 
+      // =================================================
+      // VALIDASI
+      // =================================================
+
       if (
         !siswaId ||
         !judul ||
@@ -290,32 +209,21 @@ exports.handler = async function (event) {
         !durasi
       ) {
 
-        return {
+        return response(400, {
 
-          statusCode: 400,
+          success: false,
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+          message:
+            "Data pesan belum lengkap."
 
-          body: JSON.stringify({
-
-            success: false,
-
-            message:
-              "Data pesan belum lengkap."
-
-          })
-
-        };
+        });
 
       }
 
 
-      // =========================
+      // =================================================
       // DURASI
-      // =========================
+      // =================================================
 
       const durationMap = {
 
@@ -342,31 +250,81 @@ exports.handler = async function (event) {
 
       if (!hours) {
 
-        return {
+        return response(400, {
 
-          statusCode: 400,
+          success: false,
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+          message:
+            "Durasi pesan tidak valid."
 
-          body: JSON.stringify({
-
-            success: false,
-
-            message:
-              "Durasi pesan tidak valid."
-
-          })
-
-        };
+        });
 
       }
 
 
+      // =================================================
+      // CEK SISWA
+      // =================================================
+
+      const siswaIdNormal =
+        String(
+          siswaId
+        ).trim();
+
+
+      const {
+        data: siswa,
+        error: siswaError
+      } = await supabase
+        .from("siswa")
+        .select("id")
+        .eq("id", siswaIdNormal)
+        .maybeSingle();
+
+
+      if (siswaError) {
+
+        console.error(
+          "SUPABASE ADMIN INBOX CHECK SISWA ERROR:",
+          siswaError
+        );
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            "Gagal memeriksa siswa.",
+
+          error:
+            siswaError.message
+
+        });
+
+      }
+
+
+      if (!siswa) {
+
+        return response(404, {
+
+          success: false,
+
+          message:
+            "Siswa tidak ditemukan."
+
+        });
+
+      }
+
+
+      // =================================================
+      // WAKTU
+      // =================================================
+
       const createdAt =
         new Date();
+
 
       const expiredAt =
         new Date(
@@ -378,105 +336,123 @@ exports.handler = async function (event) {
         );
 
 
+      // =================================================
+      // ID PESAN
+      // =================================================
+
       const id =
         "MSG" +
         Date.now();
 
 
-      // =========================
+      // =================================================
+      // ADMIN
+      // =================================================
+
+      const dibuatOleh =
+        String(
+          admin || "admin"
+        ).trim();
+
+
+      // =================================================
       // SIMPAN PESAN
-      // =========================
+      // =================================================
 
-      await sheets.spreadsheets.values.append({
+      const {
+        error: insertError
+      } = await supabase
+        .from("inbox")
+        .insert({
 
-        spreadsheetId,
+          id,
 
-        range:
-          "Inbox!A:H",
+          siswa_id:
+            siswaIdNormal,
 
-        valueInputOption:
-          "RAW",
+          judul:
+            String(judul).trim(),
 
-        insertDataOption:
-          "INSERT_ROWS",
+          pesan:
+            String(pesan).trim(),
 
-        requestBody: {
-
-          values: [[
-
-            id,
-
-            String(siswaId),
-
-            String(judul),
-
-            String(pesan),
-
+          dibuat:
             createdAt.toISOString(),
 
+          kedaluwarsa:
             expiredAt.toISOString(),
 
-            String(
-              admin || "admin"
-            ),
+          dibuat_oleh:
+            dibuatOleh,
 
+          status:
             "Aktif"
 
-          ]]
+        });
+
+
+      if (insertError) {
+
+        console.error(
+          "SUPABASE ADMIN INBOX INSERT ERROR:",
+          insertError
+        );
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            "Gagal menyimpan pesan.",
+
+          error:
+            insertError.message
+
+        });
+
+      }
+
+
+      // =================================================
+      // RESPONSE
+      // =================================================
+
+      return response(200, {
+
+        success: true,
+
+        message:
+          "Pesan berhasil dikirim.",
+
+        data: {
+
+          id,
+
+          dibuat:
+            createdAt.toISOString(),
+
+          kedaluwarsa:
+            expiredAt.toISOString()
 
         }
 
       });
 
-
-      return {
-
-        statusCode: 200,
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-
-          success: true,
-
-          message:
-            "Pesan berhasil dikirim.",
-
-          data: {
-
-            id,
-
-            dibuat:
-              createdAt.toISOString(),
-
-            kedaluwarsa:
-              expiredAt.toISOString()
-
-          }
-
-        })
-
-      };
-
     }
 
 
-    // =========================
+    // ===================================================
     // DELETE
     // HAPUS PESAN
-    // =========================
+    // ===================================================
 
-    if (
-      event.httpMethod === "DELETE"
-    ) {
+    if (event.httpMethod === "DELETE") {
 
       const data =
         JSON.parse(
           event.body || "{}"
         );
+
 
       const messageId =
         String(
@@ -484,233 +460,139 @@ exports.handler = async function (event) {
         ).trim();
 
 
+      // =================================================
+      // VALIDASI ID
+      // =================================================
+
       if (!messageId) {
 
-        return {
+        return response(400, {
 
-          statusCode: 400,
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-
-            success: false,
-
-            message:
-              "ID pesan wajib diisi."
-
-          })
-
-        };
-
-      }
-
-
-      // =========================
-      // CARI PESAN
-      // =========================
-
-      const response =
-        await sheets.spreadsheets.values.get({
-
-          spreadsheetId,
-
-          range:
-            "Inbox!A:H"
-
-        });
-
-
-      const rows =
-        response.data.values || [];
-
-
-      let rowNumber =
-        -1;
-
-
-      for (
-        let i = 1;
-        i < rows.length;
-        i++
-      ) {
-
-        const id =
-          String(
-            rows[i][0] || ""
-          ).trim();
-
-
-        if (
-          id === messageId
-        ) {
-
-          rowNumber =
-            i + 1;
-
-          break;
-
-        }
-
-      }
-
-
-      if (
-        rowNumber === -1
-      ) {
-
-        return {
-
-          statusCode: 404,
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-
-            success: false,
-
-            message:
-              "Pesan tidak ditemukan."
-
-          })
-
-        };
-
-      }
-
-
-      // =========================
-      // CARI SHEET ID
-      // =========================
-
-      const spreadsheet =
-        await sheets.spreadsheets.get({
-
-          spreadsheetId,
-
-          fields:
-            "sheets(properties(sheetId,title))"
-
-        });
-
-
-      const inboxSheet =
-        spreadsheet.data.sheets.find(
-          sheet =>
-            sheet.properties.title ===
-            "Inbox"
-        );
-
-
-      if (!inboxSheet) {
-
-        throw new Error(
-          'Sheet "Inbox" tidak ditemukan.'
-        );
-
-      }
-
-
-      const sheetId =
-        inboxSheet.properties.sheetId;
-
-
-      // =========================
-      // HAPUS BARIS
-      // =========================
-
-      await sheets.spreadsheets.batchUpdate({
-
-        spreadsheetId,
-
-        requestBody: {
-
-          requests: [
-
-            {
-
-              deleteDimension: {
-
-                range: {
-
-                  sheetId,
-
-                  dimension:
-                    "ROWS",
-
-                  startIndex:
-                    rowNumber - 1,
-
-                  endIndex:
-                    rowNumber
-
-                }
-
-              }
-
-            }
-
-          ]
-
-        }
-
-      });
-
-
-      return {
-
-        statusCode: 200,
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-
-          success: true,
+          success: false,
 
           message:
-            "Pesan berhasil dihapus."
+            "ID pesan wajib diisi."
 
-        })
+        });
 
-      };
+      }
+
+
+      // =================================================
+      // CEK PESAN
+      // =================================================
+
+      const {
+        data: existingMessage,
+        error: findError
+      } = await supabase
+        .from("inbox")
+        .select("id")
+        .eq("id", messageId)
+        .maybeSingle();
+
+
+      if (findError) {
+
+        console.error(
+          "SUPABASE ADMIN INBOX FIND ERROR:",
+          findError
+        );
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            "Gagal mencari pesan.",
+
+          error:
+            findError.message
+
+        });
+
+      }
+
+
+      if (!existingMessage) {
+
+        return response(404, {
+
+          success: false,
+
+          message:
+            "Pesan tidak ditemukan."
+
+        });
+
+      }
+
+
+      // =================================================
+      // DELETE PESAN
+      // =================================================
+
+      const {
+        error: deleteError
+      } = await supabase
+        .from("inbox")
+        .delete()
+        .eq("id", messageId);
+
+
+      if (deleteError) {
+
+        console.error(
+          "SUPABASE ADMIN INBOX DELETE ERROR:",
+          deleteError
+        );
+
+        return response(500, {
+
+          success: false,
+
+          message:
+            "Gagal menghapus pesan.",
+
+          error:
+            deleteError.message
+
+        });
+
+      }
+
+
+      // =================================================
+      // RESPONSE
+      // =================================================
+
+      return response(200, {
+
+        success: true,
+
+        message:
+          "Pesan berhasil dihapus."
+
+      });
 
     }
 
 
-    // =========================
+    // ===================================================
     // METHOD TIDAK DIIZINKAN
-    // =========================
+    // ===================================================
 
-    return {
+    return response(405, {
 
-      statusCode: 405,
+      success: false,
 
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
+      message:
+        "Method tidak diizinkan."
 
-      body: JSON.stringify({
-
-        success: false,
-
-        message:
-          "Method tidak diizinkan."
-
-      })
-
-    };
+    });
 
   }
+
   catch (error) {
 
     console.error(
@@ -718,28 +600,17 @@ exports.handler = async function (event) {
       error
     );
 
-    return {
+    return response(500, {
 
-      statusCode: 500,
+      success: false,
 
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
+      message:
+        "Terjadi kesalahan server.",
 
-      body: JSON.stringify({
+      error:
+        error.message
 
-        success: false,
-
-        message:
-          "Terjadi kesalahan server.",
-
-        error:
-          error.message
-
-      })
-
-    };
+    });
 
   }
 
