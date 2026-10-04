@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,20 +15,15 @@
   >
 
   <style>
-
     :root {
       --bg-dark: #0b132b;
       --card-bg: #1c2541;
       --input-bg: #0f1935;
-
       --accent-gold: #fbc02d;
       --accent-gold-dark: #d48806;
-
       --text-main: #ffffff;
       --text-muted: #94a3b8;
-
-      --border-color: rgba(255, 255, 255, 0.08);
-
+      --border-color: rgba(255,255,255,.08);
       --success: #22c55e;
       --danger: #ef4444;
     }
@@ -43,22 +37,19 @@
 
     body {
       min-height: 100vh;
-
       background-color: var(--bg-dark);
-
       color: var(--text-main);
-
       padding: 20px;
 
       background-image:
         radial-gradient(
           circle at 10% 10%,
-          rgba(251, 192, 45, 0.06),
+          rgba(251,192,45,.06),
           transparent 35%
         ),
         radial-gradient(
           circle at 90% 90%,
-          rgba(28, 37, 65, 0.7),
+          rgba(28,37,65,.7),
           transparent 45%
         );
     }
@@ -66,45 +57,31 @@
     .container {
       width: 100%;
       max-width: 1200px;
-
       margin: auto;
     }
 
     .card {
       background: var(--card-bg);
-
       border: 1px solid var(--border-color);
-
       border-radius: 22px;
-
       padding: 24px;
-
-      box-shadow:
-        0 20px 40px rgba(0, 0, 0, 0.35);
-
+      box-shadow: 0 20px 40px rgba(0,0,0,.35);
       margin-bottom: 18px;
     }
 
-    /* =========================================
-       HEADER
-    ========================================= */
+    /* ================= HEADER ================= */
 
     .header {
       display: flex;
-
       align-items: center;
-
       gap: 14px;
-
       padding-bottom: 18px;
-
       border-bottom: 1px solid var(--border-color);
     }
 
     .logo {
       width: 48px;
       height: 48px;
-
       border-radius: 14px;
 
       background:
@@ -115,45 +92,34 @@
         );
 
       display: flex;
-
       align-items: center;
       justify-content: center;
 
       color: var(--bg-dark);
-
       font-size: 22px;
-
       font-weight: 800;
 
       box-shadow:
-        0 4px 15px rgba(251, 192, 45, 0.25);
+        0 4px 15px rgba(251,192,45,.25);
     }
 
     .header-title h1 {
       font-size: 21px;
-
       font-weight: 800;
     }
 
     .header-title p {
       margin-top: 3px;
-
       font-size: 12px;
-
       color: var(--accent-gold);
-
       font-weight: 700;
     }
 
     .back-button {
       margin-left: auto;
-
       color: var(--accent-gold);
-
       text-decoration: none;
-
       font-size: 13px;
-
       font-weight: 700;
     }
 
@@ -161,100 +127,70 @@
       text-decoration: underline;
     }
 
-    /* =========================================
-       FILTER
-    ========================================= */
+    /* ================= FILTER ================= */
 
     .filter-grid {
       display: grid;
-
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
+      grid-template-columns: repeat(2,minmax(0,1fr));
       gap: 14px;
-
       margin-top: 20px;
     }
 
     .field {
       display: flex;
-
       flex-direction: column;
-
       gap: 7px;
     }
 
     .field.full {
-      grid-column: 1 / -1;
+      grid-column: 1/-1;
     }
 
     .field label {
       font-size: 12px;
-
       color: var(--text-muted);
-
       font-weight: 700;
     }
 
     input,
     select {
       width: 100%;
-
       padding: 12px;
-
       border-radius: 11px;
-
       border: 1px solid var(--border-color);
-
       background: var(--input-bg);
-
-      color: #ffffff;
-
+      color: #fff;
       outline: none;
-
       font-size: 13px;
     }
 
     input:focus,
     select:focus {
-      border-color:
-        rgba(251, 192, 45, 0.65);
+      border-color: rgba(251,192,45,.65);
     }
 
     select option {
       background: #1c2541;
-
-      color: #ffffff;
+      color: #fff;
     }
 
-    /* =========================================
-       BUTTON
-    ========================================= */
+    /* ================= BUTTON ================= */
 
     .button-row {
       display: flex;
-
       flex-wrap: wrap;
-
       gap: 10px;
-
       margin-top: 16px;
     }
 
     button {
       border: none;
-
       border-radius: 11px;
-
       padding: 12px 16px;
-
       font-size: 13px;
-
       font-weight: 800;
-
       cursor: pointer;
-
-      transition: 0.2s ease;
+      transition: .2s ease;
     }
 
     button:hover {
@@ -262,10 +198,8 @@
     }
 
     button:disabled {
-      opacity: 0.6;
-
+      opacity: .6;
       cursor: not-allowed;
-
       transform: none;
     }
 
@@ -276,170 +210,113 @@
           var(--accent-gold),
           var(--accent-gold-dark)
         );
-
       color: var(--bg-dark);
     }
 
     .btn-success {
       background: #166534;
-
-      color: #ffffff;
+      color: #fff;
     }
 
     .btn-secondary {
-      background:
-        rgba(255, 255, 255, 0.06);
-
-      border:
-        1px solid var(--border-color);
-
-      color: #ffffff;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border-color);
+      color: #fff;
     }
 
     .btn-danger {
-      background:
-        rgba(239, 68, 68, 0.15);
-
-      border:
-        1px solid rgba(239, 68, 68, 0.25);
-
+      background: rgba(239,68,68,.15);
+      border: 1px solid rgba(239,68,68,.25);
       color: #f87171;
     }
 
     .status {
       min-height: 20px;
-
       margin-top: 12px;
-
       font-size: 12px;
-
       color: var(--text-muted);
     }
 
-    /* =========================================
-       SUMMARY
-    ========================================= */
+    /* ================= SUMMARY ================= */
 
     .summary-grid {
       display: grid;
-
-      grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
+      grid-template-columns: repeat(4,minmax(0,1fr));
       gap: 12px;
     }
 
     .summary-card {
-      background:
-        rgba(11, 19, 43, 0.55);
-
-      border:
-        1px solid var(--border-color);
-
+      background: rgba(11,19,43,.55);
+      border: 1px solid var(--border-color);
       border-radius: 15px;
-
       padding: 16px;
     }
 
     .summary-card span {
       display: block;
-
       color: var(--text-muted);
-
       font-size: 11px;
-
       font-weight: 600;
     }
 
     .summary-card strong {
       display: block;
-
       margin-top: 6px;
-
       color: var(--accent-gold);
-
       font-size: 21px;
-
       font-weight: 800;
     }
 
-    /* =========================================
-       SECTION HEADER
-    ========================================= */
+    /* ================= SECTION ================= */
 
     .section-header {
       display: flex;
-
       align-items: center;
-
       justify-content: space-between;
-
       gap: 10px;
-
       margin-bottom: 12px;
     }
 
     .section-header h2 {
       color: var(--accent-gold);
-
       font-size: 16px;
-
       font-weight: 800;
     }
 
     .section-header span {
       color: var(--text-muted);
-
       font-size: 12px;
     }
 
-    /* =========================================
-       TABLE
-    ========================================= */
+    /* ================= TABLE ================= */
 
     .table-wrapper {
       overflow-x: auto;
-
-      border:
-        1px solid var(--border-color);
-
+      border: 1px solid var(--border-color);
       border-radius: 14px;
     }
 
     table {
       width: 100%;
-
       min-width: 760px;
-
       border-collapse: collapse;
-
       font-size: 12px;
     }
 
     th,
     td {
       padding: 11px 12px;
-
       text-align: left;
-
-      border-bottom:
-        1px solid var(--border-color);
-
+      border-bottom: 1px solid var(--border-color);
       white-space: nowrap;
     }
 
     th {
-      background:
-        rgba(11, 19, 43, 0.75);
-
+      background: rgba(11,19,43,.75);
       color: var(--accent-gold);
-
       font-weight: 800;
-
       position: sticky;
-
       top: 0;
-
       z-index: 1;
     }
 
@@ -448,8 +325,7 @@
     }
 
     tbody tr:hover {
-      background:
-        rgba(255, 255, 255, 0.025);
+      background: rgba(255,255,255,.025);
     }
 
     tbody tr:last-child td {
@@ -458,16 +334,11 @@
 
     .empty {
       text-align: center;
-
       color: var(--text-muted);
-
       padding: 22px;
     }
 
-
-    /* =========================================
-       GRAFIK REKAP
-    ========================================= */
+    /* ================= GRAFIK ================= */
 
     .chart-card {
       margin-bottom: 18px;
@@ -558,13 +429,132 @@
       background: #dc2626;
     }
 
+    /* ================= HIDDEN ================= */
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ================= MOBILE ================= */
+
+    @media(max-width:800px) {
+
+      body {
+        padding: 10px;
+      }
+
+      .card {
+        padding: 16px;
+        border-radius: 18px;
+      }
+
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+      }
+
+      .header-title h1 {
+        font-size: 18px;
+      }
+
+      .back-button {
+        font-size: 11px;
+      }
+
+      .button-row button {
+        flex: 1;
+        min-width: 120px;
+      }
+    }
+
+    @media(max-width:450px) {
+
+      .summary-card strong {
+        font-size: 18px;
+      }
+
+      .logo {
+        width: 42px;
+        height: 42px;
+        font-size: 19px;
+      }
+
+      .header-title h1 {
+        font-size: 16px;
+      }
+    }
+
+    /* ================= PRINT ================= */
+
     @media print {
+
+      @page {
+        size: A4 landscape;
+        margin: 12mm;
+      }
+
+      body {
+        background: #fff;
+        color: #000;
+        padding: 0;
+      }
+
+      .card {
+        box-shadow: none;
+        background: #fff;
+        color: #000;
+        border: 1px solid #ccc;
+      }
+
+      .header,
+      .filter-grid,
+      .button-row,
+      .status,
+      .back-button {
+        display: none !important;
+      }
+
+      .summary-card {
+        background: #fff;
+        color: #000;
+        border: 1px solid #ccc;
+      }
+
+      .summary-card span,
+      .summary-card strong {
+        color: #000;
+      }
+
+      th {
+        background: #eee;
+        color: #000;
+      }
+
+      td {
+        color: #000;
+      }
+
+      table {
+        min-width: 0;
+      }
+
+      .table-wrapper {
+        overflow: visible;
+      }
+
       .chart-card {
         display: block !important;
         break-inside: avoid;
         page-break-inside: avoid;
-        border: 1px solid #999999;
-        background: #ffffff;
+        border: 1px solid #999;
+        background: #fff;
         box-shadow: none;
       }
 
@@ -583,2995 +573,2816 @@
       }
 
       .chart-axis {
-        stroke: #555555;
+        stroke: #555;
       }
 
       .chart-label,
       .chart-value {
-        fill: #111111;
+        fill: #111;
+      }
+
+      .chart-bar-reward {
+        fill: #555;
+      }
+
+      .chart-bar-violation {
+        fill: #999;
       }
     }
-
-    /* =========================================
-       HIDDEN
-    ========================================= */
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* =========================================
-       PRINT
-    ========================================= */
-
-    @media print {
-
-      body {
-        background: #ffffff;
-
-        color: #000000;
-
-        padding: 0;
-      }
-
-      .card {
-        box-shadow: none;
-
-        background: #ffffff;
-
-        color: #000000;
-
-        border: 1px solid #cccccc;
-      }
-
-      .header,
-      .filter-grid,
-      .button-row,
-      .status,
-      .back-button {
-        display: none !important;
-      }
-
-      .summary-card {
-        background: #ffffff;
-
-        color: #000000;
-
-        border: 1px solid #cccccc;
-      }
-
-      .summary-card span,
-      .summary-card strong {
-        color: #000000;
-      }
-
-      th {
-        background: #eeeeee;
-
-        color: #000000;
-      }
-
-      td {
-        color: #000000;
-      }
-
-      table {
-        min-width: 0;
-      }
-
-      .table-wrapper {
-        overflow: visible;
-      }
-    }
-
-    /* =========================================
-       MOBILE
-    ========================================= */
-
-    @media (max-width: 800px) {
-
-      body {
-        padding: 10px;
-      }
-
-      .card {
-        padding: 16px;
-
-        border-radius: 18px;
-      }
-
-      .filter-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .field.full {
-        grid-column: auto;
-      }
-
-      .summary-grid {
-        grid-template-columns:
-          repeat(2, minmax(0, 1fr));
-      }
-
-      .header-title h1 {
-        font-size: 18px;
-      }
-
-      .back-button {
-        font-size: 11px;
-      }
-
-      .button-row button {
-        flex: 1;
-
-        min-width: 120px;
-      }
-    }
-
-    @media (max-width: 450px) {
-
-      .summary-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .summary-card strong {
-        font-size: 18px;
-      }
-
-      .logo {
-        width: 42px;
-        height: 42px;
-
-        font-size: 19px;
-      }
-
-      .header-title h1 {
-        font-size: 16px;
-      }
-    }
-
   </style>
-
 </head>
 
 <body>
 
-  <main class="container">
+<main class="container">
 
-    <!-- =========================================
-         FILTER CARD
-    ========================================== -->
+  <!-- ================= FILTER ================= -->
 
-    <section class="card">
+  <section class="card">
 
-      <div class="header">
+    <div class="header">
 
-        <div class="logo">
-          L
-        </div>
+      <div class="logo">
+        L
+      </div>
 
-        <div class="header-title">
+      <div class="header-title">
+        <h1>Rekap Poin Siswa</h1>
+        <p>LENTERA SMANTI • ADMIN</p>
+      </div>
 
-          <h1>
-            Rekap Poin Siswa
-          </h1>
+      <a
+        href="admin.html"
+        class="back-button"
+      >
+        ← Kembali
+      </a>
 
-          <p>
-            LENTERA SMANTI • ADMIN
-          </p>
+    </div>
 
-        </div>
+    <div class="filter-grid">
 
-        <a
-          href="admin.html"
-          class="back-button"
+      <div class="field">
+        <label for="tanggalMulai">
+          Tanggal Mulai
+        </label>
+
+        <input
+          type="date"
+          id="tanggalMulai"
         >
-          ← Kembali
-        </a>
+      </div>
+
+      <div class="field">
+        <label for="tanggalAkhir">
+          Tanggal Akhir
+        </label>
+
+        <input
+          type="date"
+          id="tanggalAkhir"
+        >
+      </div>
+
+      <div class="field">
+        <label for="tipeRekap">
+          Jenis Rekap
+        </label>
+
+        <select id="tipeRekap">
+
+          <option value="siswa">
+            Per Siswa
+          </option>
+
+          <option value="kelas">
+            Per Kelas
+          </option>
+
+          <option value="sekolah">
+            Satu Sekolah
+          </option>
+
+        </select>
+      </div>
+
+      <div
+        class="field hidden"
+        id="siswaField"
+      >
+
+        <label for="siswaSelect">
+          Pilih Siswa
+        </label>
+
+        <select id="siswaSelect">
+          <option value="">
+            Memuat siswa...
+          </option>
+        </select>
 
       </div>
 
+      <div
+        class="field hidden"
+        id="kelasField"
+      >
 
-      <div class="filter-grid">
+        <label for="kelasSelect">
+          Pilih Kelas
+        </label>
 
-        <!-- TANGGAL MULAI -->
+        <select id="kelasSelect">
+          <option value="">
+            Memuat kelas...
+          </option>
+        </select>
 
-        <div class="field">
+      </div>
 
-          <label for="tanggalMulai">
-            Tanggal Mulai
-          </label>
+    </div>
 
-          <input
-            type="date"
-            id="tanggalMulai"
-          >
+    <div class="button-row">
 
-        </div>
+      <button
+        type="button"
+        class="btn-primary"
+        id="tampilkanBtn"
+      >
+        📊 Tampilkan Rekap
+      </button>
 
+      <button
+        type="button"
+        class="btn-success hidden"
+        id="exportXlsBtn"
+      >
+        📗 Export XLS
+      </button>
 
-        <!-- TANGGAL AKHIR -->
+      <button
+        type="button"
+        class="btn-secondary hidden"
+        id="exportCsvBtn"
+      >
+        📄 Export CSV
+      </button>
 
-        <div class="field">
+      <button
+        type="button"
+        class="btn-secondary"
+        id="cetakBtn"
+      >
+        🖨️ Cetak
+      </button>
 
-          <label for="tanggalAkhir">
-            Tanggal Akhir
-          </label>
+    </div>
 
-          <input
-            type="date"
-            id="tanggalAkhir"
-          >
+    <div
+      class="status"
+      id="status"
+    ></div>
 
-        </div>
-
-
-        <!-- TIPE REKAP -->
-
-        <div class="field">
-
-          <label for="tipeRekap">
-            Jenis Rekap
-          </label>
-
-          <select id="tipeRekap">
-
-            <option value="siswa">
-              Per Siswa
-            </option>
-
-            <option value="kelas">
-              Per Kelas
-            </option>
-
-            <option value="sekolah">
-              Satu Sekolah
-            </option>
-
-          </select>
-
-        </div>
+  </section>
 
 
-        <!-- SISWA -->
+  <!-- ================= RINGKASAN ================= -->
+
+  <section
+    class="card hidden"
+    id="ringkasanCard"
+  >
+
+    <div class="section-header">
+
+      <h2>
+        Ringkasan Rekap
+      </h2>
+
+      <span id="periodeText">
+        -
+      </span>
+
+    </div>
+
+    <div class="summary-grid">
+
+      <div class="summary-card">
+        <span>Jumlah Siswa</span>
+
+        <strong id="jumlahSiswa">
+          0
+        </strong>
+      </div>
+
+      <div class="summary-card">
+        <span>Total Penghargaan</span>
+
+        <strong id="totalPenghargaan">
+          0
+        </strong>
+      </div>
+
+      <div class="summary-card">
+        <span>Total Pelanggaran</span>
+
+        <strong id="totalPelanggaran">
+          0
+        </strong>
+      </div>
+
+      <div class="summary-card">
+        <span>Poin Bersih</span>
+
+        <strong id="totalBersih">
+          0
+        </strong>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ================= GRAFIK ================= -->
+
+  <section
+    class="card chart-card hidden"
+    id="chartCard"
+  >
+
+    <div class="section-header">
+
+      <div>
+
+        <h2
+          class="chart-title"
+          id="chartTitle"
+        >
+          Grafik Rekap Poin
+        </h2>
 
         <div
-          class="field hidden"
-          id="siswaField"
+          class="chart-subtitle"
+          id="chartSubtitle"
         >
-
-          <label for="siswaSelect">
-            Pilih Siswa
-          </label>
-
-          <select id="siswaSelect">
-
-            <option value="">
-              Memuat siswa...
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <!-- KELAS -->
-
-        <div
-          class="field hidden"
-          id="kelasField"
-        >
-
-          <label for="kelasSelect">
-            Pilih Kelas
-          </label>
-
-          <select id="kelasSelect">
-
-            <option value="">
-              Memuat kelas...
-            </option>
-
-          </select>
-
+          Perbandingan penghargaan dan pelanggaran.
         </div>
 
       </div>
 
+    </div>
 
-      <!-- BUTTON -->
+    <div
+      class="chart-wrap"
+      id="chartWrap"
+    ></div>
 
-      <div class="button-row">
+    <div class="chart-legend">
 
-        <button
-          type="button"
-          class="btn-primary"
-          id="tampilkanBtn"
-        >
-          📊 Tampilkan Rekap
-        </button>
+      <span class="legend-item">
+        <span class="legend-dot legend-reward"></span>
+        Penghargaan
+      </span>
 
-        <button
-          type="button"
-          class="btn-success hidden"
-          id="exportXlsBtn"
-        >
-          📗 Export XLS
-        </button>
+      <span class="legend-item">
+        <span class="legend-dot legend-violation"></span>
+        Pelanggaran
+      </span>
 
-        <button
-          type="button"
-          class="btn-secondary hidden"
-          id="exportCsvBtn"
-        >
-          📄 Export CSV
-        </button>
+    </div>
 
-        <button
-          type="button"
-          class="btn-secondary"
-          id="cetakBtn"
-        >
-          🖨️ Cetak
-        </button>
+  </section>
 
-      </div>
 
+  <!-- ================= REKAP UTAMA ================= -->
 
-      <div
-        class="status"
-        id="status"
-      ></div>
+  <section
+    class="card hidden"
+    id="rekapCard"
+  >
 
-    </section>
+    <div class="section-header">
 
+      <h2 id="judulRekap">
+        Rekap
+      </h2>
 
-    <!-- =========================================
-         RINGKASAN
-    ========================================== -->
+      <span id="jumlahData">
+        0 data
+      </span>
 
-    <section
-      class="card hidden"
-      id="ringkasanCard"
-    >
+    </div>
 
-      <div class="section-header">
+    <div
+      class="table-wrapper"
+      id="rekapTableWrapper"
+    ></div>
 
-        <h2>
-          Ringkasan Rekap
-        </h2>
+  </section>
 
-        <span id="periodeText">
-          -
-        </span>
 
-      </div>
+  <!-- ================= DETAIL ================= -->
 
+  <section
+    class="card hidden"
+    id="detailCard"
+  >
 
-      <div class="summary-grid">
+    <div class="section-header">
 
-        <div class="summary-card">
+      <h2>
+        Detail Transaksi Poin
+      </h2>
 
-          <span>
-            Jumlah Siswa
-          </span>
+      <span id="jumlahTransaksi">
+        0 transaksi
+      </span>
 
-          <strong id="jumlahSiswa">
-            0
-          </strong>
+    </div>
 
-        </div>
+    <div
+      class="table-wrapper"
+      id="detailTableWrapper"
+    ></div>
 
+  </section>
 
-        <div class="summary-card">
+</main>
 
-          <span>
-            Total Penghargaan
-          </span>
 
-          <strong id="totalPenghargaan">
-            0
-          </strong>
+<script>
 
-        </div>
+/* =========================================================
+   SESSION ADMIN
+========================================================= */
 
+const adminSession =
+  sessionStorage.getItem(
+    "lentera_admin_session"
+  );
 
-        <div class="summary-card">
+if (!adminSession) {
 
-          <span>
-            Total Pelanggaran
-          </span>
+  window.location.replace(
+    "admin-login.html"
+  );
 
-          <strong id="totalPelanggaran">
-            0
-          </strong>
+}
 
-        </div>
 
+/* =========================================================
+   ELEMENT
+========================================================= */
+
+const tanggalMulai =
+  document.getElementById(
+    "tanggalMulai"
+  );
+
+const tanggalAkhir =
+  document.getElementById(
+    "tanggalAkhir"
+  );
+
+const tipeRekap =
+  document.getElementById(
+    "tipeRekap"
+  );
+
+const siswaField =
+  document.getElementById(
+    "siswaField"
+  );
 
-        <div class="summary-card">
+const kelasField =
+  document.getElementById(
+    "kelasField"
+  );
 
-          <span>
-            Poin Bersih
-          </span>
+const siswaSelect =
+  document.getElementById(
+    "siswaSelect"
+  );
 
-          <strong id="totalBersih">
-            0
-          </strong>
+const kelasSelect =
+  document.getElementById(
+    "kelasSelect"
+  );
 
-        </div>
+const tampilkanBtn =
+  document.getElementById(
+    "tampilkanBtn"
+  );
 
-      </div>
+const exportXlsBtn =
+  document.getElementById(
+    "exportXlsBtn"
+  );
 
-    </section>
+const exportCsvBtn =
+  document.getElementById(
+    "exportCsvBtn"
+  );
 
+const cetakBtn =
+  document.getElementById(
+    "cetakBtn"
+  );
 
+const statusElement =
+  document.getElementById(
+    "status"
+  );
 
-    <!-- =========================================
-         GRAFIK
-    ========================================== -->
+const chartCard =
+  document.getElementById(
+    "chartCard"
+  );
 
-    <section
-      class="card chart-card hidden"
-      id="chartCard"
-    >
+const chartWrap =
+  document.getElementById(
+    "chartWrap"
+  );
 
-      <div class="section-header">
+const chartTitle =
+  document.getElementById(
+    "chartTitle"
+  );
 
-        <div>
-          <h2 class="chart-title" id="chartTitle">
-            Grafik Rekap Poin
-          </h2>
+const chartSubtitle =
+  document.getElementById(
+    "chartSubtitle"
+  );
 
-          <div class="chart-subtitle" id="chartSubtitle">
-            Perbandingan penghargaan dan pelanggaran.
-          </div>
-        </div>
 
-      </div>
+/* =========================================================
+   DATA
+========================================================= */
 
-      <div class="chart-wrap" id="chartWrap"></div>
+let daftarSiswa = [];
+let daftarKelas = [];
+let latestReport = null;
 
-      <div class="chart-legend">
-        <span class="legend-item">
-          <span class="legend-dot legend-reward"></span>
-          Penghargaan
-        </span>
-        <span class="legend-item">
-          <span class="legend-dot legend-violation"></span>
-          Pelanggaran
-        </span>
-      </div>
 
-    </section>
+/* =========================================================
+   TANGGAL
+========================================================= */
 
-    <!-- =========================================
-         REKAP UTAMA
-    ========================================== -->
+function getToday() {
 
-    <section
-      class="card hidden"
-      id="rekapCard"
-    >
+  const date = new Date();
 
-      <div class="section-header">
+  const year =
+    date.getFullYear();
 
-        <h2 id="judulRekap">
-          Rekap
-        </h2>
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(2,"0");
 
-        <span id="jumlahData">
-          0 data
-        </span>
+  const day =
+    String(
+      date.getDate()
+    ).padStart(2,"0");
 
-      </div>
+  return `${year}-${month}-${day}`;
 
+}
 
-      <div
-        class="table-wrapper"
-        id="rekapTableWrapper"
-      ></div>
 
-    </section>
+function getFirstDayOfMonth() {
 
+  const date = new Date();
 
-    <!-- =========================================
-         DETAIL TRANSAKSI
-    ========================================== -->
+  const year =
+    date.getFullYear();
 
-    <section
-      class="card hidden"
-      id="detailCard"
-    >
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(2,"0");
 
-      <div class="section-header">
+  return `${year}-${month}-01`;
 
-        <h2>
-          Detail Transaksi Poin
-        </h2>
+}
 
-        <span id="jumlahTransaksi">
-          0 transaksi
-        </span>
 
-      </div>
+tanggalMulai.value =
+  getFirstDayOfMonth();
 
+tanggalAkhir.value =
+  getToday();
 
-      <div
-        class="table-wrapper"
-        id="detailTableWrapper"
-      ></div>
 
-    </section>
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
 
-  </main>
+function escapeHtml(value) {
 
+  return String(
+    value ?? ""
+  ).replace(
+    /[&<>"']/g,
+    function(char) {
 
-  <script>
+      const map = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      };
 
-    /* =========================================
-       SESSION ADMIN
-    ========================================== */
-
-    const adminSession =
-      sessionStorage.getItem(
-        "lentera_admin_session"
-      );
-
-    if (!adminSession) {
-
-      window.location.replace(
-        "admin-login.html"
-      );
+      return map[char];
 
     }
+  );
+
+}
 
 
-    /* =========================================
-       ELEMENT
-    ========================================== */
+/* =========================================================
+   ESCAPE XML
+========================================================= */
 
-    const tanggalMulai =
-      document.getElementById(
-        "tanggalMulai"
-      );
+function escapeXml(value) {
 
-    const tanggalAkhir =
-      document.getElementById(
-        "tanggalAkhir"
-      );
+  return String(
+    value ?? ""
+  )
+  .replace(/&/g,"&amp;")
+  .replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;")
+  .replace(/'/g,"&apos;");
 
-    const tipeRekap =
-      document.getElementById(
-        "tipeRekap"
-      );
-
-    const siswaField =
-      document.getElementById(
-        "siswaField"
-      );
-
-    const kelasField =
-      document.getElementById(
-        "kelasField"
-      );
-
-    const siswaSelect =
-      document.getElementById(
-        "siswaSelect"
-      );
-
-    const kelasSelect =
-      document.getElementById(
-        "kelasSelect"
-      );
-
-    const tampilkanBtn =
-      document.getElementById(
-        "tampilkanBtn"
-      );
-
-    const exportXlsBtn =
-      document.getElementById(
-        "exportXlsBtn"
-      );
-
-    const exportCsvBtn =
-      document.getElementById(
-        "exportCsvBtn"
-      );
-
-    const cetakBtn =
-      document.getElementById(
-        "cetakBtn"
-      );
-
-    const statusElement =
-      document.getElementById(
-        "status"
-      );
-
-    const chartCard =
-      document.getElementById(
-        "chartCard"
-      );
-
-    const chartWrap =
-      document.getElementById(
-        "chartWrap"
-      );
-
-    const chartTitle =
-      document.getElementById(
-        "chartTitle"
-      );
-
-    const chartSubtitle =
-      document.getElementById(
-        "chartSubtitle"
-      );
+}
 
 
-    /* =========================================
-       DATA
-    ========================================== */
+/* =========================================================
+   NUMBER
+========================================================= */
 
-    let daftarSiswa = [];
+function numberValue(value) {
 
-    let daftarKelas = [];
+  return Number(
+    value || 0
+  );
 
-    let latestReport = null;
-
-
-    /* =========================================
-       TANGGAL DEFAULT
-    ========================================== */
-
-    function getToday() {
-
-      const date = new Date();
-
-      const year =
-        date.getFullYear();
-
-      const month =
-        String(
-          date.getMonth() + 1
-        ).padStart(2, "0");
-
-      const day =
-        String(
-          date.getDate()
-        ).padStart(2, "0");
-
-      return `${year}-${month}-${day}`;
-
-    }
+}
 
 
-    function getFirstDayOfMonth() {
+/* =========================================================
+   FORMAT TANGGAL
+========================================================= */
 
-      const date = new Date();
+function formatTanggal(tanggal) {
 
-      const year =
-        date.getFullYear();
+  if (!tanggal) {
+    return "-";
+  }
 
-      const month =
-        String(
-          date.getMonth() + 1
-        ).padStart(2, "0");
+  const parts =
+    String(tanggal).split("-");
 
-      return `${year}-${month}-01`;
+  if (parts.length !== 3) {
+    return tanggal;
+  }
 
-    }
+  return (
+    parts[2] +
+    "-" +
+    parts[1] +
+    "-" +
+    parts[0]
+  );
 
-
-    tanggalMulai.value =
-      getFirstDayOfMonth();
-
-    tanggalAkhir.value =
-      getToday();
-
-
-    /* =========================================
-       ESCAPE HTML
-    ========================================== */
-
-    function escapeHtml(value) {
-
-      return String(
-        value ?? ""
-      ).replace(
-        /[&<>"']/g,
-        function (char) {
-
-          const map = {
-
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-
-          };
-
-          return map[char];
-
-        }
-      );
-
-    }
+}
 
 
-    /* =========================================
-       ESCAPE XML
-    ========================================== */
+/* =========================================================
+   LOAD DATA MASTER
+========================================================= */
 
-    function escapeXml(value) {
+async function loadDataMaster() {
 
-      return String(
-        value ?? ""
+  try {
+
+    statusElement.textContent =
+      "Memuat data siswa dan kelas...";
+
+    const [
+      siswaResponse,
+      kelasResponse
+    ] = await Promise.all([
+
+      fetch(
+        "/.netlify/functions/admin-students"
+      ),
+
+      fetch(
+        "/.netlify/functions/admin-classes"
       )
-        .replace(
-          /&/g,
-          "&amp;"
-        )
-        .replace(
-          /</g,
-          "&lt;"
-        )
-        .replace(
-          />/g,
-          "&gt;"
-        )
-        .replace(
-          /"/g,
-          "&quot;"
-        )
-        .replace(
-          /'/g,
-          "&apos;"
-        );
 
-    }
+    ]);
 
 
-    /* =========================================
-       NUMBER
-    ========================================== */
+    const siswaResult =
+      await siswaResponse.json();
 
-    function numberValue(value) {
-
-      return Number(
-        value || 0
-      );
-
-    }
+    const kelasResult =
+      await kelasResponse.json();
 
 
-    /* =========================================
-       FORMAT TANGGAL
-    ========================================== */
-
-    function formatTanggal(
-      tanggal
+    if (
+      !siswaResponse.ok ||
+      !siswaResult.success
     ) {
 
-      if (!tanggal) {
-
-        return "-";
-
-      }
-
-      const parts =
-        String(tanggal)
-          .split("-");
-
-      if (
-        parts.length !== 3
-      ) {
-
-        return tanggal;
-
-      }
-
-      return (
-        parts[2] +
-        "-" +
-        parts[1] +
-        "-" +
-        parts[0]
+      throw new Error(
+        siswaResult.message ||
+        "Gagal mengambil data siswa."
       );
 
     }
 
 
-    /* =========================================
-       LOAD SISWA + KELAS
-    ========================================== */
+    if (
+      !kelasResponse.ok ||
+      !kelasResult.success
+    ) {
 
-    async function loadDataMaster() {
+      throw new Error(
+        kelasResult.message ||
+        "Gagal mengambil data kelas."
+      );
 
-      try {
-
-        statusElement.textContent =
-          "Memuat data siswa dan kelas...";
-
-
-        const [
-          siswaResponse,
-          kelasResponse
-        ] = await Promise.all([
-
-          fetch(
-            "/.netlify/functions/admin-students"
-          ),
-
-          fetch(
-            "/.netlify/functions/admin-classes"
-          )
-
-        ]);
+    }
 
 
-        const siswaResult =
-          await siswaResponse.json();
-
-        const kelasResult =
-          await kelasResponse.json();
-
-
-        if (
-          !siswaResponse.ok ||
-          !siswaResult.success
-        ) {
-
-          throw new Error(
-            siswaResult.message ||
-            "Gagal mengambil data siswa."
-          );
-
-        }
+    daftarSiswa =
+      Array.isArray(
+        siswaResult.siswa
+      )
+      ? siswaResult.siswa
+      : [];
 
 
-        if (
-          !kelasResponse.ok ||
-          !kelasResult.success
-        ) {
-
-          throw new Error(
-            kelasResult.message ||
-            "Gagal mengambil data kelas."
-          );
-
-        }
+    daftarKelas =
+      Array.isArray(
+        kelasResult.kelas
+      )
+      ? kelasResult.kelas
+      : [];
 
 
-        daftarSiswa =
-          Array.isArray(
-            siswaResult.siswa
-          )
-            ? siswaResult.siswa
-            : [];
+    renderSiswaSelect();
+    renderKelasSelect();
 
 
-        daftarKelas =
-          Array.isArray(
-            kelasResult.kelas
-          )
-            ? kelasResult.kelas
-            : [];
+    statusElement.textContent =
+      "Data siap digunakan.";
+
+  }
+  catch(error) {
+
+    console.error(
+      "LOAD MASTER ERROR:",
+      error
+    );
+
+    statusElement.textContent =
+      error.message ||
+      "Gagal memuat data.";
+
+  }
+
+}
 
 
-        renderSiswaSelect();
+/* =========================================================
+   SELECT SISWA
+========================================================= */
 
-        renderKelasSelect();
+function renderSiswaSelect() {
 
+  siswaSelect.innerHTML =
+    '<option value="">-- Pilih Siswa --</option>';
 
-        statusElement.textContent =
-          "Data siap digunakan.";
+  daftarSiswa.forEach(
+    function(siswa) {
 
-      }
-      catch (error) {
-
-        console.error(
-          "LOAD MASTER ERROR:",
-          error
+      const option =
+        document.createElement(
+          "option"
         );
 
-        statusElement.textContent =
-          error.message ||
-          "Gagal memuat data.";
+      option.value =
+        siswa.id || "";
 
-      }
+      const nama =
+        siswa.nama || "-";
 
-    }
+      const nisn =
+        siswa.nisn || "-";
 
+      const kelas =
+        siswa.kelas ||
+        siswa.nama_kelas ||
+        "-";
 
-    /* =========================================
-       SELECT SISWA
-    ========================================== */
+      option.textContent =
+        `${nama} — ${nisn} (${kelas})`;
 
-    function renderSiswaSelect() {
-
-      siswaSelect.innerHTML =
-        '<option value="">-- Pilih Siswa --</option>';
-
-
-      daftarSiswa.forEach(
-        function (siswa) {
-
-          const option =
-            document.createElement(
-              "option"
-            );
-
-          option.value =
-            siswa.id || "";
-
-          const nama =
-            siswa.nama || "-";
-
-          const nisn =
-            siswa.nisn || "-";
-
-          const kelas =
-            siswa.kelas ||
-            siswa.nama_kelas ||
-            "-";
-
-
-          option.textContent =
-            `${nama} — ${nisn} (${kelas})`;
-
-
-          siswaSelect.appendChild(
-            option
-          );
-
-        }
+      siswaSelect.appendChild(
+        option
       );
 
     }
+  );
+
+}
 
 
-    /* =========================================
-       SELECT KELAS
-    ========================================== */
+/* =========================================================
+   SELECT KELAS
+========================================================= */
 
-    function renderKelasSelect() {
+function renderKelasSelect() {
 
-      kelasSelect.innerHTML =
-        '<option value="">-- Pilih Kelas --</option>';
+  kelasSelect.innerHTML =
+    '<option value="">-- Pilih Kelas --</option>';
 
+  daftarKelas.forEach(
+    function(kelas) {
 
-      daftarKelas.forEach(
-        function (kelas) {
+      const option =
+        document.createElement(
+          "option"
+        );
 
-          const option =
-            document.createElement(
-              "option"
-            );
+      option.value =
+        kelas.id || "";
 
-          option.value =
-            kelas.id || "";
+      option.textContent =
+        kelas.nama_kelas ||
+        kelas.nama ||
+        kelas.id ||
+        "-";
 
-          option.textContent =
-            kelas.nama_kelas ||
-            kelas.nama ||
-            kelas.id ||
-            "-";
-
-
-          kelasSelect.appendChild(
-            option
-          );
-
-        }
+      kelasSelect.appendChild(
+        option
       );
 
     }
+  );
+
+}
 
 
-    /* =========================================
-       UBAH JENIS REKAP
-    ========================================== */
+/* =========================================================
+   FILTER
+========================================================= */
 
-    function updateFilter() {
+function updateFilter() {
 
-      siswaField.classList.toggle(
-        "hidden",
-        tipeRekap.value !== "siswa"
-      );
+  siswaField.classList.toggle(
+    "hidden",
+    tipeRekap.value !== "siswa"
+  );
+
+  kelasField.classList.toggle(
+    "hidden",
+    tipeRekap.value !== "kelas"
+  );
+
+}
+
+tipeRekap.addEventListener(
+  "change",
+  updateFilter
+);
+
+updateFilter();
 
 
-      kelasField.classList.toggle(
-        "hidden",
-        tipeRekap.value !== "kelas"
-      );
+/* =========================================================
+   TAMPILKAN REKAP
+========================================================= */
 
-    }
+async function tampilkanRekap() {
+
+  const mulai =
+    tanggalMulai.value;
+
+  const akhir =
+    tanggalAkhir.value;
+
+  const tipe =
+    tipeRekap.value;
 
 
-    tipeRekap.addEventListener(
-      "change",
-      updateFilter
+  if (!mulai || !akhir) {
+
+    alert(
+      "Tanggal mulai dan tanggal akhir wajib diisi."
+    );
+
+    return;
+
+  }
+
+
+  if (mulai > akhir) {
+
+    alert(
+      "Tanggal mulai tidak boleh lebih besar dari tanggal akhir."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    tipe === "siswa" &&
+    !siswaSelect.value
+  ) {
+
+    alert(
+      "Silakan pilih siswa terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    tipe === "kelas" &&
+    !kelasSelect.value
+  ) {
+
+    alert(
+      "Silakan pilih kelas terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+
+  tampilkanBtn.disabled = true;
+
+  tampilkanBtn.textContent =
+    "⏳ Memuat...";
+
+  statusElement.textContent =
+    "Mengambil data rekap...";
+
+
+  try {
+
+    const params =
+      new URLSearchParams();
+
+    params.set(
+      "mulai",
+      mulai
+    );
+
+    params.set(
+      "akhir",
+      akhir
+    );
+
+    params.set(
+      "tipe",
+      tipe
     );
 
 
-    updateFilter();
-
-
-    /* =========================================
-       TAMPILKAN REKAP
-    ========================================== */
-
-    async function tampilkanRekap() {
-
-      const mulai =
-        tanggalMulai.value;
-
-      const akhir =
-        tanggalAkhir.value;
-
-      const tipe =
-        tipeRekap.value;
-
-
-      /* VALIDASI */
-
-      if (!mulai || !akhir) {
-
-        alert(
-          "Tanggal mulai dan tanggal akhir wajib diisi."
-        );
-
-        return;
-
-      }
-
-
-      if (mulai > akhir) {
-
-        alert(
-          "Tanggal mulai tidak boleh lebih besar dari tanggal akhir."
-        );
-
-        return;
-
-      }
-
-
-      if (
-        tipe === "siswa" &&
-        !siswaSelect.value
-      ) {
-
-        alert(
-          "Silakan pilih siswa terlebih dahulu."
-        );
-
-        return;
-
-      }
-
-
-      if (
-        tipe === "kelas" &&
-        !kelasSelect.value
-      ) {
-
-        alert(
-          "Silakan pilih kelas terlebih dahulu."
-        );
-
-        return;
-
-      }
-
-
-      /* LOADING */
-
-      tampilkanBtn.disabled =
-        true;
-
-      tampilkanBtn.textContent =
-        "⏳ Memuat...";
-
-      statusElement.textContent =
-        "Mengambil data rekap...";
-
-
-      try {
-
-        const params =
-          new URLSearchParams();
-
-
-        params.set(
-          "mulai",
-          mulai
-        );
-
-
-        params.set(
-          "akhir",
-          akhir
-        );
-
-
-        params.set(
-          "tipe",
-          tipe
-        );
-
-
-        if (tipe === "siswa") {
-
-          params.set(
-            "siswaId",
-            siswaSelect.value
-          );
-
-        }
-
-
-        if (tipe === "kelas") {
-
-          params.set(
-            "kelasId",
-            kelasSelect.value
-          );
-
-        }
-
-
-        const response =
-          await fetch(
-            "/.netlify/functions/admin-report?" +
-            params.toString()
-          );
-
-
-        const result =
-          await response.json();
-
-
-        if (
-          !response.ok ||
-          !result.success
-        ) {
-
-          throw new Error(
-            result.message ||
-            "Gagal mengambil rekap."
-          );
-
-        }
-
-
-        latestReport =
-          result;
-
-
-        renderReport(
-          result
-        );
-
-
-        exportXlsBtn.classList.remove(
-          "hidden"
-        );
-
-
-        exportCsvBtn.classList.remove(
-          "hidden"
-        );
-
-
-        statusElement.textContent =
-          "Rekap berhasil dibuat.";
-
-      }
-      catch (error) {
-
-        console.error(
-          "REKAP ERROR:",
-          error
-        );
-
-
-        latestReport =
-          null;
-
-
-        exportXlsBtn.classList.add(
-          "hidden"
-        );
-
-
-        exportCsvBtn.classList.add(
-          "hidden"
-        );
-
-
-        statusElement.textContent =
-          error.message ||
-          "Gagal membuat rekap.";
-
-
-        alert(
-          error.message ||
-          "Gagal membuat rekap."
-        );
-
-      }
-      finally {
-
-        tampilkanBtn.disabled =
-          false;
-
-        tampilkanBtn.textContent =
-          "📊 Tampilkan Rekap";
-
-      }
-
-    }
-
-
-    /* =========================================
-       RENDER REKAP
-    ========================================== */
-
-    function renderReport(
-      report
-    ) {
-
-      document
-        .getElementById(
-          "ringkasanCard"
-        )
-        .classList.remove(
-          "hidden"
-        );
-
-
-      document
-        .getElementById(
-          "rekapCard"
-        )
-        .classList.remove(
-          "hidden"
-        );
-
-
-      document
-        .getElementById(
-          "detailCard"
-        )
-        .classList.remove(
-          "hidden"
-        );
-
-
-      /* PERIODE */
-
-      document
-        .getElementById(
-          "periodeText"
-        )
-        .textContent =
-        `${formatTanggal(report.periode.mulai)}
-         s/d
-         ${formatTanggal(report.periode.akhir)}`;
-
-
-      /* SUMMARY */
-
-      document
-        .getElementById(
-          "jumlahSiswa"
-        )
-        .textContent =
-        numberValue(
-          report.ringkasan.jumlahSiswa
-        );
-
-
-      document
-        .getElementById(
-          "totalPenghargaan"
-        )
-        .textContent =
-        numberValue(
-          report.ringkasan.totalPenghargaan
-        );
-
-
-      document
-        .getElementById(
-          "totalPelanggaran"
-        )
-        .textContent =
-        numberValue(
-          report.ringkasan.totalPelanggaran
-        );
-
-
-      document
-        .getElementById(
-          "totalBersih"
-        )
-        .textContent =
-        numberValue(
-          report.ringkasan.totalBersih
-        );
-
-
-      /* TABEL UTAMA */
-
-      if (
-        report.tipe === "kelas"
-      ) {
-
-        renderRekapKelas(
-          report
-        );
-
-      }
-      else {
-
-        renderRekapSiswa(
-          report
-        );
-
-      }
-
-
-      /* DETAIL */
-
-      renderDetailTransaksi(
-        report
-      );
-
-      renderChart(
-        report
+    if (tipe === "siswa") {
+
+      params.set(
+        "siswaId",
+        siswaSelect.value
       );
 
     }
 
 
-    /* =========================================
-       REKAP SISWA
-    ========================================== */
+    if (tipe === "kelas") {
 
-    function renderRekapSiswa(
-      report
-    ) {
-
-      document
-        .getElementById(
-          "judulRekap"
-        )
-        .textContent =
-        report.tipe === "siswa"
-          ? "Rekap Per Siswa"
-          : "Rekap Satu Sekolah";
-
-
-      document
-        .getElementById(
-          "jumlahData"
-        )
-        .textContent =
-        `${report.siswa.length} siswa`;
-
-
-      let html = "";
-
-      html += `
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>No</th>
-
-              <th>NISN</th>
-
-              <th>Nama</th>
-
-              <th>Kelas</th>
-
-              <th>Penghargaan</th>
-
-              <th>Pelanggaran</th>
-
-              <th>Poin Bersih</th>
-
-              <th>Transaksi</th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-      `;
-
-
-      if (
-        !report.siswa ||
-        report.siswa.length === 0
-      ) {
-
-        html += `
-          <tr>
-            <td
-              colspan="8"
-              class="empty"
-            >
-              Tidak ada data siswa.
-            </td>
-          </tr>
-        `;
-
-      }
-      else {
-
-        report.siswa.forEach(
-          function (siswa, index) {
-
-            html += `
-              <tr>
-
-                <td>
-                  ${index + 1}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    siswa.nisn
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    siswa.nama
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    siswa.kelas
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    siswa.penghargaan
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    siswa.pelanggaran
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    siswa.total
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    siswa.transaksi
-                  )}
-                </td>
-
-              </tr>
-            `;
-
-          }
-        );
-
-      }
-
-
-      html += `
-          </tbody>
-
-        </table>
-      `;
-
-
-      document
-        .getElementById(
-          "rekapTableWrapper"
-        )
-        .innerHTML =
-        html;
+      params.set(
+        "kelasId",
+        kelasSelect.value
+      );
 
     }
 
 
-    /* =========================================
-       REKAP KELAS
-    ========================================== */
+    const response =
+      await fetch(
+        "/.netlify/functions/admin-report?" +
+        params.toString()
+      );
 
-    function renderRekapKelas(
-      report
+
+    const result =
+      await response.json();
+
+
+    if (
+      !response.ok ||
+      !result.success
     ) {
 
-      document
-        .getElementById(
-          "judulRekap"
-        )
-        .textContent =
-        "Rekap Per Kelas";
-
-
-      document
-        .getElementById(
-          "jumlahData"
-        )
-        .textContent =
-        `${report.kelas.length} kelas`;
-
-
-      let html = "";
-
-      html += `
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>No</th>
-
-              <th>Kelas</th>
-
-              <th>Jumlah Siswa</th>
-
-              <th>Penghargaan</th>
-
-              <th>Pelanggaran</th>
-
-              <th>Poin Bersih</th>
-
-              <th>Transaksi</th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-      `;
-
-
-      if (
-        !report.kelas ||
-        report.kelas.length === 0
-      ) {
-
-        html += `
-          <tr>
-
-            <td
-              colspan="7"
-              class="empty"
-            >
-              Tidak ada data kelas.
-            </td>
-
-          </tr>
-        `;
-
-      }
-      else {
-
-        report.kelas.forEach(
-          function (kelas, index) {
-
-            html += `
-              <tr>
-
-                <td>
-                  ${index + 1}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    kelas.kelas
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    kelas.jumlahSiswa
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    kelas.penghargaan
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    kelas.pelanggaran
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    kelas.total
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    kelas.transaksi
-                  )}
-                </td>
-
-              </tr>
-            `;
-
-          }
-        );
-
-      }
-
-
-      html += `
-          </tbody>
-
-        </table>
-      `;
-
-
-      document
-        .getElementById(
-          "rekapTableWrapper"
-        )
-        .innerHTML =
-        html;
+      throw new Error(
+        result.message ||
+        "Gagal mengambil rekap."
+      );
 
     }
 
 
-    /* =========================================
-       DETAIL TRANSAKSI
-    ========================================== */
-
-    function renderDetailTransaksi(
-      report
-    ) {
-
-      const transaksi =
-        report.transaksi || [];
+    latestReport =
+      result;
 
 
-      document
-        .getElementById(
-          "jumlahTransaksi"
-        )
-        .textContent =
-        `${transaksi.length} transaksi`;
+    renderReport(
+      result
+    );
 
 
-      let html = "";
+    exportXlsBtn.classList.remove(
+      "hidden"
+    );
 
-      html += `
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>Tanggal</th>
-
-              <th>NISN</th>
-
-              <th>Nama</th>
-
-              <th>Kelas</th>
-
-              <th>Jenis</th>
-
-              <th>Poin</th>
-
-              <th>Keterangan</th>
-
-              <th>Dibuat Oleh</th>
-
-              <th>Peran</th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-      `;
+    exportCsvBtn.classList.remove(
+      "hidden"
+    );
 
 
-      if (
-        transaksi.length === 0
-      ) {
+    statusElement.textContent =
+      "Rekap berhasil dibuat.";
+
+  }
+  catch(error) {
+
+    console.error(
+      "REKAP ERROR:",
+      error
+    );
+
+    latestReport = null;
+
+    exportXlsBtn.classList.add(
+      "hidden"
+    );
+
+    exportCsvBtn.classList.add(
+      "hidden"
+    );
+
+    statusElement.textContent =
+      error.message ||
+      "Gagal membuat rekap.";
+
+    alert(
+      error.message ||
+      "Gagal membuat rekap."
+    );
+
+  }
+  finally {
+
+    tampilkanBtn.disabled =
+      false;
+
+    tampilkanBtn.textContent =
+      "📊 Tampilkan Rekap";
+
+  }
+
+}
+
+
+/* =========================================================
+   RENDER REPORT
+========================================================= */
+
+function renderReport(report) {
+
+  document
+    .getElementById("ringkasanCard")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("rekapCard")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("detailCard")
+    .classList.remove("hidden");
+
+
+  document
+    .getElementById("periodeText")
+    .textContent =
+    `${formatTanggal(report.periode.mulai)} s/d ${formatTanggal(report.periode.akhir)}`;
+
+
+  document
+    .getElementById("jumlahSiswa")
+    .textContent =
+    numberValue(
+      report.ringkasan.jumlahSiswa
+    );
+
+
+  document
+    .getElementById("totalPenghargaan")
+    .textContent =
+    numberValue(
+      report.ringkasan.totalPenghargaan
+    );
+
+
+  document
+    .getElementById("totalPelanggaran")
+    .textContent =
+    numberValue(
+      report.ringkasan.totalPelanggaran
+    );
+
+
+  document
+    .getElementById("totalBersih")
+    .textContent =
+    numberValue(
+      report.ringkasan.totalBersih
+    );
+
+
+  if (report.tipe === "kelas") {
+
+    renderRekapKelas(report);
+
+  }
+  else {
+
+    renderRekapSiswa(report);
+
+  }
+
+
+  renderDetailTransaksi(report);
+
+  renderChart(report);
+
+}
+
+
+/* =========================================================
+   REKAP SISWA
+========================================================= */
+
+function renderRekapSiswa(report) {
+
+  document
+    .getElementById("judulRekap")
+    .textContent =
+    report.tipe === "siswa"
+      ? "Rekap Per Siswa"
+      : "Rekap Satu Sekolah";
+
+
+  document
+    .getElementById("jumlahData")
+    .textContent =
+    `${report.siswa.length} siswa`;
+
+
+  let html = `
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>No</th>
+          <th>NISN</th>
+          <th>Nama</th>
+          <th>Kelas</th>
+          <th>Penghargaan</th>
+          <th>Pelanggaran</th>
+          <th>Poin Bersih</th>
+          <th>Transaksi</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+  `;
+
+
+  if (
+    !report.siswa ||
+    report.siswa.length === 0
+  ) {
+
+    html += `
+      <tr>
+        <td
+          colspan="8"
+          class="empty"
+        >
+          Tidak ada data siswa.
+        </td>
+      </tr>
+    `;
+
+  }
+  else {
+
+    report.siswa.forEach(
+      function(siswa,index) {
 
         html += `
           <tr>
 
-            <td
-              colspan="9"
-              class="empty"
-            >
-              Tidak ada transaksi
-              pada periode tersebut.
+            <td>
+              ${index + 1}
+            </td>
+
+            <td>
+              ${escapeHtml(siswa.nisn)}
+            </td>
+
+            <td>
+              ${escapeHtml(siswa.nama)}
+            </td>
+
+            <td>
+              ${escapeHtml(siswa.kelas)}
+            </td>
+
+            <td>
+              ${numberValue(siswa.penghargaan)}
+            </td>
+
+            <td>
+              ${numberValue(siswa.pelanggaran)}
+            </td>
+
+            <td>
+              ${numberValue(siswa.total)}
+            </td>
+
+            <td>
+              ${numberValue(siswa.transaksi)}
             </td>
 
           </tr>
         `;
 
       }
-      else {
+    );
 
-        transaksi.forEach(
-          function (item) {
-
-            html += `
-              <tr>
-
-                <td>
-                  ${formatTanggal(
-                    item.tanggal
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    item.nisn
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    item.nama
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    item.kelas
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    item.jenis
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    item.poin
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    item.keterangan
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    item.dibuatOleh ||
-                    "-"
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    item.peran ||
-                    "-"
-                  )}
-                </td>
-
-              </tr>
-            `;
-
-          }
-        );
-
-      }
+  }
 
 
-      html += `
-          </tbody>
-
-        </table>
-      `;
-
-
-      document
-        .getElementById(
-          "detailTableWrapper"
-        )
-        .innerHTML =
-        html;
-
-    }
+  html += `
+      </tbody>
+    </table>
+  `;
 
 
-\n    /* =========================================\n       GRAFIK REKAP\n       Grafik dibuat dengan SVG agar ikut tercetak\n       dengan baik melalui window.print().\n    ========================================== */\n\n    function renderChart(report) {\n\n      chartCard.classList.remove("hidden");\n\n      let rows = [];\n\n      if (report.tipe === "kelas") {\n        rows = (report.kelas || []).map(function (item) {\n          return {\n            label: item.kelas || "-",\n            penghargaan: numberValue(item.penghargaan),\n            pelanggaran: numberValue(item.pelanggaran)\n          };\n        });\n\n        chartTitle.textContent = "Grafik Poin Per Kelas";\n        chartSubtitle.textContent =\n          "Perbandingan total penghargaan dan pelanggaran setiap kelas.";\n      } else if (report.tipe === "siswa") {\n        rows = (report.siswa || []).map(function (item) {\n          return {\n            label: item.nama || "-",\n            penghargaan: numberValue(item.penghargaan),\n            pelanggaran: numberValue(item.pelanggaran)\n          };\n        });\n\n        chartTitle.textContent = "Grafik Poin Siswa";\n        chartSubtitle.textContent =\n          "Perbandingan penghargaan dan pelanggaran siswa yang dipilih.";\n      } else {\n        rows = (report.siswa || []).map(function (item) {\n          return {\n            label: item.nama || "-",\n            penghargaan: numberValue(item.penghargaan),\n            pelanggaran: numberValue(item.pelanggaran)\n          };\n        });\n\n        chartTitle.textContent = "Grafik Poin Satu Sekolah";\n        chartSubtitle.textContent =\n          "Perbandingan penghargaan dan pelanggaran seluruh siswa.";\n      }\n\n      if (!rows.length) {\n        chartWrap.innerHTML =\n          '<div class="empty">Tidak ada data untuk ditampilkan pada grafik.</div>';\n        return;\n      }\n\n      // Agar grafik sekolah tidak terlalu penuh, tampilkan siswa yang memiliki\n      // total aktivitas terbesar. Tabel tetap menampilkan seluruh siswa.\n      if (report.tipe === "sekolah" && rows.length > 20) {\n        rows = rows\n          .slice()\n          .sort(function (a, b) {\n            return (b.penghargaan + b.pelanggaran) -\n                   (a.penghargaan + a.pelanggaran);\n          })\n          .slice(0, 20);\n\n        chartSubtitle.textContent +=\n          " Menampilkan maksimal 20 siswa dengan aktivitas poin terbanyak.";\n      }\n\n      const maxValue = Math.max(\n        1,\n        ...rows.map(function (item) {\n          return Math.max(item.penghargaan, item.pelanggaran);\n        })\n      );\n\n      const width = 1000;\n      const height = 300;\n      const left = 55;\n      const right = 20;\n      const top = 20;\n      const bottom = 58;\n      const chartHeight = height - top - bottom;\n      const chartWidth = width - left - right;\n      const groupWidth = chartWidth / rows.length;\n      const barWidth = Math.max(5, Math.min(22, groupWidth * 0.28));\n      const gap = Math.max(2, groupWidth * 0.05);\n\n      let svg = '';\n      svg += '<svg class="chart-svg" viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Grafik rekap poin">';\n\n      // Grid horizontal.\n      for (let i = 0; i <= 4; i++) {\n        const value = Math.round(maxValue * (i / 4));\n        const y = top + chartHeight - (chartHeight * (i / 4));\n\n        svg += '<line class="chart-grid-line" x1="' + left + '" y1="' + y +\n               '" x2="' + (width - right) + '" y2="' + y + '"></line>';\n\n        svg += '<text class="chart-label" x="' + (left - 8) +\n               '" y="' + (y + 4) + '" text-anchor="end">' +\n               escapeHtml(value) + '</text>';\n      }\n\n      svg += '<line class="chart-axis" x1="' + left + '" y1="' + (top + chartHeight) +\n             '" x2="' + (width - right) + '" y2="' + (top + chartHeight) + '"></line>';\n\n      rows.forEach(function (item, index) {\n        const center = left + (groupWidth * index) + (groupWidth / 2);\n        const rewardHeight = (item.penghargaan / maxValue) * chartHeight;\n        const violationHeight = (item.pelanggaran / maxValue) * chartHeight;\n\n        const rewardX = center - barWidth - (gap / 2);\n        const violationX = center + (gap / 2);\n        const rewardY = top + chartHeight - rewardHeight;\n        const violationY = top + chartHeight - violationHeight;\n\n        svg += '<rect class="chart-bar-reward" x="' + rewardX +\n               '" y="' + rewardY + '" width="' + barWidth +\n               '" height="' + Math.max(0, rewardHeight) + '" rx="3"></rect>';\n\n        svg += '<rect class="chart-bar-violation" x="' + violationX +\n               '" y="' + violationY + '" width="' + barWidth +\n               '" height="' + Math.max(0, violationHeight) + '" rx="3"></rect>';\n\n        if (item.penghargaan > 0) {\n          svg += '<text class="chart-value" x="' + (rewardX + barWidth / 2) +\n                 '" y="' + Math.max(12, rewardY - 5) +\n                 '" text-anchor="middle">' + item.penghargaan + '</text>';\n        }\n\n        if (item.pelanggaran > 0) {\n          svg += '<text class="chart-value" x="' + (violationX + barWidth / 2) +\n                 '" y="' + Math.max(12, violationY - 5) +\n                 '" text-anchor="middle">' + item.pelanggaran + '</text>';\n        }\n\n        let label = String(item.label || "-");\n        if (label.length > 16) {\n          label = label.slice(0, 15) + "…";\n        }\n\n        svg += '<text class="chart-label" x="' + center +\n               '" y="' + (height - 30) +\n               '" text-anchor="middle">' + escapeHtml(label) + '</text>';\n      });\n\n      svg += '</svg>';\n\n      chartWrap.innerHTML = svg;\n    }\n\n    /* =========================================
-       TARGET EXPORT
-    ========================================== */
+  document
+    .getElementById("rekapTableWrapper")
+    .innerHTML =
+    html;
 
-    function getTargetName() {
-
-      if (!latestReport) {
-
-        return "rekap";
-
-      }
+}
 
 
-      if (
-        latestReport.tipe ===
-        "siswa"
-      ) {
+/* =========================================================
+   REKAP KELAS
+========================================================= */
 
-        const siswa =
-          daftarSiswa.find(
-            function (item) {
+function renderRekapKelas(report) {
 
-              return String(
-                item.id
-              ) === String(
-                siswaSelect.value
-              );
-
-            }
-          );
+  document
+    .getElementById("judulRekap")
+    .textContent =
+    "Rekap Per Kelas";
 
 
-        return siswa
-          ? siswa.nama
-          : "siswa";
+  document
+    .getElementById("jumlahData")
+    .textContent =
+    `${report.kelas.length} kelas`;
+
+
+  let html = `
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>No</th>
+          <th>Kelas</th>
+          <th>Jumlah Siswa</th>
+          <th>Penghargaan</th>
+          <th>Pelanggaran</th>
+          <th>Poin Bersih</th>
+          <th>Transaksi</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+  `;
+
+
+  if (
+    !report.kelas ||
+    report.kelas.length === 0
+  ) {
+
+    html += `
+      <tr>
+
+        <td
+          colspan="7"
+          class="empty"
+        >
+          Tidak ada data kelas.
+        </td>
+
+      </tr>
+    `;
+
+  }
+  else {
+
+    report.kelas.forEach(
+      function(kelas,index) {
+
+        html += `
+          <tr>
+
+            <td>
+              ${index + 1}
+            </td>
+
+            <td>
+              ${escapeHtml(kelas.kelas)}
+            </td>
+
+            <td>
+              ${numberValue(kelas.jumlahSiswa)}
+            </td>
+
+            <td>
+              ${numberValue(kelas.penghargaan)}
+            </td>
+
+            <td>
+              ${numberValue(kelas.pelanggaran)}
+            </td>
+
+            <td>
+              ${numberValue(kelas.total)}
+            </td>
+
+            <td>
+              ${numberValue(kelas.transaksi)}
+            </td>
+
+          </tr>
+        `;
 
       }
+    );
+
+  }
 
 
-      if (
-        latestReport.tipe ===
-        "kelas"
-      ) {
-
-        const kelas =
-          daftarKelas.find(
-            function (item) {
-
-              return String(
-                item.id
-              ) === String(
-                kelasSelect.value
-              );
-
-            }
-          );
+  html += `
+      </tbody>
+    </table>
+  `;
 
 
-        return kelas
-          ? (
-              kelas.nama_kelas ||
-              kelas.nama ||
-              "kelas"
+  document
+    .getElementById("rekapTableWrapper")
+    .innerHTML =
+    html;
+
+}
+
+
+/* =========================================================
+   DETAIL TRANSAKSI
+========================================================= */
+
+function renderDetailTransaksi(report) {
+
+  const transaksi =
+    report.transaksi || [];
+
+
+  document
+    .getElementById("jumlahTransaksi")
+    .textContent =
+    `${transaksi.length} transaksi`;
+
+
+  let html = `
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Tanggal</th>
+          <th>NISN</th>
+          <th>Nama</th>
+          <th>Kelas</th>
+          <th>Jenis</th>
+          <th>Poin</th>
+          <th>Keterangan</th>
+          <th>Dibuat Oleh</th>
+          <th>Peran</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+  `;
+
+
+  if (transaksi.length === 0) {
+
+    html += `
+      <tr>
+
+        <td
+          colspan="9"
+          class="empty"
+        >
+          Tidak ada transaksi
+          pada periode tersebut.
+        </td>
+
+      </tr>
+    `;
+
+  }
+  else {
+
+    transaksi.forEach(
+      function(item) {
+
+        html += `
+          <tr>
+
+            <td>
+              ${formatTanggal(item.tanggal)}
+            </td>
+
+            <td>
+              ${escapeHtml(item.nisn)}
+            </td>
+
+            <td>
+              ${escapeHtml(item.nama)}
+            </td>
+
+            <td>
+              ${escapeHtml(item.kelas)}
+            </td>
+
+            <td>
+              ${escapeHtml(item.jenis)}
+            </td>
+
+            <td>
+              ${numberValue(item.poin)}
+            </td>
+
+            <td>
+              ${escapeHtml(item.keterangan)}
+            </td>
+
+            <td>
+              ${escapeHtml(item.dibuatOleh || "-")}
+            </td>
+
+            <td>
+              ${escapeHtml(item.peran || "-")}
+            </td>
+
+          </tr>
+        `;
+
+      }
+    );
+
+  }
+
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+
+  document
+    .getElementById("detailTableWrapper")
+    .innerHTML =
+    html;
+
+}
+
+
+/* =========================================================
+   GRAFIK REKAP
+   SVG digunakan supaya grafik ikut tercetak.
+========================================================= */
+
+function renderChart(report) {
+
+  chartCard.classList.remove(
+    "hidden"
+  );
+
+
+  let rows = [];
+
+
+  /* ---------- PER KELAS ---------- */
+
+  if (report.tipe === "kelas") {
+
+    rows =
+      (report.kelas || [])
+      .map(function(item) {
+
+        return {
+          label:
+            item.kelas || "-",
+
+          penghargaan:
+            numberValue(
+              item.penghargaan
+            ),
+
+          pelanggaran:
+            numberValue(
+              item.pelanggaran
             )
-          : "kelas";
+        };
 
-      }
-
-
-      return "sekolah";
-
-    }
+      });
 
 
-    /* =========================================
-       NAMA FILE
-    ========================================== */
+    chartTitle.textContent =
+      "Grafik Poin Per Kelas";
 
-    function sanitizeFileName(
-      value
-    ) {
+    chartSubtitle.textContent =
+      "Perbandingan penghargaan dan pelanggaran setiap kelas.";
 
-      return String(
-        value || ""
+  }
+
+
+  /* ---------- PER SISWA ---------- */
+
+  else if (report.tipe === "siswa") {
+
+    rows =
+      (report.siswa || [])
+      .map(function(item) {
+
+        return {
+          label:
+            item.nama || "-",
+
+          penghargaan:
+            numberValue(
+              item.penghargaan
+            ),
+
+          pelanggaran:
+            numberValue(
+              item.pelanggaran
+            )
+        };
+
+      });
+
+
+    chartTitle.textContent =
+      "Grafik Poin Siswa";
+
+    chartSubtitle.textContent =
+      "Perbandingan penghargaan dan pelanggaran siswa yang dipilih.";
+
+  }
+
+
+  /* ---------- SATU SEKOLAH ---------- */
+
+  else {
+
+    rows =
+      (report.kelas || [])
+      .map(function(item) {
+
+        return {
+          label:
+            item.kelas || "-",
+
+          penghargaan:
+            numberValue(
+              item.penghargaan
+            ),
+
+          pelanggaran:
+            numberValue(
+              item.pelanggaran
+            )
+        };
+
+      });
+
+
+    chartTitle.textContent =
+      "Grafik Poin Satu Sekolah";
+
+    chartSubtitle.textContent =
+      "Perbandingan penghargaan dan pelanggaran setiap kelas.";
+
+  }
+
+
+  /* ---------- TIDAK ADA DATA ---------- */
+
+  if (!rows.length) {
+
+    chartWrap.innerHTML =
+      `
+        <div class="empty">
+          Tidak ada data untuk ditampilkan pada grafik.
+        </div>
+      `;
+
+    return;
+
+  }
+
+
+  /* ---------- NILAI MAKSIMUM ---------- */
+
+  const maxValue =
+    Math.max(
+      1,
+      ...rows.map(function(item) {
+
+        return Math.max(
+          item.penghargaan,
+          item.pelanggaran
+        );
+
+      })
+    );
+
+
+  /* ---------- UKURAN ---------- */
+
+  const width = 1000;
+  const height = 320;
+
+  const left = 60;
+  const right = 25;
+  const top = 25;
+  const bottom = 65;
+
+  const chartHeight =
+    height -
+    top -
+    bottom;
+
+  const chartWidth =
+    width -
+    left -
+    right;
+
+  const groupWidth =
+    chartWidth /
+    rows.length;
+
+  const barWidth =
+    Math.max(
+      6,
+      Math.min(
+        24,
+        groupWidth * .25
       )
-        .trim()
-        .replace(
-          /[^a-zA-Z0-9_-]+/g,
-          "-"
-        )
-        .replace(
-          /^-+|-+$/g,
-          ""
-        )
-        .toLowerCase() ||
-        "rekap";
+    );
 
-    }
+  const gap =
+    Math.max(
+      3,
+      groupWidth * .06
+    );
 
 
-    /* =========================================
-       DOWNLOAD
-    ========================================== */
+  /* ---------- SVG ---------- */
 
-    function downloadBlob(
-      blob,
-      filename
-    ) {
+  let svg = "";
 
-      const url =
-        URL.createObjectURL(
-          blob
-        );
+  svg +=
+    `<svg
+      class="chart-svg"
+      viewBox="0 0 ${width} ${height}"
+      role="img"
+      aria-label="Grafik rekap poin"
+    >`;
 
 
-      const link =
-        document.createElement(
-          "a"
-        );
+  /* ---------- GRID ---------- */
 
+  for (
+    let i = 0;
+    i <= 4;
+    i++
+  ) {
 
-      link.href =
-        url;
+    const percentage =
+      i / 4;
 
-      link.download =
-        filename;
+    const value =
+      Math.round(
+        maxValue *
+        percentage
+      );
 
-
-      document.body.appendChild(
-        link
+    const y =
+      top +
+      chartHeight -
+      (
+        chartHeight *
+        percentage
       );
 
 
-      link.click();
+    svg +=
+      `<line
+        class="chart-grid-line"
+        x1="${left}"
+        y1="${y}"
+        x2="${width - right}"
+        y2="${y}"
+      ></line>`;
 
 
-      link.remove();
+    svg +=
+      `<text
+        class="chart-label"
+        x="${left - 8}"
+        y="${y + 4}"
+        text-anchor="end"
+      >
+        ${escapeHtml(value)}
+      </text>`;
+
+  }
 
 
-      setTimeout(
-        function () {
+  /* ---------- SUMBU ---------- */
 
-          URL.revokeObjectURL(
-            url
-          );
-
-        },
-        1000
-      );
-
-    }
+  svg +=
+    `<line
+      class="chart-axis"
+      x1="${left}"
+      y1="${top + chartHeight}"
+      x2="${width - right}"
+      y2="${top + chartHeight}"
+    ></line>`;
 
 
-    /* =========================================
-       CSV CELL
-    ========================================== */
+  /* ---------- BAR ---------- */
 
-    function csvCell(
-      value
-    ) {
+  rows.forEach(
+    function(item,index) {
 
-      const text =
-        String(
-          value ?? ""
-        );
-
-
-      return (
-        '"' +
-        text.replace(
-          /"/g,
-          '""'
+      const center =
+        left +
+        (
+          groupWidth *
+          index
         ) +
-        '"'
-      );
-
-    }
-
-
-    function csvRow(
-      values
-    ) {
-
-      return values
-        .map(
-          csvCell
-        )
-        .join(",");
-
-    }
+        (
+          groupWidth / 2
+        );
 
 
-    /* =========================================
-       BUAT CSV
-    ========================================== */
-
-    function buildCSV() {
-
-      const report =
-        latestReport;
+      const rewardHeight =
+        (
+          item.penghargaan /
+          maxValue
+        ) *
+        chartHeight;
 
 
-      const rows = [];
+      const violationHeight =
+        (
+          item.pelanggaran /
+          maxValue
+        ) *
+        chartHeight;
 
 
-      /* JUDUL */
-
-      rows.push([
-        "REKAP POIN LENTERA SMANTI"
-      ]);
-
-
-      rows.push([
-        "Periode Mulai",
-        report.periode.mulai
-      ]);
+      const rewardX =
+        center -
+        barWidth -
+        (gap / 2);
 
 
-      rows.push([
-        "Periode Akhir",
-        report.periode.akhir
-      ]);
+      const violationX =
+        center +
+        (gap / 2);
 
 
-      rows.push([
-        "Jenis Rekap",
-        report.tipe === "siswa"
-          ? "Per Siswa"
-          : report.tipe === "kelas"
-            ? "Per Kelas"
-            : "Satu Sekolah"
-      ]);
+      const rewardY =
+        top +
+        chartHeight -
+        rewardHeight;
 
 
-      rows.push([
-        "Target",
-        getTargetName()
-      ]);
+      const violationY =
+        top +
+        chartHeight -
+        violationHeight;
 
 
-      rows.push([]);
+      /* PENGHARGAAN */
+
+      svg +=
+        `<rect
+          class="chart-bar-reward"
+          x="${rewardX}"
+          y="${rewardY}"
+          width="${barWidth}"
+          height="${Math.max(
+            0,
+            rewardHeight
+          )}"
+          rx="3"
+        ></rect>`;
 
 
-      /* RINGKASAN */
+      /* PELANGGARAN */
 
-      rows.push([
-        "RINGKASAN"
-      ]);
-
-
-      rows.push([
-        "Jumlah Siswa",
-        report.ringkasan.jumlahSiswa
-      ]);
-
-
-      rows.push([
-        "Total Penghargaan",
-        report.ringkasan.totalPenghargaan
-      ]);
+      svg +=
+        `<rect
+          class="chart-bar-violation"
+          x="${violationX}"
+          y="${violationY}"
+          width="${barWidth}"
+          height="${Math.max(
+            0,
+            violationHeight
+          )}"
+          rx="3"
+        ></rect>`;
 
 
-      rows.push([
-        "Total Pelanggaran",
-        report.ringkasan.totalPelanggaran
-      ]);
-
-
-      rows.push([
-        "Poin Bersih",
-        report.ringkasan.totalBersih
-      ]);
-
-
-      rows.push([
-        "Total Transaksi",
-        report.ringkasan.totalTransaksi
-      ]);
-
-
-      rows.push([]);
-
-
-      /* REKAP */
+      /* NILAI PENGHARGAAN */
 
       if (
-        report.tipe ===
-        "kelas"
+        item.penghargaan > 0
       ) {
 
-        rows.push([
-          "REKAP PER KELAS"
-        ]);
-
-
-        rows.push([
-          "Kelas",
-          "Jumlah Siswa",
-          "Penghargaan",
-          "Pelanggaran",
-          "Poin Bersih",
-          "Transaksi"
-        ]);
-
-
-        (
-          report.kelas || []
-        ).forEach(
-          function (item) {
-
-            rows.push([
-
-              item.kelas,
-
-              item.jumlahSiswa,
-
-              item.penghargaan,
-
-              item.pelanggaran,
-
-              item.total,
-
-              item.transaksi
-
-            ]);
-
-          }
-        );
+        svg +=
+          `<text
+            class="chart-value"
+            x="${rewardX + barWidth / 2}"
+            y="${Math.max(
+              14,
+              rewardY - 6
+            )}"
+            text-anchor="middle"
+          >
+            ${item.penghargaan}
+          </text>`;
 
       }
-      else {
+
+
+      /* NILAI PELANGGARAN */
+
+      if (
+        item.pelanggaran > 0
+      ) {
+
+        svg +=
+          `<text
+            class="chart-value"
+            x="${violationX + barWidth / 2}"
+            y="${Math.max(
+              14,
+              violationY - 6
+            )}"
+            text-anchor="middle"
+          >
+            ${item.pelanggaran}
+          </text>`;
+
+      }
+
+
+      /* LABEL */
+
+      let label =
+        String(
+          item.label || "-"
+        );
+
+
+      if (
+        label.length > 16
+      ) {
+
+        label =
+          label.substring(
+            0,
+            15
+          ) +
+          "…";
+
+      }
+
+
+      svg +=
+        `<text
+          class="chart-label"
+          x="${center}"
+          y="${height - 30}"
+          text-anchor="middle"
+        >
+          ${escapeHtml(label)}
+        </text>`;
+
+    }
+  );
+
+
+  svg += "</svg>";
+
+
+  chartWrap.innerHTML =
+    svg;
+
+}
+
+
+/* =========================================================
+   TARGET EXPORT
+========================================================= */
+
+function getTargetName() {
+
+  if (!latestReport) {
+    return "rekap";
+  }
+
+
+  if (
+    latestReport.tipe ===
+    "siswa"
+  ) {
+
+    const siswa =
+      daftarSiswa.find(
+        function(item) {
+
+          return String(item.id) ===
+            String(siswaSelect.value);
+
+        }
+      );
+
+
+    return siswa
+      ? siswa.nama
+      : "siswa";
+
+  }
+
+
+  if (
+    latestReport.tipe ===
+    "kelas"
+  ) {
+
+    const kelas =
+      daftarKelas.find(
+        function(item) {
+
+          return String(item.id) ===
+            String(kelasSelect.value);
+
+        }
+      );
+
+
+    return kelas
+      ? (
+          kelas.nama_kelas ||
+          kelas.nama ||
+          "kelas"
+        )
+      : "kelas";
+
+  }
+
+
+  return "sekolah";
+
+}
+
+
+/* =========================================================
+   SANITIZE FILE NAME
+========================================================= */
+
+function sanitizeFileName(value) {
+
+  return String(
+    value || ""
+  )
+  .trim()
+  .replace(
+    /[^a-zA-Z0-9_-]+/g,
+    "-"
+  )
+  .replace(
+    /^-+|-+$/g,
+    ""
+  )
+  .toLowerCase() ||
+  "rekap";
+
+}
+
+
+/* =========================================================
+   DOWNLOAD
+========================================================= */
+
+function downloadBlob(
+  blob,
+  filename
+) {
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  const link =
+    document.createElement("a");
+
+
+  link.href = url;
+
+  link.download =
+    filename;
+
+
+  document.body.appendChild(
+    link
+  );
+
+
+  link.click();
+
+
+  link.remove();
+
+
+  setTimeout(
+    function() {
+
+      URL.revokeObjectURL(
+        url
+      );
+
+    },
+    1000
+  );
+
+}
+
+
+/* =========================================================
+   CSV
+========================================================= */
+
+function csvCell(value) {
+
+  const text =
+    String(
+      value ?? ""
+    );
+
+  return (
+    '"' +
+    text.replace(
+      /"/g,
+      '""'
+    ) +
+    '"'
+  );
+
+}
+
+
+function csvRow(values) {
+
+  return values
+    .map(csvCell)
+    .join(",");
+
+}
+
+
+/* =========================================================
+   BUILD CSV
+========================================================= */
+
+function buildCSV() {
+
+  const report =
+    latestReport;
+
+  const rows = [];
+
+
+  rows.push([
+    "REKAP POIN LENTERA SMANTI"
+  ]);
+
+
+  rows.push([
+    "Periode Mulai",
+    report.periode.mulai
+  ]);
+
+
+  rows.push([
+    "Periode Akhir",
+    report.periode.akhir
+  ]);
+
+
+  rows.push([
+    "Jenis Rekap",
+    report.tipe === "siswa"
+      ? "Per Siswa"
+      : report.tipe === "kelas"
+        ? "Per Kelas"
+        : "Satu Sekolah"
+  ]);
+
+
+  rows.push([
+    "Target",
+    getTargetName()
+  ]);
+
+
+  rows.push([]);
+
+
+  rows.push([
+    "RINGKASAN"
+  ]);
+
+
+  rows.push([
+    "Jumlah Siswa",
+    report.ringkasan.jumlahSiswa
+  ]);
+
+
+  rows.push([
+    "Total Penghargaan",
+    report.ringkasan.totalPenghargaan
+  ]);
+
+
+  rows.push([
+    "Total Pelanggaran",
+    report.ringkasan.totalPelanggaran
+  ]);
+
+
+  rows.push([
+    "Poin Bersih",
+    report.ringkasan.totalBersih
+  ]);
+
+
+  rows.push([
+    "Total Transaksi",
+    report.ringkasan.totalTransaksi
+  ]);
+
+
+  rows.push([]);
+
+
+  if (
+    report.tipe ===
+    "kelas"
+  ) {
+
+    rows.push([
+      "REKAP PER KELAS"
+    ]);
+
+
+    rows.push([
+      "Kelas",
+      "Jumlah Siswa",
+      "Penghargaan",
+      "Pelanggaran",
+      "Poin Bersih",
+      "Transaksi"
+    ]);
+
+
+    (
+      report.kelas || []
+    ).forEach(
+      function(item) {
 
         rows.push([
+          item.kelas,
+          item.jumlahSiswa,
+          item.penghargaan,
+          item.pelanggaran,
+          item.total,
+          item.transaksi
+        ]);
 
+      }
+    );
+
+  }
+  else {
+
+    rows.push([
+      report.tipe === "siswa"
+        ? "REKAP PER SISWA"
+        : "REKAP SATU SEKOLAH"
+    ]);
+
+
+    rows.push([
+      "NISN",
+      "Nama",
+      "Kelas",
+      "Penghargaan",
+      "Pelanggaran",
+      "Poin Bersih",
+      "Transaksi"
+    ]);
+
+
+    (
+      report.siswa || []
+    ).forEach(
+      function(item) {
+
+        rows.push([
+          item.nisn,
+          item.nama,
+          item.kelas,
+          item.penghargaan,
+          item.pelanggaran,
+          item.total,
+          item.transaksi
+        ]);
+
+      }
+    );
+
+  }
+
+
+  rows.push([]);
+
+
+  rows.push([
+    "DETAIL TRANSAKSI"
+  ]);
+
+
+  rows.push([
+    "Tanggal",
+    "NISN",
+    "Nama",
+    "Kelas",
+    "Jenis",
+    "Poin",
+    "Keterangan",
+    "Dibuat Oleh",
+    "Peran"
+  ]);
+
+
+  (
+    report.transaksi || []
+  ).forEach(
+    function(item) {
+
+      rows.push([
+        item.tanggal,
+        item.nisn,
+        item.nama,
+        item.kelas,
+        item.jenis,
+        item.poin,
+        item.keterangan,
+        item.dibuatOleh,
+        item.peran
+      ]);
+
+    }
+  );
+
+
+  return (
+    "\uFEFF" +
+    rows
+      .map(csvRow)
+      .join("\r\n")
+  );
+
+}
+
+
+/* =========================================================
+   EXPORT CSV
+========================================================= */
+
+function exportCSV() {
+
+  if (!latestReport) {
+
+    alert(
+      "Tampilkan rekap terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+
+  const target =
+    sanitizeFileName(
+      getTargetName()
+    );
+
+
+  const filename =
+    `rekap-poin-${target}-${latestReport.periode.mulai}-${latestReport.periode.akhir}.csv`;
+
+
+  const csv =
+    buildCSV();
+
+
+  const blob =
+    new Blob(
+      [csv],
+      {
+        type:
+          "text/csv;charset=utf-8"
+      }
+    );
+
+
+  downloadBlob(
+    blob,
+    filename
+  );
+
+}
+
+
+/* =========================================================
+   BUILD XLS
+========================================================= */
+
+function buildXLS() {
+
+  const report =
+    latestReport;
+
+  let html = "";
+
+
+  html += `
+    <!DOCTYPE html>
+
+    <html>
+
+    <head>
+
+      <meta charset="UTF-8">
+
+      <style>
+
+        body {
+          font-family: Arial, sans-serif;
+        }
+
+        h1 {
+          font-size: 20px;
+        }
+
+        h2 {
+          font-size: 15px;
+          background: #1c2541;
+          color: #fff;
+          padding: 7px;
+        }
+
+        table {
+          border-collapse: collapse;
+          margin-bottom: 25px;
+        }
+
+        th,
+        td {
+          border: 1px solid #999;
+          padding: 7px;
+        }
+
+        th {
+          background: #fbc02d;
+          color: #000;
+          font-weight: bold;
+        }
+
+      </style>
+
+    </head>
+
+    <body>
+
+      <h1>
+        REKAP POIN LENTERA SMANTI
+      </h1>
+
+      <p>
+        <b>Periode:</b>
+        ${escapeXml(report.periode.mulai)}
+        s/d
+        ${escapeXml(report.periode.akhir)}
+      </p>
+
+      <p>
+        <b>Jenis Rekap:</b>
+        ${
+          report.tipe === "siswa"
+            ? "Per Siswa"
+            : report.tipe === "kelas"
+              ? "Per Kelas"
+              : "Satu Sekolah"
+        }
+      </p>
+
+      <p>
+        <b>Target:</b>
+        ${escapeXml(getTargetName())}
+      </p>
+  `;
+
+
+  /* ================= RINGKASAN ================= */
+
+  html += `
+
+    <h2>
+      RINGKASAN
+    </h2>
+
+    <table>
+
+      <tr>
+
+        <th>Jumlah Siswa</th>
+        <th>Total Penghargaan</th>
+        <th>Total Pelanggaran</th>
+        <th>Poin Bersih</th>
+        <th>Total Transaksi</th>
+
+      </tr>
+
+      <tr>
+
+        <td>
+          ${numberValue(
+            report.ringkasan.jumlahSiswa
+          )}
+        </td>
+
+        <td>
+          ${numberValue(
+            report.ringkasan.totalPenghargaan
+          )}
+        </td>
+
+        <td>
+          ${numberValue(
+            report.ringkasan.totalPelanggaran
+          )}
+        </td>
+
+        <td>
+          ${numberValue(
+            report.ringkasan.totalBersih
+          )}
+        </td>
+
+        <td>
+          ${numberValue(
+            report.ringkasan.totalTransaksi
+          )}
+        </td>
+
+      </tr>
+
+    </table>
+
+  `;
+
+
+  /* ================= KELAS ================= */
+
+  if (
+    report.tipe ===
+    "kelas"
+  ) {
+
+    html += `
+
+      <h2>
+        REKAP PER KELAS
+      </h2>
+
+      <table>
+
+        <tr>
+
+          <th>Kelas</th>
+          <th>Jumlah Siswa</th>
+          <th>Penghargaan</th>
+          <th>Pelanggaran</th>
+          <th>Poin Bersih</th>
+          <th>Transaksi</th>
+
+        </tr>
+
+    `;
+
+
+    (
+      report.kelas || []
+    ).forEach(
+      function(item) {
+
+        html += `
+
+          <tr>
+
+            <td>
+              ${escapeXml(item.kelas)}
+            </td>
+
+            <td>
+              ${numberValue(item.jumlahSiswa)}
+            </td>
+
+            <td>
+              ${numberValue(item.penghargaan)}
+            </td>
+
+            <td>
+              ${numberValue(item.pelanggaran)}
+            </td>
+
+            <td>
+              ${numberValue(item.total)}
+            </td>
+
+            <td>
+              ${numberValue(item.transaksi)}
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    );
+
+
+    html += `
+      </table>
+    `;
+
+  }
+
+
+  /* ================= SISWA / SEKOLAH ================= */
+
+  else {
+
+    html += `
+
+      <h2>
+        ${
           report.tipe === "siswa"
             ? "REKAP PER SISWA"
             : "REKAP SATU SEKOLAH"
-
-        ]);
-
-
-        rows.push([
-
-          "NISN",
-          "Nama",
-          "Kelas",
-          "Penghargaan",
-          "Pelanggaran",
-          "Poin Bersih",
-          "Transaksi"
-
-        ]);
-
-
-        (
-          report.siswa || []
-        ).forEach(
-          function (item) {
-
-            rows.push([
-
-              item.nisn,
-
-              item.nama,
-
-              item.kelas,
-
-              item.penghargaan,
-
-              item.pelanggaran,
-
-              item.total,
-
-              item.transaksi
-
-            ]);
-
-          }
-        );
-
-      }
-
-
-      rows.push([]);
-
-
-      /* DETAIL */
-
-      rows.push([
-        "DETAIL TRANSAKSI"
-      ]);
-
-
-      rows.push([
-
-        "Tanggal",
-        "NISN",
-        "Nama",
-        "Kelas",
-        "Jenis",
-        "Poin",
-        "Keterangan",
-        "Dibuat Oleh",
-        "Peran"
-
-      ]);
-
-
-      (
-        report.transaksi || []
-      ).forEach(
-        function (item) {
-
-          rows.push([
-
-            item.tanggal,
-
-            item.nisn,
-
-            item.nama,
-
-            item.kelas,
-
-            item.jenis,
-
-            item.poin,
-
-            item.keterangan,
-
-            item.dibuatOleh,
-
-            item.peran
-
-          ]);
-
         }
-      );
+      </h2>
 
+      <table>
 
-      return (
-        "\uFEFF" +
-        rows
-          .map(csvRow)
-          .join("\r\n")
-      );
+        <tr>
 
-    }
+          <th>NISN</th>
+          <th>Nama</th>
+          <th>Kelas</th>
+          <th>Penghargaan</th>
+          <th>Pelanggaran</th>
+          <th>Poin Bersih</th>
+          <th>Transaksi</th>
 
+        </tr>
 
-    /* =========================================
-       EXPORT CSV
-    ========================================== */
+    `;
 
-    function exportCSV() {
 
-      if (!latestReport) {
+    (
+      report.siswa || []
+    ).forEach(
+      function(item) {
 
-        alert(
-          "Tampilkan rekap terlebih dahulu."
-        );
-
-        return;
-
-      }
-
-
-      const target =
-        sanitizeFileName(
-          getTargetName()
-        );
-
-
-      const filename =
-        `rekap-poin-${target}-${latestReport.periode.mulai}-${latestReport.periode.akhir}.csv`;
-
-
-      const csv =
-        buildCSV();
-
-
-      const blob =
-        new Blob(
-          [csv],
-          {
-            type:
-              "text/csv;charset=utf-8"
-          }
-        );
-
-
-      downloadBlob(
-        blob,
-        filename
-      );
-
-    }
-
-
-    /* =========================================
-       BUAT XLS
-       
-       XLS menggunakan HTML Spreadsheet
-       yang kompatibel dengan Microsoft Excel.
-    ========================================== */
-
-    function buildXLS() {
-
-      const report =
-        latestReport;
-
-
-      let html = "";
-
-
-      html += `
-        <!DOCTYPE html>
-
-        <html>
-
-        <head>
-
-          <meta charset="UTF-8">
-
-          <style>
-
-            body {
-              font-family: Arial, sans-serif;
-            }
-
-            h1 {
-              font-size: 20px;
-            }
-
-            h2 {
-              font-size: 15px;
-
-              background: #1c2541;
-
-              color: #ffffff;
-
-              padding: 7px;
-            }
-
-            table {
-              border-collapse: collapse;
-
-              margin-bottom: 25px;
-            }
-
-            th,
-            td {
-              border: 1px solid #999999;
-
-              padding: 7px;
-            }
-
-            th {
-              background: #fbc02d;
-
-              color: #000000;
-
-              font-weight: bold;
-            }
-
-            .number {
-              mso-number-format: "0";
-            }
-
-          </style>
-
-        </head>
-
-        <body>
-      `;
-
-
-      /* JUDUL */
-
-      html += `
-        <h1>
-          REKAP POIN LENTERA SMANTI
-        </h1>
-      `;
-
-
-      /* INFORMASI */
-
-      html += `
-        <p>
-
-          <b>
-            Periode:
-          </b>
-
-          ${escapeXml(
-            report.periode.mulai
-          )}
-
-          s/d
-
-          ${escapeXml(
-            report.periode.akhir
-          )}
-
-        </p>
-      `;
-
-
-      html += `
-        <p>
-
-          <b>
-            Jenis Rekap:
-          </b>
-
-          ${
-            report.tipe === "siswa"
-              ? "Per Siswa"
-              : report.tipe === "kelas"
-                ? "Per Kelas"
-                : "Satu Sekolah"
-          }
-
-        </p>
-      `;
-
-
-      html += `
-        <p>
-
-          <b>
-            Target:
-          </b>
-
-          ${escapeXml(
-            getTargetName()
-          )}
-
-        </p>
-      `;
-
-
-      /* =========================================
-         RINGKASAN
-      ========================================== */
-
-      html += `
-        <h2>
-          RINGKASAN
-        </h2>
-
-        <table>
-
-          <tr>
-
-            <th>
-              Jumlah Siswa
-            </th>
-
-            <th>
-              Total Penghargaan
-            </th>
-
-            <th>
-              Total Pelanggaran
-            </th>
-
-            <th>
-              Poin Bersih
-            </th>
-
-            <th>
-              Total Transaksi
-            </th>
-
-          </tr>
+        html += `
 
           <tr>
 
             <td>
-              ${numberValue(
-                report.ringkasan.jumlahSiswa
-              )}
+              ${escapeXml(item.nisn)}
             </td>
 
             <td>
-              ${numberValue(
-                report.ringkasan.totalPenghargaan
-              )}
+              ${escapeXml(item.nama)}
             </td>
 
             <td>
-              ${numberValue(
-                report.ringkasan.totalPelanggaran
-              )}
+              ${escapeXml(item.kelas)}
             </td>
 
             <td>
-              ${numberValue(
-                report.ringkasan.totalBersih
-              )}
+              ${numberValue(item.penghargaan)}
             </td>
 
             <td>
-              ${numberValue(
-                report.ringkasan.totalTransaksi
-              )}
+              ${numberValue(item.pelanggaran)}
+            </td>
+
+            <td>
+              ${numberValue(item.total)}
+            </td>
+
+            <td>
+              ${numberValue(item.transaksi)}
             </td>
 
           </tr>
 
-        </table>
-      `;
-
-
-      /* =========================================
-         REKAP KELAS
-      ========================================== */
-
-      if (
-        report.tipe ===
-        "kelas"
-      ) {
-
-        html += `
-          <h2>
-            REKAP PER KELAS
-          </h2>
-
-          <table>
-
-            <tr>
-
-              <th>
-                Kelas
-              </th>
-
-              <th>
-                Jumlah Siswa
-              </th>
-
-              <th>
-                Penghargaan
-              </th>
-
-              <th>
-                Pelanggaran
-              </th>
-
-              <th>
-                Poin Bersih
-              </th>
-
-              <th>
-                Transaksi
-              </th>
-
-            </tr>
-        `;
-
-
-        (
-          report.kelas || []
-        ).forEach(
-          function (item) {
-
-            html += `
-              <tr>
-
-                <td>
-                  ${escapeXml(
-                    item.kelas
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    item.jumlahSiswa
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    item.penghargaan
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    item.pelanggaran
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    item.total
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    item.transaksi
-                  )}
-                </td>
-
-              </tr>
-            `;
-
-          }
-        );
-
-
-        html += `
-          </table>
         `;
 
       }
+    );
 
 
-      /* =========================================
-         REKAP SISWA / SEKOLAH
-      ========================================== */
+    html += `
+      </table>
+    `;
 
-      else {
-
-        html += `
-          <h2>
-
-            ${
-              report.tipe === "siswa"
-                ? "REKAP PER SISWA"
-                : "REKAP SATU SEKOLAH"
-            }
-
-          </h2>
-
-          <table>
-
-            <tr>
-
-              <th>
-                NISN
-              </th>
-
-              <th>
-                Nama
-              </th>
-
-              <th>
-                Kelas
-              </th>
-
-              <th>
-                Penghargaan
-              </th>
-
-              <th>
-                Pelanggaran
-              </th>
-
-              <th>
-                Poin Bersih
-              </th>
-
-              <th>
-                Transaksi
-              </th>
-
-            </tr>
-        `;
+  }
 
 
-        (
-          report.siswa || []
-        ).forEach(
-          function (item) {
+  /* ================= DETAIL ================= */
 
-            html += `
-              <tr>
+  html += `
 
-                <td>
-                  ${escapeXml(
-                    item.nisn
-                  )}
-                </td>
+    <h2>
+      DETAIL TRANSAKSI
+    </h2>
 
-                <td>
-                  ${escapeXml(
-                    item.nama
-                  )}
-                </td>
+    <table>
 
-                <td>
-                  ${escapeXml(
-                    item.kelas
-                  )}
-                </td>
+      <tr>
 
-                <td>
-                  ${numberValue(
-                    item.penghargaan
-                  )}
-                </td>
+        <th>Tanggal</th>
+        <th>NISN</th>
+        <th>Nama</th>
+        <th>Kelas</th>
+        <th>Jenis</th>
+        <th>Poin</th>
+        <th>Keterangan</th>
+        <th>Dibuat Oleh</th>
+        <th>Peran</th>
 
-                <td>
-                  ${numberValue(
-                    item.pelanggaran
-                  )}
-                </td>
+      </tr>
 
-                <td>
-                  ${numberValue(
-                    item.total
-                  )}
-                </td>
-
-                <td>
-                  ${numberValue(
-                    item.transaksi
-                  )}
-                </td>
-
-              </tr>
-            `;
-
-          }
-        );
+  `;
 
 
-        html += `
-          </table>
-        `;
-
-      }
-
-
-      /* =========================================
-         DETAIL TRANSAKSI
-      ========================================== */
+  (
+    report.transaksi || []
+  ).forEach(
+    function(item) {
 
       html += `
-        <h2>
-          DETAIL TRANSAKSI
-        </h2>
 
-        <table>
+        <tr>
 
-          <tr>
+          <td>
+            ${escapeXml(item.tanggal)}
+          </td>
 
-            <th>
-              Tanggal
-            </th>
+          <td>
+            ${escapeXml(item.nisn)}
+          </td>
 
-            <th>
-              NISN
-            </th>
+          <td>
+            ${escapeXml(item.nama)}
+          </td>
 
-            <th>
-              Nama
-            </th>
+          <td>
+            ${escapeXml(item.kelas)}
+          </td>
 
-            <th>
-              Kelas
-            </th>
+          <td>
+            ${escapeXml(item.jenis)}
+          </td>
 
-            <th>
-              Jenis
-            </th>
+          <td>
+            ${numberValue(item.poin)}
+          </td>
 
-            <th>
-              Poin
-            </th>
+          <td>
+            ${escapeXml(item.keterangan)}
+          </td>
 
-            <th>
-              Keterangan
-            </th>
+          <td>
+            ${escapeXml(
+              item.dibuatOleh || "-"
+            )}
+          </td>
 
-            <th>
-              Dibuat Oleh
-            </th>
+          <td>
+            ${escapeXml(
+              item.peran || "-"
+            )}
+          </td>
 
-            <th>
-              Peran
-            </th>
+        </tr>
 
-          </tr>
       `;
 
-
-      (
-        report.transaksi || []
-      ).forEach(
-        function (item) {
-
-          html += `
-            <tr>
-
-              <td>
-                ${escapeXml(
-                  item.tanggal
-                )}
-              </td>
-
-              <td>
-                ${escapeXml(
-                  item.nisn
-                )}
-              </td>
-
-              <td>
-                ${escapeXml(
-                  item.nama
-                )}
-              </td>
-
-              <td>
-                ${escapeXml(
-                  item.kelas
-                )}
-              </td>
-
-              <td>
-                ${escapeXml(
-                  item.jenis
-                )}
-              </td>
-
-              <td>
-                ${numberValue(
-                  item.poin
-                )}
-              </td>
-
-              <td>
-                ${escapeXml(
-                  item.keterangan
-                )}
-              </td>
-
-              <td>
-                ${escapeXml(
-                  item.dibuatOleh ||
-                  "-"
-                )}
-              </td>
-
-              <td>
-                ${escapeXml(
-                  item.peran ||
-                  "-"
-                )}
-              </td>
-
-            </tr>
-          `;
-
-        }
-      );
-
-
-      html += `
-        </table>
-
-        </body>
-
-        </html>
-      `;
-
-
-      return html;
-
     }
+  );
 
 
-    /* =========================================
-       EXPORT XLS
-    ========================================== */
+  html += `
 
-    function exportXLS() {
+      </table>
 
-      if (!latestReport) {
+    </body>
 
-        alert(
-          "Tampilkan rekap terlebih dahulu."
-        );
+    </html>
 
-        return;
-
-      }
+  `;
 
 
-      const target =
-        sanitizeFileName(
-          getTargetName()
-        );
+  return html;
+
+}
 
 
-      const filename =
-        `rekap-poin-${target}-${latestReport.periode.mulai}-${latestReport.periode.akhir}.xls`;
+/* =========================================================
+   EXPORT XLS
+========================================================= */
+
+function exportXLS() {
+
+  if (!latestReport) {
+
+    alert(
+      "Tampilkan rekap terlebih dahulu."
+    );
+
+    return;
+
+  }
 
 
-      const xls =
-        buildXLS();
-
-
-      const blob =
-        new Blob(
-          [xls],
-          {
-            type:
-              "application/vnd.ms-excel;charset=utf-8"
-          }
-        );
-
-
-      downloadBlob(
-        blob,
-        filename
-      );
-
-    }
-
-
-    /* =========================================
-       EVENT
-    ========================================== */
-
-    tampilkanBtn.addEventListener(
-      "click",
-      tampilkanRekap
+  const target =
+    sanitizeFileName(
+      getTargetName()
     );
 
 
-    exportXlsBtn.addEventListener(
-      "click",
-      exportXLS
-    );
+  const filename =
+    `rekap-poin-${target}-${latestReport.periode.mulai}-${latestReport.periode.akhir}.xls`;
 
 
-    exportCsvBtn.addEventListener(
-      "click",
-      exportCSV
-    );
+  const xls =
+    buildXLS();
 
 
-    cetakBtn.addEventListener(
-      "click",
-      function () {
-
-        window.print();
-
+  const blob =
+    new Blob(
+      [xls],
+      {
+        type:
+          "application/vnd.ms-excel;charset=utf-8"
       }
     );
 
 
-    /* =========================================
-       LOAD AWAL
-    ========================================== */
+  downloadBlob(
+    blob,
+    filename
+  );
 
-    loadDataMaster();
+}
 
-  </script>
+
+/* =========================================================
+   EVENT
+========================================================= */
+
+tampilkanBtn.addEventListener(
+  "click",
+  tampilkanRekap
+);
+
+
+exportXlsBtn.addEventListener(
+  "click",
+  exportXLS
+);
+
+
+exportCsvBtn.addEventListener(
+  "click",
+  exportCSV
+);
+
+
+cetakBtn.addEventListener(
+  "click",
+  function() {
+
+    window.print();
+
+  }
+);
+
+
+/* =========================================================
+   LOAD AWAL
+========================================================= */
+
+loadDataMaster();
+
+</script>
 
 </body>
-
 </html>
