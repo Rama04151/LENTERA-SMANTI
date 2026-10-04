@@ -1,4 +1,4 @@
-const { google } = require("googleapis");
+const supabase = require("./_supabase");
 
 exports.handler = async (event) => {
 
@@ -24,194 +24,96 @@ exports.handler = async (event) => {
       });
     }
 
-    // =========================
-    // GOOGLE SHEETS AUTH
-    // =========================
-
-    const privateKey =
-      process.env.GOOGLE_PRIVATE_KEY
-        .replace(/\\n/g, "\n")
-        .replace(/^"|"$/g, "");
-
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email:
-          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-
-        private_key:
-          privateKey
-      },
-
-      scopes: [
-        "https://www.googleapis.com/auth/spreadsheets"
-      ]
-    });
-
-    const sheets = google.sheets({
-      version: "v4",
-      auth
-    });
-
-    const spreadsheetId =
-      process.env.GOOGLE_SHEET_ID;
-
-
-    // =========================
-    // AMBIL SEMUA DATA SEKALIGUS
-    // =========================
-
-    const batchResult =
-      await sheets.spreadsheets.values.batchGet({
-
-        spreadsheetId,
-
-        ranges: [
-          "Siswa!A:F",
-          "Login_Control!A:C",
-          "Kelas!A:E"
-        ]
-
-      });
-
-    const valueRanges =
-      batchResult.data.valueRanges || [];
-
-
-    const siswaRows =
-      valueRanges[0]?.values || [];
-
-    const loginRows =
-      valueRanges[1]?.values || [];
-
-    const kelasRows =
-      valueRanges[2]?.values || [];
-
+    const targetNisn = String(nisn).trim();
 
     // =========================
     // CARI SISWA
     // =========================
 
-    let siswa = null;
-    let siswaRowNumber = null;
-
-    const targetNisn =
-      String(nisn).trim();
-
-    for (let i = 1; i < siswaRows.length; i++) {
-
-      const row = siswaRows[i];
-
-      const id =
-        row[0] || "";
-
-      const rowNisn =
-        row[1] || "";
-
-      const nama =
-        row[2] || "";
-
-      const kelasId =
-        row[3] || "";
-
-      const rowPassword =
-        row[4] || "";
-
-      const status =
-        row[5] || "";
-
-
-      if (
-        String(rowNisn).trim() ===
-        targetNisn
-      ) {
-
-        siswa = {
+    const { data: siswa, error: siswaError } =
+      await supabase
+        .from("siswa")
+        .select(`
           id,
-          nisn: rowNisn,
+          nisn,
           nama,
-          kelasId,
-          password: rowPassword,
+          kelas_id,
+          password,
           status
-        };
+        `)
+        .eq("nisn", targetNisn)
+        .maybeSingle();
 
-        siswaRowNumber = i + 1;
+    if (siswaError) {
+      console.error(
+        "SUPABASE SISWA ERROR:",
+        siswaError
+      );
 
-        break;
-      }
+      return response(500, {
+        success: false,
+        message: "Gagal mengakses data siswa"
+      });
     }
-
 
     // =========================
     // NISN TIDAK DITEMUKAN
     // =========================
 
     if (!siswa) {
-
       return response(401, {
         success: false,
         message: "NISN atau password salah"
       });
-
     }
-
 
     // =========================
     // CEK STATUS SISWA
     // =========================
 
     if (
-      String(siswa.status)
-        .toLowerCase() !== "aktif"
+      String(siswa.status || "").toLowerCase() !== "aktif"
     ) {
-
       return response(403, {
         success: false,
         message: "Akun siswa tidak aktif"
       });
-
     }
-
 
     // =========================
     // CARI LOGIN CONTROL
     // =========================
 
-    let loginRowNumber = null;
-    let failedAttempts = 0;
-    let lockedUntil = "";
+    const {
+      data: loginControl,
+      error: loginControlError
+    } = await supabase
+      .from("login_control")
+      .select(`
+        nisn,
+        failed_attempts,
+        locked_until
+      `)
+      .eq("nisn", targetNisn)
+      .maybeSingle();
 
-    for (let i = 1; i < loginRows.length; i++) {
+    if (loginControlError) {
+      console.error(
+        "SUPABASE LOGIN CONTROL ERROR:",
+        loginControlError
+      );
 
-      const row =
-        loginRows[i];
-
-      const rowNisn =
-        row[0] || "";
-
-      if (
-        String(rowNisn).trim() ===
-        targetNisn
-      ) {
-
-        loginRowNumber = i + 1;
-
-        failedAttempts =
-          parseInt(
-            row[1] || "0",
-            10
-          );
-
-        if (Number.isNaN(failedAttempts)) {
-          failedAttempts = 0;
-        }
-
-        lockedUntil =
-          String(row[2] || "").trim();
-
-        break;
-      }
+      return response(500, {
+        success: false,
+        message: "Gagal mengakses kontrol login"
+      });
     }
 
+    let failedAttempts =
+      Number(loginControl?.failed_attempts || 0);
+
+    let lockedUntil =
+      loginControl?.locked_until || null;
 
     // =========================
     // CEK LOCK
@@ -232,7 +134,7 @@ exports.handler = async (event) => {
 
         const remainingSeconds =
           Math.ceil(
-            (lockedTime - now) / 1000
+            (lockedTime.getTime() - now.getTime()) / 1000
           );
 
         const remainingMinutes =
@@ -250,9 +152,8 @@ exports.handler = async (event) => {
 
       // Lock sudah habis
       failedAttempts = 0;
-      lockedUntil = "";
+      lockedUntil = null;
     }
-
 
     // =========================
     // CEK PASSWORD
@@ -273,8 +174,7 @@ exports.handler = async (event) => {
 
         const lockUntilDate =
           new Date(
-            Date.now() +
-            5 * 60 * 1000
+            Date.now() + 5 * 60 * 1000
           );
 
         lockedUntil =
@@ -283,55 +183,32 @@ exports.handler = async (event) => {
         failedAttempts = 3;
       }
 
-
       // =========================
-      // UPDATE LOGIN CONTROL
+      // SIMPAN LOGIN CONTROL
       // =========================
 
-      if (loginRowNumber) {
+      const { error: upsertError } =
+        await supabase
+          .from("login_control")
+          .upsert({
+            nisn: targetNisn,
+            failed_attempts: failedAttempts,
+            locked_until: lockedUntil
+          }, {
+            onConflict: "nisn"
+          });
 
-        await sheets.spreadsheets.values.update({
+      if (upsertError) {
+        console.error(
+          "SUPABASE LOGIN CONTROL UPDATE ERROR:",
+          upsertError
+        );
 
-          spreadsheetId,
-
-          range:
-            `Login_Control!A${loginRowNumber}:C${loginRowNumber}`,
-
-          valueInputOption: "RAW",
-
-          requestBody: {
-            values: [[
-              targetNisn,
-              failedAttempts,
-              lockedUntil
-            ]]
-          }
-
+        return response(500, {
+          success: false,
+          message: "Gagal memperbarui kontrol login"
         });
-
-      } else {
-
-        await sheets.spreadsheets.values.append({
-
-          spreadsheetId,
-
-          range:
-            "Login_Control!A:C",
-
-          valueInputOption: "RAW",
-
-          requestBody: {
-            values: [[
-              targetNisn,
-              failedAttempts,
-              lockedUntil
-            ]]
-          }
-
-        });
-
       }
-
 
       // =========================
       // JIKA SUDAH 3 KALI
@@ -347,83 +224,77 @@ exports.handler = async (event) => {
 
       }
 
-
       return response(401, {
         success: false,
         message:
           `NISN atau password salah. Percobaan ${failedAttempts}/3.`
       });
-
     }
-
 
     // =========================
     // LOGIN BERHASIL
     // =========================
 
-    if (loginRowNumber) {
+    const { error: resetError } =
+      await supabase
+        .from("login_control")
+        .upsert({
+          nisn: targetNisn,
+          failed_attempts: 0,
+          locked_until: null
+        }, {
+          onConflict: "nisn"
+        });
 
-      await sheets.spreadsheets.values.update({
+    if (resetError) {
+      console.error(
+        "SUPABASE LOGIN RESET ERROR:",
+        resetError
+      );
 
-        spreadsheetId,
-
-        range:
-          `Login_Control!A${loginRowNumber}:C${loginRowNumber}`,
-
-        valueInputOption: "RAW",
-
-        requestBody: {
-          values: [[
-            targetNisn,
-            0,
-            ""
-          ]]
-        }
-
+      return response(500, {
+        success: false,
+        message: "Gagal memperbarui status login"
       });
-
     }
-
 
     // =========================
     // CARI NAMA KELAS
     // =========================
 
-    let namaKelas = "-";
+    const {
+      data: kelas,
+      error: kelasError
+    } = await supabase
+      .from("kelas")
+      .select(`
+        id,
+        nama_kelas,
+        status
+      `)
+      .eq("id", siswa.kelas_id)
+      .maybeSingle();
 
-    for (
-      let i = 1;
-      i < kelasRows.length;
-      i++
-    ) {
+    if (kelasError) {
+      console.error(
+        "SUPABASE KELAS ERROR:",
+        kelasError
+      );
 
-      const row =
-        kelasRows[i];
-
-      const idKelas =
-        row[0] || "";
-
-      const nama =
-        row[1] || "";
-
-      const status =
-        row[4] || "";
-
-
-      if (
-        String(idKelas) ===
-          String(siswa.kelasId) &&
-        String(status).toLowerCase() ===
-          "aktif"
-      ) {
-
-        namaKelas =
-          nama;
-
-        break;
-      }
+      return response(500, {
+        success: false,
+        message: "Gagal mengakses data kelas"
+      });
     }
 
+    let namaKelas = "-";
+
+    if (
+      kelas &&
+      String(kelas.status || "").toLowerCase() === "aktif"
+    ) {
+      namaKelas = kelas.nama_kelas;
+    }
 
     // =========================
     // RESPONSE LOGIN BERHASIL
@@ -448,7 +319,7 @@ exports.handler = async (event) => {
           siswa.nama,
 
         kelasId:
-          siswa.kelasId,
+          siswa.kelas_id,
 
         kelas:
           namaKelas
@@ -456,7 +327,6 @@ exports.handler = async (event) => {
       }
 
     });
-
 
   } catch (error) {
 
@@ -473,7 +343,6 @@ exports.handler = async (event) => {
         "Terjadi kesalahan pada server"
 
     });
-
   }
 };
 
@@ -505,5 +374,4 @@ function response(
       JSON.stringify(body)
 
   };
-
 }
