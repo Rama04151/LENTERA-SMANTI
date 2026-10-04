@@ -1,45 +1,12 @@
-const { google } = require("googleapis");
-
-/* =========================================================
-   GOOGLE SHEETS
-========================================================= */
-
-function getSheets() {
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email:
-        process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-
-      private_key:
-        process.env.GOOGLE_PRIVATE_KEY
-          .replace(/\\n/g, "\n")
-          .replace(/^"|"$/g, "")
-    },
-
-    scopes: [
-      "https://www.googleapis.com/auth/spreadsheets"
-    ]
-  });
-
-  return google.sheets({
-    version: "v4",
-    auth
-  });
-}
-
-/* =========================================================
-   RESPONSE
-========================================================= */
+const supabase = require("./_supabase");
 
 function success(data = {}) {
   return {
     statusCode: 200,
-
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-store"
     },
-
     body: JSON.stringify({
       success: true,
       ...data
@@ -50,12 +17,10 @@ function success(data = {}) {
 function error(message, statusCode = 400) {
   return {
     statusCode,
-
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-store"
     },
-
     body: JSON.stringify({
       success: false,
       message
@@ -63,107 +28,12 @@ function error(message, statusCode = 400) {
   };
 }
 
-/* =========================================================
-   FIND GURU FROM ROWS
-   Tidak melakukan request sendiri.
-========================================================= */
-
-function findGuru(rows, guruId, guruUsername) {
-  for (const row of rows.slice(1)) {
-    const id =
-      String(row[0] || "").trim();
-
-    const username =
-      String(row[1] || "").trim();
-
-    const nama =
-      String(row[3] || "").trim();
-
-    const status =
-      String(row[4] || "").trim();
-
-    if (
-      status.toLowerCase() !== "aktif"
-    ) {
-      continue;
-    }
-
-    /* UTAMAKAN ID */
-
-    if (
-      guruId &&
-      id === String(guruId).trim()
-    ) {
-      return {
-        id,
-        username,
-        nama
-      };
-    }
-
-    /* FALLBACK USERNAME */
-
-    if (
-      guruUsername &&
-      username.toLowerCase() ===
-        String(guruUsername)
-          .trim()
-          .toLowerCase()
-    ) {
-      return {
-        id,
-        username,
-        nama
-      };
-    }
-  }
-
-  return null;
-}
-
-/* =========================================================
-   BATCH GET
-   Beberapa sheet diambil dalam SATU request API.
-========================================================= */
-
-async function batchGetSheets(
-  sheets,
-  spreadsheetId,
-  ranges
-) {
-  const response =
-    await sheets.spreadsheets.values.batchGet({
-      spreadsheetId,
-      ranges
-    });
-
-  const valueRanges =
-    response.data.valueRanges || [];
-
-  const result = {};
-
-  for (let i = 0; i < ranges.length; i++) {
-    result[ranges[i]] =
-      valueRanges[i]?.values || [];
-  }
-
-  return result;
-}
-
-/* =========================================================
-   VALIDASI JENIS POIN
-========================================================= */
-
 function validJenis(jenis) {
   return (
     jenis === "penghargaan" ||
     jenis === "pelanggaran"
   );
 }
-
-/* =========================================================
-   TANGGAL INDONESIA
-========================================================= */
 
 function getTanggalIndonesia() {
   return new Intl.DateTimeFormat(
@@ -177,23 +47,66 @@ function getTanggalIndonesia() {
   ).format(new Date());
 }
 
-/* =========================================================
-   HANDLER
-========================================================= */
+async function findGuru(guruId, guruUsername) {
+
+  let query = supabase
+    .from("guru")
+    .select(`
+      id,
+      username,
+      nama,
+      status
+    `);
+
+  if (guruId) {
+    query = query.eq("id", guruId);
+  } else if (guruUsername) {
+    query = query.eq(
+      "username",
+      guruUsername
+    );
+  } else {
+    return null;
+  }
+
+  const {
+    data,
+    error: queryError
+  } = await query.maybeSingle();
+
+  if (queryError) {
+    throw queryError;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  if (
+    String(data.status || "")
+      .trim()
+      .toLowerCase() !== "aktif"
+  ) {
+    return null;
+  }
+
+  return {
+    id: data.id,
+    username: data.username,
+    nama: data.nama
+  };
+}
 
 exports.handler = async function (event) {
-  const sheets = getSheets();
-
-  const spreadsheetId =
-    process.env.GOOGLE_SHEET_ID;
 
   try {
-    /* =====================================================
-       GET — POIN SAYA
-       SEKARANG: 1 REQUEST
-    ===================================================== */
+
+    // ============================================================
+    // GET — POIN SAYA
+    // ============================================================
 
     if (event.httpMethod === "GET") {
+
       const params =
         event.queryStringParameters || {};
 
@@ -217,43 +130,12 @@ exports.handler = async function (event) {
         );
       }
 
-      /*
-        Guru + Poin + Siswa + Kelas
-        semuanya diambil menggunakan
-        SATU batchGet request.
-      */
-
-      const data =
-        await batchGetSheets(
-          sheets,
-          spreadsheetId,
-          [
-            "Guru!A:E",
-            "Poin!A:H",
-            "Siswa!A:F",
-            "Kelas!A:E"
-          ]
-        );
-
-      const guruRows =
-        data["Guru!A:E"] || [];
-
-      const poinRows =
-        data["Poin!A:H"] || [];
-
-      const siswaRows =
-        data["Siswa!A:F"] || [];
-
-      const kelasRows =
-        data["Kelas!A:E"] || [];
-
-      /* =================================================
-         CARI GURU
-      ================================================= */
+      // ----------------------------------------------------------
+      // Cari Guru
+      // ----------------------------------------------------------
 
       const guru =
-        findGuru(
-          guruRows,
+        await findGuru(
           guruId,
           guruUsername
         );
@@ -265,18 +147,117 @@ exports.handler = async function (event) {
         );
       }
 
-      /* =================================================
-         MAP SISWA
-      ================================================= */
+      // ----------------------------------------------------------
+      // Ambil poin milik Guru
+      // ----------------------------------------------------------
+
+      const {
+        data: poinRows,
+        error: poinError
+      } = await supabase
+        .from("poin")
+        .select(`
+          id,
+          siswa_id,
+          jenis,
+          poin,
+          keterangan,
+          tanggal,
+          dibuat_oleh,
+          peran
+        `)
+        .eq(
+          "peran",
+          "Guru"
+        )
+        .ilike(
+          "dibuat_oleh",
+          guru.username
+        )
+        .order(
+          "tanggal",
+          {
+            ascending: false
+          }
+        );
+
+      if (poinError) {
+        console.error(
+          "SUPABASE GURU POINTS GET ERROR:",
+          poinError
+        );
+
+        return error(
+          "Gagal mengambil data poin.",
+          500
+        );
+      }
+
+      // ----------------------------------------------------------
+      // Ambil siswa
+      // ----------------------------------------------------------
+
+      const {
+        data: siswaRows,
+        error: siswaError
+      } = await supabase
+        .from("siswa")
+        .select(`
+          id,
+          nama,
+          nisn,
+          kelas_id
+        `);
+
+      if (siswaError) {
+        console.error(
+          "SUPABASE GURU POINTS SISWA ERROR:",
+          siswaError
+        );
+
+        return error(
+          "Gagal mengambil data siswa.",
+          500
+        );
+      }
+
+      // ----------------------------------------------------------
+      // Ambil kelas
+      // ----------------------------------------------------------
+
+      const {
+        data: kelasRows,
+        error: kelasError
+      } = await supabase
+        .from("kelas")
+        .select(`
+          id,
+          nama_kelas
+        `);
+
+      if (kelasError) {
+        console.error(
+          "SUPABASE GURU POINTS KELAS ERROR:",
+          kelasError
+        );
+
+        return error(
+          "Gagal mengambil data kelas.",
+          500
+        );
+      }
+
+      // ----------------------------------------------------------
+      // Map siswa
+      // ----------------------------------------------------------
 
       const siswaMap = {};
 
-      for (
-        const row of siswaRows.slice(1)
-      ) {
+      for (const row of siswaRows || []) {
+
         const id =
           String(
-            row[0] || ""
+            row.id || ""
           ).trim();
 
         if (!id) {
@@ -286,38 +267,37 @@ exports.handler = async function (event) {
         siswaMap[id] = {
           nama:
             String(
-              row[2] || ""
+              row.nama || ""
             ).trim(),
 
           nisn:
             String(
-              row[1] || ""
+              row.nisn || ""
             ).trim(),
 
           kelasId:
             String(
-              row[3] || ""
+              row.kelas_id || ""
             ).trim()
         };
       }
 
-      /* =================================================
-         MAP KELAS
-      ================================================= */
+      // ----------------------------------------------------------
+      // Map kelas
+      // ----------------------------------------------------------
 
       const kelasMap = {};
 
-      for (
-        const row of kelasRows.slice(1)
-      ) {
+      for (const row of kelasRows || []) {
+
         const id =
           String(
-            row[0] || ""
+            row.id || ""
           ).trim();
 
         const nama =
           String(
-            row[1] || ""
+            row.nama_kelas || ""
           ).trim();
 
         if (id) {
@@ -325,70 +305,27 @@ exports.handler = async function (event) {
         }
       }
 
-      /* =================================================
-         FILTER POIN GURU
-      ================================================= */
-
-      const usernameGuru =
-        guru.username.toLowerCase();
+      // ----------------------------------------------------------
+      // Bentuk response poin
+      // ----------------------------------------------------------
 
       const poinSaya = [];
 
-      for (
-        const row of poinRows.slice(1)
-      ) {
-        const pointId =
-          String(
-            row[0] || ""
-          ).trim();
+      for (const row of poinRows || []) {
 
         const siswaId =
           String(
-            row[1] || ""
+            row.siswa_id || ""
           ).trim();
-
-        const jenis =
-          String(
-            row[2] || ""
-          ).trim();
-
-        const poin =
-          Number(
-            row[3] || 0
-          );
-
-        const keterangan =
-          String(
-            row[4] || ""
-          ).trim();
-
-        const tanggal =
-          String(
-            row[5] || ""
-          ).trim();
-
-        const dibuatOleh =
-          String(
-            row[6] || ""
-          ).trim();
-
-        /*
-          Hanya tampilkan poin
-          yang dibuat oleh guru ini.
-        */
-
-        if (
-          dibuatOleh.toLowerCase() !==
-          usernameGuru
-        ) {
-          continue;
-        }
 
         const siswa =
           siswaMap[siswaId] || {};
 
         poinSaya.push({
-          id: pointId,
+          id:
+            String(
+              row.id || ""
+            ).trim(),
 
           siswaId,
 
@@ -403,28 +340,28 @@ exports.handler = async function (event) {
               siswa.kelasId
             ] || "-",
 
-          jenis,
+          jenis:
+            String(
+              row.jenis || ""
+            ).trim(),
 
-          poin,
+          poin:
+            Number(
+              row.poin || 0
+            ),
 
-          keterangan,
+          keterangan:
+            String(
+              row.keterangan || ""
+            ).trim(),
 
-          tanggal,
+          tanggal:
+            row.tanggal || "",
 
           guruUsername:
             guru.username
         });
       }
-
-      /* =================================================
-         TERBARU DI ATAS
-      ================================================= */
-
-      poinSaya.sort(
-        (a, b) =>
-          new Date(b.tanggal) -
-          new Date(a.tanggal)
-      );
 
       return success({
         guru: {
@@ -437,12 +374,12 @@ exports.handler = async function (event) {
       });
     }
 
-    /* =====================================================
-       POST — TAMBAH POIN
-       1 READ + 1 WRITE = 2 REQUEST
-    ===================================================== */
+    // ============================================================
+    // POST — TAMBAH POIN
+    // ============================================================
 
     if (event.httpMethod === "POST") {
+
       const body =
         JSON.parse(
           event.body || "{}"
@@ -478,7 +415,9 @@ exports.handler = async function (event) {
           body.guruUsername || ""
         ).trim();
 
-      /* VALIDASI */
+      // ----------------------------------------------------------
+      // Validasi
+      // ----------------------------------------------------------
 
       if (!siswaId) {
         return error(
@@ -508,21 +447,12 @@ exports.handler = async function (event) {
         );
       }
 
-      /*
-        Hanya baca Guru.
-        1 request.
-      */
-
-      const guruData =
-        await batchGetSheets(
-          sheets,
-          spreadsheetId,
-          ["Guru!A:E"]
-        );
+      // ----------------------------------------------------------
+      // Validasi Guru
+      // ----------------------------------------------------------
 
       const guru =
-        findGuru(
-          guruData["Guru!A:E"] || [],
+        await findGuru(
           guruId,
           guruUsername
         );
@@ -534,44 +464,83 @@ exports.handler = async function (event) {
         );
       }
 
-      /* ID POIN */
+      // ----------------------------------------------------------
+      // Pastikan siswa ada
+      // ----------------------------------------------------------
+
+      const {
+        data: siswa,
+        error: siswaError
+      } = await supabase
+        .from("siswa")
+        .select("id")
+        .eq("id", siswaId)
+        .maybeSingle();
+
+      if (siswaError) {
+        console.error(
+          "SUPABASE CHECK SISWA ERROR:",
+          siswaError
+        );
+
+        return error(
+          "Gagal memeriksa siswa.",
+          500
+        );
+      }
+
+      if (!siswa) {
+        return error(
+          "Siswa tidak ditemukan.",
+          404
+        );
+      }
+
+      // ----------------------------------------------------------
+      // ID poin
+      // ----------------------------------------------------------
 
       const pointId =
-        "P" + Date.now();
+        "P" +
+        Date.now();
 
-      /* TANGGAL */
+      // ----------------------------------------------------------
+      // Tanggal Indonesia
+      // ----------------------------------------------------------
 
       const tanggal =
         getTanggalIndonesia();
 
-      /*
-        1 WRITE REQUEST
-      */
+      // ----------------------------------------------------------
+      // Insert poin
+      // ----------------------------------------------------------
 
-      await sheets.spreadsheets.values.append({
-        spreadsheetId,
+      const {
+        error: insertError
+      } = await supabase
+        .from("poin")
+        .insert({
+          id: pointId,
+          siswa_id: siswaId,
+          jenis,
+          poin,
+          keterangan,
+          tanggal,
+          dibuat_oleh: guru.username,
+          peran: "Guru"
+        });
 
-        range: "Poin!A:H",
+      if (insertError) {
+        console.error(
+          "SUPABASE GURU POINTS INSERT ERROR:",
+          insertError
+        );
 
-        valueInputOption:
-          "USER_ENTERED",
-
-        insertDataOption:
-          "INSERT_ROWS",
-
-        requestBody: {
-          values: [[
-            pointId,
-            siswaId,
-            jenis,
-            poin,
-            keterangan,
-            tanggal,
-            guru.username,
-            "Guru"
-          ]]
-        }
-      });
+        return error(
+          "Gagal menambahkan poin.",
+          500
+        );
+      }
 
       return success({
         message:
@@ -579,12 +548,12 @@ exports.handler = async function (event) {
       });
     }
 
-    /* =====================================================
-       PUT — EDIT POIN SENDIRI
-       SEKARANG: 1 BATCH READ + 1 WRITE = 2 REQUEST
-    ===================================================== */
+    // ============================================================
+    // PUT — EDIT POIN SENDIRI
+    // ============================================================
 
     if (event.httpMethod === "PUT") {
+
       const body =
         JSON.parse(
           event.body || "{}"
@@ -625,7 +594,9 @@ exports.handler = async function (event) {
           body.guruUsername || ""
         ).trim();
 
-      /* VALIDASI */
+      // ----------------------------------------------------------
+      // Validasi
+      // ----------------------------------------------------------
 
       if (!pointId) {
         return error(
@@ -655,24 +626,12 @@ exports.handler = async function (event) {
         );
       }
 
-      /*
-        Guru + Poin dibaca dalam
-        SATU batchGet request.
-      */
-
-      const data =
-        await batchGetSheets(
-          sheets,
-          spreadsheetId,
-          [
-            "Guru!A:E",
-            "Poin!A:H"
-          ]
-        );
+      // ----------------------------------------------------------
+      // Validasi Guru
+      // ----------------------------------------------------------
 
       const guru =
-        findGuru(
-          data["Guru!A:E"] || [],
+        await findGuru(
           guruId,
           guruUsername
         );
@@ -684,53 +643,73 @@ exports.handler = async function (event) {
         );
       }
 
-      const rows =
-        data["Poin!A:H"] || [];
+      // ----------------------------------------------------------
+      // Ambil poin dan pastikan milik Guru ini
+      // ----------------------------------------------------------
 
-      let rowNumber = -1;
-      let siswaIdLama = "";
+      const {
+        data: existingPoint,
+        error: pointError
+      } = await supabase
+        .from("poin")
+        .select(`
+          id,
+          siswa_id,
+          dibuat_oleh,
+          peran
+        `)
+        .eq("id", pointId)
+        .maybeSingle();
 
-      for (
-        let i = 1;
-        i < rows.length;
-        i++
-      ) {
-        const id =
-          String(
-            rows[i][0] || ""
-          ).trim();
+      if (pointError) {
+        console.error(
+          "SUPABASE GET POINT ERROR:",
+          pointError
+        );
 
-        const creator =
-          String(
-            rows[i][6] || ""
-          ).trim();
-
-        if (
-          id === pointId &&
-          creator.toLowerCase() ===
-            guru.username.toLowerCase()
-        ) {
-          rowNumber = i + 1;
-
-          siswaIdLama =
-            String(
-              rows[i][1] || ""
-            ).trim();
-
-          break;
-        }
+        return error(
+          "Gagal mengambil data poin.",
+          500
+        );
       }
 
-      if (rowNumber === -1) {
+      if (!existingPoint) {
         return error(
           "Poin tidak ditemukan atau bukan poin Anda.",
           403
         );
       }
 
+      if (
+        String(
+          existingPoint.peran || ""
+        ).toLowerCase() !== "guru"
+      ) {
+        return error(
+          "Poin tidak ditemukan atau bukan poin Anda.",
+          403
+        );
+      }
+
+      if (
+        String(
+          existingPoint.dibuat_oleh || ""
+        ).toLowerCase() !==
+        guru.username.toLowerCase()
+      ) {
+        return error(
+          "Poin tidak ditemukan atau bukan poin Anda.",
+          403
+        );
+      }
+
+      // ----------------------------------------------------------
+      // Tentukan siswa
+      // ----------------------------------------------------------
+
       const siswaIdFinal =
         siswaIdBaru ||
-        siswaIdLama;
+        existingPoint.siswa_id;
 
       if (!siswaIdFinal) {
         return error(
@@ -738,29 +717,75 @@ exports.handler = async function (event) {
         );
       }
 
-      /*
-        G dan H tidak disentuh.
-        Creator tetap aman.
-      */
+      // ----------------------------------------------------------
+      // Pastikan siswa tujuan ada
+      // ----------------------------------------------------------
 
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
+      const {
+        data: siswa,
+        error: siswaError
+      } = await supabase
+        .from("siswa")
+        .select("id")
+        .eq("id", siswaIdFinal)
+        .maybeSingle();
 
-        range:
-          `Poin!B${rowNumber}:E${rowNumber}`,
+      if (siswaError) {
+        console.error(
+          "SUPABASE CHECK SISWA UPDATE ERROR:",
+          siswaError
+        );
 
-        valueInputOption:
-          "USER_ENTERED",
+        return error(
+          "Gagal memeriksa siswa.",
+          500
+        );
+      }
 
-        requestBody: {
-          values: [[
-            siswaIdFinal,
-            jenis,
-            poin,
-            keterangan
-          ]]
-        }
-      });
+      if (!siswa) {
+        return error(
+          "Siswa tidak ditemukan.",
+          404
+        );
+      }
+
+      // ----------------------------------------------------------
+      // Update
+      //
+      // Dibuat_oleh dan Peran tidak disentuh.
+      // ----------------------------------------------------------
+
+      const {
+        error: updateError
+      } = await supabase
+        .from("poin")
+        .update({
+          siswa_id: siswaIdFinal,
+          jenis,
+          poin,
+          keterangan
+        })
+        .eq("id", pointId)
+        .eq(
+          "dibuat_oleh",
+          guru.username
+        )
+        .eq(
+          "peran",
+          "Guru"
+        );
+
+      if (updateError) {
+        console.error(
+          "SUPABASE GURU POINTS UPDATE ERROR:",
+          updateError
+        );
+
+        return error(
+          "Gagal memperbarui poin.",
+          500
+        );
+      }
 
       return success({
         message:
@@ -768,17 +793,12 @@ exports.handler = async function (event) {
       });
     }
 
-    /* =====================================================
-       DELETE — HAPUS POIN SENDIRI
-       SEKARANG: 1 BATCH READ + 1 WRITE = 2 REQUEST
-
-       CATATAN:
-       Baris tidak dihapus secara fisik.
-       A:H dikosongkan.
-       Ini menghilangkan kebutuhan mengambil sheetId.
-    ===================================================== */
+    // ============================================================
+    // DELETE — HAPUS POIN SENDIRI
+    // ============================================================
 
     if (event.httpMethod === "DELETE") {
+
       const body =
         JSON.parse(
           event.body || "{}"
@@ -805,24 +825,12 @@ exports.handler = async function (event) {
         );
       }
 
-      /*
-        Guru + Poin
-        = SATU batchGet request
-      */
-
-      const data =
-        await batchGetSheets(
-          sheets,
-          spreadsheetId,
-          [
-            "Guru!A:E",
-            "Poin!A:H"
-          ]
-        );
+      // ----------------------------------------------------------
+      // Validasi Guru
+      // ----------------------------------------------------------
 
       const guru =
-        findGuru(
-          data["Guru!A:E"] || [],
+        await findGuru(
           guruId,
           guruUsername
         );
@@ -834,55 +842,95 @@ exports.handler = async function (event) {
         );
       }
 
-      const rows =
-        data["Poin!A:H"] || [];
+      // ----------------------------------------------------------
+      // Pastikan poin milik Guru ini
+      // ----------------------------------------------------------
 
-      let rowNumber = -1;
+      const {
+        data: existingPoint,
+        error: pointError
+      } = await supabase
+        .from("poin")
+        .select(`
+          id,
+          dibuat_oleh,
+          peran
+        `)
+        .eq("id", pointId)
+        .maybeSingle();
 
-      for (
-        let i = 1;
-        i < rows.length;
-        i++
-      ) {
-        const id =
-          String(
-            rows[i][0] || ""
-          ).trim();
+      if (pointError) {
+        console.error(
+          "SUPABASE GET POINT DELETE ERROR:",
+          pointError
+        );
 
-        const creator =
-          String(
-            rows[i][6] || ""
-          ).trim();
-
-        if (
-          id === pointId &&
-          creator.toLowerCase() ===
-            guru.username.toLowerCase()
-        ) {
-          rowNumber = i + 1;
-          break;
-        }
+        return error(
+          "Gagal mengambil data poin.",
+          500
+        );
       }
 
-      if (rowNumber === -1) {
+      if (!existingPoint) {
         return error(
           "Poin tidak ditemukan atau bukan poin Anda.",
           403
         );
       }
 
-      /*
-        Kosongkan A:H.
-        Tidak membutuhkan sheetId.
-        1 WRITE REQUEST.
-      */
+      if (
+        String(
+          existingPoint.peran || ""
+        ).toLowerCase() !== "guru"
+      ) {
+        return error(
+          "Poin tidak ditemukan atau bukan poin Anda.",
+          403
+        );
+      }
 
-      await sheets.spreadsheets.values.clear({
-        spreadsheetId,
+      if (
+        String(
+          existingPoint.dibuat_oleh || ""
+        ).toLowerCase() !==
+        guru.username.toLowerCase()
+      ) {
+        return error(
+          "Poin tidak ditemukan atau bukan poin Anda.",
+          403
+        );
+      }
 
-        range:
-          `Poin!A${rowNumber}:H${rowNumber}`
-      });
+      // ----------------------------------------------------------
+      // Hapus poin
+      // ----------------------------------------------------------
+
+      const {
+        error: deleteError
+      } = await supabase
+        .from("poin")
+        .delete()
+        .eq("id", pointId)
+        .eq(
+          "dibuat_oleh",
+          guru.username
+        )
+        .eq(
+          "peran",
+          "Guru"
+        );
+
+      if (deleteError) {
+        console.error(
+          "SUPABASE GURU POINTS DELETE ERROR:",
+          deleteError
+        );
+
+        return error(
+          "Gagal menghapus poin.",
+          500
+        );
+      }
 
       return success({
         message:
@@ -890,9 +938,9 @@ exports.handler = async function (event) {
       });
     }
 
-    /* =====================================================
-       METHOD TIDAK DIIZINKAN
-    ===================================================== */
+    // ============================================================
+    // METHOD TIDAK DIIZINKAN
+    // ============================================================
 
     return error(
       "Method tidak diizinkan.",
@@ -900,6 +948,7 @@ exports.handler = async function (event) {
     );
 
   } catch (err) {
+
     console.error(
       "GURU POINTS ERROR:",
       err
