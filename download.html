@@ -1,148 +1,492 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download Lentera Smanti - SMAN 3 Tebas</title>
-    <!-- Menggunakan Bootstrap 5 untuk styling yang cepat dan responsif -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome untuk ikon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
-        }
-        .download-card {
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            max-width: 500px;
-            width: 100%;
-            margin: 20px;
-        }
-        .card-header-custom {
-            background-color: #0d6efd;
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
-        }
-        .card-header-custom h1 {
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .card-header-custom p {
-            margin: 0;
-            font-size: 0.95rem;
-            opacity: 0.9;
-        }
-        .feature-list {
-            padding: 20px 30px;
-        }
-        .feature-item {
-            display: flex;
-            align-items: start;
-            margin-bottom: 15px;
-        }
-        .feature-item i {
-            font-size: 1.2rem;
-            color: #0d6efd;
-            margin-right: 15px;
-            margin-top: 3px;
-        }
-        .feature-item div h5 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-        .feature-item div p {
-            font-size: 0.85rem;
-            color: #666;
-            margin: 0;
-        }
-        .download-section {
-            padding: 0 30px 30px 30px;
-            text-align: center;
-        }
-        .btn-download {
-            background-color: #198754;
-            color: white;
-            font-weight: 600;
-            padding: 12px 30px;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3);
-        }
-        .btn-download:hover {
-            background-color: #157347;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(25, 135, 84, 0.4);
-        }
-        .footer-text {
-            font-size: 0.8rem;
-            color: #888;
-            margin-top: 15px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Download Aplikasi - LENTERA SMANTI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    :root {
+      --bg: #0b132b;
+      --card: #1c2541;
+      --card-hover: #243052;
+      --gold: #fbc02d;
+      --gold-dark: #d48806;
+      --text: #ffffff;
+      --muted: #94a3b8;
+      --border: rgba(255,255,255,.08);
+      --green: #22c55e;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 20px;
+
+      background:
+        radial-gradient(
+          circle at 10% 10%,
+          rgba(251,192,45,.08),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at 90% 90%,
+          rgba(59,130,246,.08),
+          transparent 40%
+        ),
+        var(--bg);
+
+      color: var(--text);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    /* ================= HEADER ================= */
+
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+    }
+
+    .logo {
+      width: 68px;
+      height: 68px;
+
+      margin: 0 auto 18px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 20px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--gold),
+          var(--gold-dark)
+        );
+
+      color: var(--bg);
+
+      font-size: 30px;
+      font-weight: 800;
+
+      box-shadow:
+        0 10px 30px rgba(251,192,45,.2);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .header p {
+      margin-top: 8px;
+
+      color: var(--muted);
+
+      font-size: 13px;
+    }
+
+    .back {
+      display: inline-block;
+
+      margin-top: 18px;
+
+      color: var(--gold);
+
+      text-decoration: none;
+
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .back:hover {
+      text-decoration: underline;
+    }
+
+    /* ================= DOWNLOAD GRID ================= */
+
+    .download-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+      gap: 18px;
+
+      margin-top: 10px;
+    }
+
+    .download-card {
+      position: relative;
+
+      background: var(--card);
+
+      border: 1px solid var(--border);
+
+      border-radius: 22px;
+
+      padding: 26px 20px;
+
+      text-align: center;
+
+      transition:
+        transform .2s ease,
+        background .2s ease,
+        border-color .2s ease;
+
+      box-shadow:
+        0 15px 35px rgba(0,0,0,.25);
+    }
+
+    .download-card:hover {
+      transform: translateY(-5px);
+
+      background: var(--card-hover);
+
+      border-color:
+        rgba(251,192,45,.25);
+    }
+
+    /* ================= ICON ================= */
+
+    .app-icon {
+      width: 76px;
+      height: 76px;
+
+      margin: 0 auto 18px;
+
+      border-radius: 20px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 34px;
+      font-weight: 800;
+    }
+
+    .admin-icon {
+      background:
+        rgba(251,192,45,.12);
+
+      color: var(--gold);
+
+      border:
+        1px solid rgba(251,192,45,.2);
+    }
+
+    .guru-icon {
+      background:
+        rgba(59,130,246,.12);
+
+      color: var(--blue);
+
+      border:
+        1px solid rgba(59,130,246,.2);
+    }
+
+    .siswa-icon {
+      background:
+        rgba(168,85,247,.12);
+
+      color: var(--purple);
+
+      border:
+        1px solid rgba(168,85,247,.2);
+    }
+
+    /* ================= TEXT ================= */
+
+    .download-card h2 {
+      font-size: 18px;
+
+      font-weight: 800;
+
+      margin-bottom: 7px;
+    }
+
+    .download-card p {
+      min-height: 42px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      line-height: 1.6;
+
+      margin-bottom: 20px;
+    }
+
+    /* ================= BUTTON ================= */
+
+    .download-button {
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      width: 100%;
+
+      padding: 12px 15px;
+
+      border-radius: 11px;
+
+      text-decoration: none;
+
+      font-size: 13px;
+
+      font-weight: 800;
+
+      transition: .2s ease;
+    }
+
+    .download-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .admin-button {
+      background:
+        linear-gradient(
+          135deg,
+          var(--gold),
+          var(--gold-dark)
+        );
+
+      color: var(--bg);
+    }
+
+    .guru-button {
+      background: var(--blue);
+
+      color: #fff;
+    }
+
+    .siswa-button {
+      background: var(--purple);
+
+      color: #fff;
+    }
+
+    /* ================= FOOTER ================= */
+
+    .footer {
+      text-align: center;
+
+      padding: 35px 10px 15px;
+
+      color: var(--muted);
+
+      font-size: 11px;
+    }
+
+    .footer strong {
+      color: var(--gold);
+    }
+
+    /* ================= MOBILE ================= */
+
+    @media (max-width: 800px) {
+
+      body {
+        padding: 10px;
+      }
+
+      .header {
+        padding:
+          30px
+          15px
+          25px;
+      }
+
+      .header h1 {
+        font-size: 23px;
+      }
+
+      .download-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .download-card {
+        padding: 22px 18px;
+      }
+
+      .app-icon {
+        width: 65px;
+        height: 65px;
+
+        font-size: 28px;
+
+        border-radius: 17px;
+      }
+
+    }
+  </style>
 </head>
+
 <body>
 
-    <div class="download-card">
-        <!-- Header -->
-        <div class="card-header-custom">
-            <i class="fa-solid fa-graduation-cap fa-3x mb-3"></i>
-            <h1>Lentera Smanti</h1>
-            <p>Sistem Informasi Poin Siswa SMAN 3 Tebas</p>
+  <main class="container">
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="header">
+
+      <div class="logo">
+        L
+      </div>
+
+      <h1>
+        Download Aplikasi
+      </h1>
+
+      <p>
+        LENTERA SMANTI
+      </p>
+
+      <a
+        href="index.html"
+        class="back"
+      >
+        ← Kembali ke Beranda
+      </a>
+
+    </header>
+
+
+    <!-- ================= DOWNLOAD ================= -->
+
+    <section class="download-grid">
+
+      <!-- ================= ADMIN ================= -->
+
+      <div class="download-card">
+
+        <div class="app-icon admin-icon">
+          A
         </div>
 
-        <!-- Informasi Aplikasi -->
-        <div class="feature-list">
-            <div class="feature-item">
-                <i class="fa-solid fa-triangle-exclamation text-danger"></i>
-                <div>
-                    <h5>Poin Pelanggaran</h5>
-                    <p>Pantau catatan kedisiplinan dan akumulasi poin pelanggaran siswa secara transparan.</p>
-                </div>
-            </div>
-            <div class="feature-item">
-                <i class="fa-solid fa-award text-success"></i>
-                <div>
-                    <h5>Poin Penghargaan (Reward)</h5>
-                    <p>Lihat apresiasi dan prestasi serta poin penghargaan yang diraih oleh siswa.</p>
-                </div>
-            </div>
-            <div class="feature-item">
-                <i class="fa-solid fa-mobile-screen-button"></i>
-                <div>
-                    <h5>Akses Mudah & Real-time</h5>
-                    <p>Memudahkan orang tua dan siswa dalam memantau perkembangan karakter di sekolah.</p>
-                </div>
-            </div>
+        <h2>
+          APK ADMIN
+        </h2>
+
+        <p>
+          Aplikasi khusus administrator
+          untuk mengelola sistem LENTERA SMANTI.
+        </p>
+
+        <!-- GANTI HREF DI SINI -->
+        <a
+          href="#"
+          class="download-button admin-button"
+        >
+          ⬇ Download APK
+        </a>
+
+      </div>
+
+
+      <!-- ================= GURU ================= -->
+
+      <div class="download-card">
+
+        <div class="app-icon guru-icon">
+          G
         </div>
 
-        <!-- Tombol Download -->
-        <div class="download-section">
-            <!-- Ganti href="#" dengan link file APK atau link Google Drive download Anda -->
-            <a href="https://www.mediafire.com/file/74bpqg945r6apry/LENTERA_SMANTI_V2.0.apk/file" class="btn btn-download">
-                <i class="fa-solid fa-download"></i> Download Aplikasi (APK)
-            </a>
-            <div class="footer-text">
-                Versi 2.0 &bull; Khusus Siswa SMAN 3 Tebas &bull; Last Updated 20-9-2026
-            </div>
+        <h2>
+          APK GURU
+        </h2>
+
+        <p>
+          Aplikasi untuk guru dalam
+          mengelola poin dan data siswa.
+        </p>
+
+        <!-- GANTI HREF DI SINI -->
+        <a
+          href="#"
+          class="download-button guru-button"
+        >
+          ⬇ Download APK
+        </a>
+
+      </div>
+
+
+      <!-- ================= SISWA ================= -->
+
+      <div class="download-card">
+
+        <div class="app-icon siswa-icon">
+          S
         </div>
-    </div>
+
+        <h2>
+          APK SISWA
+        </h2>
+
+        <p>
+          Aplikasi siswa untuk melihat
+          poin, informasi, dan akun LENTERA SMANTI.
+        </p>
+
+        <!-- GANTI HREF DI SINI -->
+        <a
+          href="#"
+          class="download-button siswa-button"
+        >
+          ⬇ Download APK
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer class="footer">
+
+      <strong>LENTERA SMANTI</strong>
+
+      <br>
+
+      Sistem Informasi Poin Siswa
+      <br>
+
+      © 2026 SMAN 3 Tebas
+
+    </footer>
+
+  </main>
 
 </body>
 </html>
