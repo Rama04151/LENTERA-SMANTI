@@ -22,11 +22,14 @@
       --bg: #0b132b;
       --card: #1c2541;
       --card-hover: #243052;
+
       --gold: #fbc02d;
       --gold-dark: #d48806;
+
       --text: #ffffff;
       --muted: #94a3b8;
       --border: rgba(255,255,255,.08);
+
       --green: #22c55e;
       --blue: #3b82f6;
       --purple: #a855f7;
@@ -65,7 +68,9 @@
       margin: auto;
     }
 
-    /* ================= HEADER ================= */
+    /* =========================
+       HEADER
+    ========================== */
 
     .header {
       text-align: center;
@@ -130,7 +135,9 @@
       text-decoration: underline;
     }
 
-    /* ================= DOWNLOAD GRID ================= */
+    /* =========================
+       GRID
+    ========================== */
 
     .download-grid {
       display: grid;
@@ -142,6 +149,10 @@
 
       margin-top: 10px;
     }
+
+    /* =========================
+       CARD
+    ========================== */
 
     .download-card {
       position: relative;
@@ -174,7 +185,9 @@
         rgba(251,192,45,.25);
     }
 
-    /* ================= ICON ================= */
+    /* =========================
+       ICON
+    ========================== */
 
     .app-icon {
       width: 76px;
@@ -222,7 +235,9 @@
         1px solid rgba(168,85,247,.2);
     }
 
-    /* ================= TEXT ================= */
+    /* =========================
+       TEXT
+    ========================== */
 
     .download-card h2 {
       font-size: 18px;
@@ -232,7 +247,7 @@
       margin-bottom: 7px;
     }
 
-    .download-card p {
+    .download-card > p {
       min-height: 42px;
 
       color: var(--muted);
@@ -241,10 +256,107 @@
 
       line-height: 1.6;
 
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
-    /* ================= BUTTON ================= */
+    /* =========================
+       LINK DOWNLOAD
+    ========================== */
+
+    .link-label {
+      display: block;
+
+      text-align: left;
+
+      margin-bottom: 7px;
+
+      color: var(--muted);
+
+      font-size: 11px;
+
+      font-weight: 700;
+    }
+
+    .download-link-box {
+      display: flex;
+
+      align-items: center;
+
+      width: 100%;
+
+      margin-bottom: 12px;
+
+      overflow: hidden;
+
+      border:
+        1px solid rgba(255,255,255,.08);
+
+      background:
+        rgba(0,0,0,.18);
+
+      border-radius: 10px;
+    }
+
+    .download-link {
+      flex: 1;
+
+      min-width: 0;
+
+      padding: 10px 11px;
+
+      color: #dbeafe;
+
+      font-size: 11px;
+
+      text-align: left;
+
+      white-space: nowrap;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+
+      user-select: all;
+    }
+
+    .copy-button {
+      flex-shrink: 0;
+
+      border: none;
+
+      border-left:
+        1px solid rgba(255,255,255,.08);
+
+      background:
+        rgba(255,255,255,.05);
+
+      color: #ffffff;
+
+      padding: 10px 12px;
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition: .2s ease;
+    }
+
+    .copy-button:hover {
+      background:
+        rgba(255,255,255,.12);
+    }
+
+    .copy-button.copied {
+      background: var(--green);
+
+      color: #ffffff;
+    }
+
+    /* =========================
+       DOWNLOAD BUTTON
+    ========================== */
 
     .download-button {
       display: flex;
@@ -294,7 +406,9 @@
       color: #fff;
     }
 
-    /* ================= FOOTER ================= */
+    /* =========================
+       FOOTER
+    ========================== */
 
     .footer {
       text-align: center;
@@ -310,7 +424,9 @@
       color: var(--gold);
     }
 
-    /* ================= MOBILE ================= */
+    /* =========================
+       MOBILE
+    ========================== */
 
     @media (max-width: 800px) {
 
@@ -320,9 +436,7 @@
 
       .header {
         padding:
-          30px
-          15px
-          25px;
+          30px 15px 25px;
       }
 
       .header h1 {
@@ -331,6 +445,7 @@
 
       .download-grid {
         grid-template-columns: 1fr;
+
         gap: 14px;
       }
 
@@ -355,7 +470,9 @@
 
   <main class="container">
 
-    <!-- ================= HEADER ================= -->
+    <!-- =========================
+         HEADER
+    ========================== -->
 
     <header class="header">
 
@@ -381,11 +498,16 @@
     </header>
 
 
-    <!-- ================= DOWNLOAD ================= -->
+    <!-- =========================
+         DOWNLOAD CARDS
+    ========================== -->
 
     <section class="download-grid">
 
-      <!-- ================= ADMIN ================= -->
+
+      <!-- =====================
+           ADMIN
+      ====================== -->
 
       <div class="download-card">
 
@@ -402,9 +524,33 @@
           untuk mengelola sistem LENTERA SMANTI.
         </p>
 
-        <!-- GANTI HREF DI SINI -->
+
+        <span class="link-label">
+          Link Download
+        </span>
+
+        <div class="download-link-box">
+
+          <span
+            class="download-link"
+            id="adminLink"
+          >
+            https://contoh.com/admin.apk
+          </span>
+
+          <button
+            class="copy-button"
+            onclick="copyLink('adminLink', this)"
+          >
+            Salin
+          </button>
+
+        </div>
+
+
         <a
-          href="#"
+          id="adminDownload"
+          href="https://contoh.com/admin.apk"
           class="download-button admin-button"
         >
           ⬇ Download APK
@@ -413,7 +559,10 @@
       </div>
 
 
-      <!-- ================= GURU ================= -->
+
+      <!-- =====================
+           GURU
+      ====================== -->
 
       <div class="download-card">
 
@@ -430,9 +579,33 @@
           mengelola poin dan data siswa.
         </p>
 
-        <!-- GANTI HREF DI SINI -->
+
+        <span class="link-label">
+          Link Download
+        </span>
+
+        <div class="download-link-box">
+
+          <span
+            class="download-link"
+            id="guruLink"
+          >
+            https://contoh.com/guru.apk
+          </span>
+
+          <button
+            class="copy-button"
+            onclick="copyLink('guruLink', this)"
+          >
+            Salin
+          </button>
+
+        </div>
+
+
         <a
-          href="#"
+          id="guruDownload"
+          href="https://contoh.com/guru.apk"
           class="download-button guru-button"
         >
           ⬇ Download APK
@@ -441,7 +614,10 @@
       </div>
 
 
-      <!-- ================= SISWA ================= -->
+
+      <!-- =====================
+           SISWA
+      ====================== -->
 
       <div class="download-card">
 
@@ -458,9 +634,33 @@
           poin, informasi, dan akun LENTERA SMANTI.
         </p>
 
-        <!-- GANTI HREF DI SINI -->
+
+        <span class="link-label">
+          Link Download
+        </span>
+
+        <div class="download-link-box">
+
+          <span
+            class="download-link"
+            id="siswaLink"
+          >
+            https://contoh.com/siswa.apk
+          </span>
+
+          <button
+            class="copy-button"
+            onclick="copyLink('siswaLink', this)"
+          >
+            Salin
+          </button>
+
+        </div>
+
+
         <a
-          href="#"
+          id="siswaDownload"
+          href="https://contoh.com/siswa.apk"
           class="download-button siswa-button"
         >
           ⬇ Download APK
@@ -468,18 +668,24 @@
 
       </div>
 
+
     </section>
 
 
-    <!-- ================= FOOTER ================= -->
+    <!-- =========================
+         FOOTER
+    ========================== -->
 
     <footer class="footer">
 
-      <strong>LENTERA SMANTI</strong>
+      <strong>
+        LENTERA SMANTI
+      </strong>
 
       <br>
 
       Sistem Informasi Poin Siswa
+
       <br>
 
       © 2026 SMAN 3 Tebas
@@ -487,6 +693,155 @@
     </footer>
 
   </main>
+
+
+  <!-- =========================
+       JAVASCRIPT
+  ========================== -->
+
+  <script>
+
+    /*
+     * =========================================
+     * ATUR LINK APK DI SINI
+     * =========================================
+     */
+
+    const APK_LINKS = {
+
+      admin:
+        "https://contoh.com/admin.apk",
+
+      guru:
+        "https://contoh.com/guru.apk",
+
+      siswa:
+        "https://contoh.com/siswa.apk"
+
+    };
+
+
+    /*
+     * =========================================
+     * PASANG LINK OTOMATIS
+     * =========================================
+     */
+
+    document.getElementById("adminLink").textContent =
+      APK_LINKS.admin;
+
+    document.getElementById("adminDownload").href =
+      APK_LINKS.admin;
+
+
+    document.getElementById("guruLink").textContent =
+      APK_LINKS.guru;
+
+    document.getElementById("guruDownload").href =
+      APK_LINKS.guru;
+
+
+    document.getElementById("siswaLink").textContent =
+      APK_LINKS.siswa;
+
+    document.getElementById("siswaDownload").href =
+      APK_LINKS.siswa;
+
+
+
+    /*
+     * =========================================
+     * FUNGSI SALIN LINK
+     * =========================================
+     */
+
+    async function copyLink(
+      elementId,
+      button
+    ) {
+
+      const element =
+        document.getElementById(elementId);
+
+      const link =
+        element.textContent.trim();
+
+
+      try {
+
+        await navigator.clipboard.writeText(link);
+
+        const originalText =
+          button.textContent;
+
+        button.textContent =
+          "✓ Tersalin";
+
+        button.classList.add("copied");
+
+
+        setTimeout(() => {
+
+          button.textContent =
+            originalText;
+
+          button.classList.remove("copied");
+
+        }, 1800);
+
+
+      } catch (error) {
+
+        /*
+         * Fallback jika Clipboard API
+         * tidak tersedia.
+         */
+
+        const textarea =
+          document.createElement("textarea");
+
+        textarea.value = link;
+
+        textarea.style.position =
+          "fixed";
+
+        textarea.style.opacity =
+          "0";
+
+        document.body.appendChild(
+          textarea
+        );
+
+        textarea.select();
+
+        document.execCommand("copy");
+
+        textarea.remove();
+
+
+        const originalText =
+          button.textContent;
+
+        button.textContent =
+          "✓ Tersalin";
+
+        button.classList.add("copied");
+
+
+        setTimeout(() => {
+
+          button.textContent =
+            originalText;
+
+          button.classList.remove("copied");
+
+        }, 1800);
+
+      }
+
+    }
+
+  </script>
 
 </body>
 </html>
