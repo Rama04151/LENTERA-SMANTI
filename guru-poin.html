@@ -1,0 +1,4100 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Manajemen Poin - LENTERA SMANTI</title>
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+
+    :root {
+
+      --bg-dark: #0b132b;
+
+      --card-bg: #1c2541;
+
+      --card-light: #243052;
+
+      --accent-gold: #fbc02d;
+
+      --accent-gold-hover: #f57f17;
+
+      --gold-glow:
+        rgba(251, 192, 45, 0.25);
+
+      --text-main: #ffffff;
+
+      --text-muted: #94a3b8;
+
+      --border-color:
+        rgba(255, 255, 255, 0.08);
+
+      --input-bg:
+        rgba(11, 19, 43, 0.7);
+
+      --danger-color: #ef4444;
+
+      --success-color: #10b981;
+
+      --reward-color: #10b981;
+
+      --violation-color: #ef4444;
+
+    }
+
+
+    * {
+
+      box-sizing: border-box;
+
+      margin: 0;
+
+      padding: 0;
+
+      font-family:
+        'Plus Jakarta Sans',
+        sans-serif;
+
+    }
+
+
+    body {
+
+      background-color:
+        var(--bg-dark);
+
+      color:
+        var(--text-main);
+
+      min-height: 100vh;
+
+      padding: 20px;
+
+      background-image:
+
+        radial-gradient(
+          circle at 10% 20%,
+          rgba(251, 192, 45, 0.06) 0%,
+          transparent 40%
+        ),
+
+        radial-gradient(
+          circle at 90% 80%,
+          rgba(28, 37, 65, 0.6) 0%,
+          transparent 50%
+        );
+
+    }
+
+
+    .container {
+
+      width: 100%;
+
+      max-width: 1100px;
+
+      margin: 0 auto;
+
+    }
+
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+
+    .header {
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(28, 37, 65, 0.98),
+          rgba(20, 30, 55, 0.98)
+        );
+
+      border:
+        1px solid var(--border-color);
+
+      border-radius: 22px;
+
+      padding: 24px;
+
+      margin-bottom: 18px;
+
+      box-shadow:
+        0 15px 40px
+        rgba(0, 0, 0, 0.35);
+
+    }
+
+
+    .header-top {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 15px;
+
+    }
+
+
+    .header-title {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 14px;
+
+    }
+
+
+    .header-icon {
+
+      width: 52px;
+
+      height: 52px;
+
+      border-radius: 15px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 27px;
+
+      background:
+        rgba(251, 192, 45, 0.12);
+
+      border:
+        1px solid
+        rgba(251, 192, 45, 0.25);
+
+    }
+
+
+    .header h1 {
+
+      font-size: 22px;
+
+      font-weight: 800;
+
+      color:
+        var(--accent-gold);
+
+    }
+
+
+    .header p {
+
+      margin-top: 3px;
+
+      font-size: 12px;
+
+      color:
+        var(--text-muted);
+
+    }
+
+
+    .profile {
+
+      margin-top: 18px;
+
+      padding: 13px 16px;
+
+      border-radius: 14px;
+
+      background:
+        rgba(11, 19, 43, 0.55);
+
+      border:
+        1px solid
+        var(--border-color);
+
+    }
+
+
+    .profile strong {
+
+      display: block;
+
+      font-size: 14px;
+
+    }
+
+
+    .profile span {
+
+      display: block;
+
+      margin-top: 3px;
+
+      font-size: 12px;
+
+      color:
+        var(--accent-gold);
+
+    }
+
+
+    /* =====================================================
+       BUTTON
+    ===================================================== */
+
+    button {
+
+      font-family: inherit;
+
+    }
+
+
+    .btn {
+
+      border: 0;
+
+      border-radius: 11px;
+
+      padding: 11px 15px;
+
+      cursor: pointer;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      transition:
+        all 0.2s ease;
+
+    }
+
+
+    .btn:hover {
+
+      transform:
+        translateY(-1px);
+
+    }
+
+
+    .btn-primary {
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--accent-gold),
+          #d48806
+        );
+
+      color:
+        #0b132b;
+
+      box-shadow:
+        0 5px 15px
+        var(--gold-glow);
+
+    }
+
+
+    .btn-secondary {
+
+      background:
+        rgba(255,255,255,0.07);
+
+      color:
+        var(--text-main);
+
+      border:
+        1px solid
+        var(--border-color);
+
+    }
+
+
+    .btn-danger {
+
+      background:
+        rgba(239, 68, 68, 0.15);
+
+      color:
+        #f87171;
+
+      border:
+        1px solid
+        rgba(239,68,68,0.25);
+
+    }
+
+
+    .btn-success {
+
+      background:
+        rgba(16,185,129,0.15);
+
+      color:
+        #34d399;
+
+      border:
+        1px solid
+        rgba(16,185,129,0.25);
+
+    }
+
+
+    .btn-full {
+
+      width: 100%;
+
+    }
+
+
+    /* =====================================================
+       TOP ACTION
+    ===================================================== */
+
+    .top-actions {
+
+      display: flex;
+
+      gap: 10px;
+
+      margin-bottom: 18px;
+
+    }
+
+
+    /* =====================================================
+       STATISTICS
+    ===================================================== */
+
+    .stats {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 12px;
+
+      margin-bottom: 18px;
+
+    }
+
+
+    .stat {
+
+      background:
+        var(--card-bg);
+
+      border:
+        1px solid
+        var(--border-color);
+
+      border-radius: 17px;
+
+      padding: 17px;
+
+    }
+
+
+    .stat-label {
+
+      color:
+        var(--text-muted);
+
+      font-size: 11px;
+
+      font-weight: 600;
+
+    }
+
+
+    .stat-value {
+
+      margin-top: 5px;
+
+      font-size: 24px;
+
+      font-weight: 800;
+
+    }
+
+
+    .stat.reward .stat-value {
+
+      color:
+        var(--success-color);
+
+    }
+
+
+    .stat.violation .stat-value {
+
+      color:
+        #f87171;
+
+    }
+
+
+    .stat.total .stat-value {
+
+      color:
+        var(--accent-gold);
+
+    }
+
+
+    /* =====================================================
+       MAIN GRID
+    ===================================================== */
+
+    .main-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+      gap: 18px;
+
+    }
+
+
+    .card {
+
+      background:
+        var(--card-bg);
+
+      border:
+        1px solid
+        var(--border-color);
+
+      border-radius: 20px;
+
+      padding: 20px;
+
+      box-shadow:
+        0 10px 30px
+        rgba(0,0,0,0.22);
+
+    }
+
+
+    .card.full {
+
+      grid-column:
+        1 / -1;
+
+    }
+
+
+    .card-header {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 10px;
+
+      margin-bottom: 18px;
+
+      padding-bottom: 13px;
+
+      border-bottom:
+        1px solid
+        var(--border-color);
+
+    }
+
+
+    .card-title {
+
+      font-size: 16px;
+
+      font-weight: 800;
+
+    }
+
+
+    .card-subtitle {
+
+      margin-top: 3px;
+
+      font-size: 11px;
+
+      color:
+        var(--text-muted);
+
+    }
+
+
+    /* =====================================================
+       TABS
+    ===================================================== */
+
+    .tabs {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 8px;
+
+      margin-bottom: 18px;
+
+    }
+
+
+    .tab {
+
+      padding: 12px;
+
+      border-radius: 11px;
+
+      border:
+        1px solid
+        var(--border-color);
+
+      background:
+        rgba(255,255,255,0.04);
+
+      color:
+        var(--text-muted);
+
+      cursor: pointer;
+
+      font-weight: 700;
+
+      font-size: 13px;
+
+      transition:
+        all 0.2s ease;
+
+    }
+
+
+    .tab.active {
+
+      background:
+        rgba(251,192,45,0.12);
+
+      color:
+        var(--accent-gold);
+
+      border-color:
+        rgba(251,192,45,0.35);
+
+    }
+
+
+    /* =====================================================
+       FORM
+    ===================================================== */
+
+    .form-group {
+
+      margin-bottom: 14px;
+
+    }
+
+
+    label {
+
+      display: block;
+
+      margin-bottom: 6px;
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      color:
+        var(--accent-gold);
+
+    }
+
+
+    input,
+    select,
+    textarea {
+
+      width: 100%;
+
+      padding: 12px 13px;
+
+      background:
+        var(--input-bg);
+
+      border:
+        1px solid
+        var(--border-color);
+
+      border-radius: 11px;
+
+      color:
+        var(--text-main);
+
+      outline: none;
+
+      font-size: 13px;
+
+      transition:
+        all 0.2s ease;
+
+    }
+
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+
+      border-color:
+        var(--accent-gold);
+
+      box-shadow:
+        0 0 0 3px
+        var(--gold-glow);
+
+    }
+
+
+    select option {
+
+      background:
+        var(--card-bg);
+
+      color:
+        var(--text-main);
+
+    }
+
+
+    textarea {
+
+      min-height: 100px;
+
+      resize: vertical;
+
+    }
+
+
+    .form-row {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 12px;
+
+    }
+
+
+    /* =====================================================
+       SELECTED STUDENT
+    ===================================================== */
+
+    .selected-student {
+
+      display: none;
+
+      padding: 13px;
+
+      margin-bottom: 14px;
+
+      border-radius: 12px;
+
+      background:
+        rgba(251,192,45,0.09);
+
+      border:
+        1px solid
+        rgba(251,192,45,0.3);
+
+    }
+
+
+    .selected-student.show {
+
+      display: block;
+
+    }
+
+
+    .selected-student strong {
+
+      color:
+        var(--accent-gold);
+
+      font-size: 13px;
+
+    }
+
+
+    .selected-student small {
+
+      display: block;
+
+      margin-top: 4px;
+
+      color:
+        var(--text-muted);
+
+    }
+
+
+    .clear-student {
+
+      margin-top: 7px;
+
+      border: 0;
+
+      background: none;
+
+      color:
+        #f87171;
+
+      cursor: pointer;
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+    }
+
+
+    /* =====================================================
+       STUDENT SEARCH
+    ===================================================== */
+
+    .student-search {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 150px;
+
+      gap: 8px;
+
+      margin-bottom: 12px;
+
+    }
+
+
+    .student-results {
+
+      max-height: 280px;
+
+      overflow-y: auto;
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 7px;
+
+      margin-bottom: 14px;
+
+    }
+
+
+    .student-item {
+
+      padding: 12px;
+
+      border-radius: 11px;
+
+      border:
+        1px solid
+        var(--border-color);
+
+      background:
+        rgba(11,19,43,0.45);
+
+      cursor: pointer;
+
+      transition:
+        all 0.2s ease;
+
+    }
+
+
+    .student-item:hover {
+
+      border-color:
+        rgba(251,192,45,0.5);
+
+      background:
+        rgba(251,192,45,0.07);
+
+    }
+
+
+    .student-name {
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+    }
+
+
+    .student-info {
+
+      margin-top: 4px;
+
+      color:
+        var(--text-muted);
+
+      font-size: 11px;
+
+    }
+
+
+    .student-points {
+
+      display: flex;
+
+      gap: 5px;
+
+      flex-wrap: wrap;
+
+      margin-top: 7px;
+
+    }
+
+
+    .badge {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      padding: 4px 7px;
+
+      border-radius: 6px;
+
+      font-size: 10px;
+
+      font-weight: 700;
+
+    }
+
+
+    .badge.reward {
+
+      background:
+        rgba(16,185,129,0.13);
+
+      color:
+        #34d399;
+
+      border:
+        1px solid
+        rgba(16,185,129,0.2);
+
+    }
+
+
+    .badge.violation {
+
+      background:
+        rgba(239,68,68,0.13);
+
+      color:
+        #f87171;
+
+      border:
+        1px solid
+        rgba(239,68,68,0.2);
+
+    }
+
+
+    .badge.total {
+
+      background:
+        rgba(255,255,255,0.06);
+
+      color:
+        var(--text-muted);
+
+      border:
+        1px solid
+        var(--border-color);
+
+    }
+
+
+    /* =====================================================
+       MESSAGE
+    ===================================================== */
+
+    .message {
+
+      display: none;
+
+      padding: 11px 13px;
+
+      border-radius: 10px;
+
+      margin-bottom: 14px;
+
+      font-size: 12px;
+
+      font-weight: 600;
+
+    }
+
+
+    .message.show {
+
+      display: block;
+
+    }
+
+
+    .message.success {
+
+      background:
+        rgba(16,185,129,0.13);
+
+      color:
+        #34d399;
+
+      border:
+        1px solid
+        rgba(16,185,129,0.25);
+
+    }
+
+
+    .message.error {
+
+      background:
+        rgba(239,68,68,0.13);
+
+      color:
+        #f87171;
+
+      border:
+        1px solid
+        rgba(239,68,68,0.25);
+
+    }
+
+
+    /* =====================================================
+       MY POINTS
+    ===================================================== */
+
+    .my-points-list {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 10px;
+
+      max-height: 650px;
+
+      overflow-y: auto;
+
+    }
+
+
+    .point-card {
+
+      border:
+        1px solid
+        var(--border-color);
+
+      border-radius: 14px;
+
+      padding: 14px;
+
+      background:
+        rgba(11,19,43,0.42);
+
+    }
+
+
+    .point-top {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      gap: 10px;
+
+      align-items: flex-start;
+
+    }
+
+
+    .point-student {
+
+      font-size: 14px;
+
+      font-weight: 800;
+
+    }
+
+
+    .point-class {
+
+      margin-top: 3px;
+
+      color:
+        var(--text-muted);
+
+      font-size: 11px;
+
+    }
+
+
+    .point-description {
+
+      margin-top: 11px;
+
+      color:
+        var(--text-muted);
+
+      font-size: 12px;
+
+      line-height: 1.5;
+
+      white-space: pre-wrap;
+
+      overflow-wrap: anywhere;
+
+    }
+
+
+    .point-date {
+
+      margin-top: 8px;
+
+      color:
+        var(--text-muted);
+
+      font-size: 11px;
+
+    }
+
+
+    .point-actions {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 7px;
+
+      margin-top: 12px;
+
+    }
+
+
+    .empty {
+
+      padding: 35px 15px;
+
+      text-align: center;
+
+      color:
+        var(--text-muted);
+
+      font-size: 12px;
+
+      border:
+        1px dashed
+        var(--border-color);
+
+      border-radius: 12px;
+
+    }
+
+
+    .loading {
+
+      padding: 25px;
+
+      text-align: center;
+
+      color:
+        var(--text-muted);
+
+      font-size: 12px;
+
+    }
+
+
+    /* =====================================================
+       EDIT MODAL
+    ===================================================== */
+
+    .modal {
+
+      display: none;
+
+      position: fixed;
+
+      inset: 0;
+
+      z-index: 9999;
+
+      background:
+        rgba(0,0,0,0.75);
+
+      backdrop-filter:
+        blur(8px);
+
+      padding: 20px;
+
+      overflow-y: auto;
+
+    }
+
+
+    .modal.show {
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+    }
+
+
+    .modal-box {
+
+      width: 100%;
+
+      max-width: 500px;
+
+      background:
+        var(--card-bg);
+
+      border:
+        1px solid
+        var(--border-color);
+
+      border-radius: 20px;
+
+      padding: 22px;
+
+      box-shadow:
+        0 20px 60px
+        rgba(0,0,0,0.65);
+
+    }
+
+
+    .modal-header {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-bottom: 18px;
+
+      padding-bottom: 12px;
+
+      border-bottom:
+        1px solid
+        var(--border-color);
+
+    }
+
+
+    .modal-header h2 {
+
+      font-size: 17px;
+
+      color:
+        var(--accent-gold);
+
+    }
+
+
+    .close {
+
+      width: 35px;
+
+      height: 35px;
+
+      border: 0;
+
+      border-radius: 50%;
+
+      background:
+        rgba(255,255,255,0.07);
+
+      color:
+        white;
+
+      font-size: 20px;
+
+      cursor: pointer;
+
+    }
+
+
+    /* =====================================================
+       FOOTER
+    ===================================================== */
+
+    .footer {
+
+      margin-top: 18px;
+
+      text-align: center;
+
+      color:
+        var(--text-muted);
+
+      font-size: 10px;
+
+      opacity: 0.7;
+
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media (max-width: 800px) {
+
+      .main-grid {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+
+      .card.full {
+
+        grid-column:
+          auto;
+
+      }
+
+
+      .stats {
+
+        grid-template-columns:
+          repeat(2, 1fr);
+
+      }
+
+
+      .my-points-list {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+      body {
+
+        padding: 10px;
+
+      }
+
+
+      .header {
+
+        padding: 18px;
+
+      }
+
+
+      .header-top {
+
+        align-items:
+          flex-start;
+
+      }
+
+
+      .top-actions {
+
+        flex-direction:
+          column;
+
+      }
+
+
+      .stats {
+
+        grid-template-columns:
+          1fr 1fr;
+
+      }
+
+
+      .form-row {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+
+      .student-search {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+
+      .student-results {
+
+        max-height: 240px;
+
+      }
+
+
+      .card {
+
+        padding: 16px;
+
+      }
+
+    }
+
+
+    @media (max-width: 400px) {
+
+      .stats {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <div class="header">
+
+    <div class="header-top">
+
+      <div class="header-title">
+
+        <div class="header-icon">
+          ⭐
+        </div>
+
+        <div>
+
+          <h1>
+            Manajemen Poin
+          </h1>
+
+          <p>
+            LENTERA SMANTI
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="profile">
+
+      <strong id="guruName">
+        Memuat...
+      </strong>
+
+      <span id="guruUsername">
+        @...
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       ACTION
+  ====================================================== -->
+
+  <div class="top-actions">
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      onclick="window.location.href='guru.html'"
+    >
+      ← Kembali ke Panel Guru
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      onclick="loadAllData()"
+    >
+      🔄 Refresh
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       STATISTICS
+  ====================================================== -->
+
+  <div class="stats">
+
+    <div class="stat reward">
+
+      <div class="stat-label">
+        Total Penghargaan
+      </div>
+
+      <div
+        class="stat-value"
+        id="statReward"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat violation">
+
+      <div class="stat-label">
+        Total Pelanggaran
+      </div>
+
+      <div
+        class="stat-value"
+        id="statViolation"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat total">
+
+      <div class="stat-label">
+        Poin Bersih
+      </div>
+
+      <div
+        class="stat-value"
+        id="statNet"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Jumlah Transaksi
+      </div>
+
+      <div
+        class="stat-value"
+        id="statTransaction"
+      >
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
+
+  <div class="main-grid">
+
+
+    <!-- ===================================================
+         TAMBAH POIN
+    ==================================================== -->
+
+    <div class="card">
+
+      <div class="card-header">
+
+        <div>
+
+          <div class="card-title">
+            Tambah Poin
+          </div>
+
+          <div class="card-subtitle">
+            Berikan penghargaan atau pelanggaran kepada siswa.
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="tabs">
+
+        <button
+          type="button"
+          class="tab active"
+          id="rewardTab"
+          onclick="setPointType('penghargaan')"
+        >
+          🏆 Penghargaan
+        </button>
+
+        <button
+          type="button"
+          class="tab"
+          id="violationTab"
+          onclick="setPointType('pelanggaran')"
+        >
+          ⚠️ Pelanggaran
+        </button>
+
+      </div>
+
+
+      <div
+        id="pointMessage"
+        class="message"
+      ></div>
+
+
+      <!-- SEARCH SISWA -->
+
+      <div class="form-group">
+
+        <label>
+          Pilih Siswa
+        </label>
+
+        <div class="student-search">
+
+          <input
+            type="text"
+            id="studentSearch"
+            placeholder="🔎 Cari nama atau NISN..."
+            oninput="filterPointStudents()"
+            autocomplete="off"
+          >
+
+          <select
+            id="studentClass"
+            onchange="filterPointStudents()"
+          >
+
+            <option value="">
+              Semua Kelas
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div
+          id="studentResults"
+          class="student-results"
+        >
+
+          <div class="loading">
+            Memuat data siswa...
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- SISWA TERPILIH -->
+
+      <div
+        id="selectedStudent"
+        class="selected-student"
+      ></div>
+
+
+      <input
+        type="hidden"
+        id="selectedStudentId"
+      >
+
+
+      <!-- JUMLAH -->
+
+      <div class="form-group">
+
+        <label for="pointValue">
+          Jumlah Poin
+        </label>
+
+        <input
+          type="number"
+          id="pointValue"
+          min="1"
+          max="100"
+          placeholder="Contoh: 10"
+        >
+
+      </div>
+
+
+      <!-- KETERANGAN -->
+
+      <div class="form-group">
+
+        <label for="pointDescription">
+          Keterangan
+        </label>
+
+        <textarea
+          id="pointDescription"
+          maxlength="500"
+          placeholder="Tuliskan alasan pemberian poin..."
+        ></textarea>
+
+      </div>
+
+
+      <button
+        type="button"
+        id="submitPointButton"
+        class="btn btn-primary btn-full"
+        onclick="submitPoint()"
+      >
+        🏆 Tambahkan Penghargaan
+      </button>
+
+    </div>
+
+
+    <!-- ===================================================
+         PETUNJUK
+    ==================================================== -->
+
+    <div class="card">
+
+      <div class="card-header">
+
+        <div>
+
+          <div class="card-title">
+            Panduan Manajemen Poin
+          </div>
+
+          <div class="card-subtitle">
+            Gunakan menu ini untuk mencatat poin siswa.
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="point-card">
+
+        <div class="point-top">
+
+          <div>
+
+            <div class="point-student">
+              🏆 Penghargaan
+            </div>
+
+            <div class="point-class">
+              Poin positif siswa
+            </div>
+
+          </div>
+
+          <span class="badge reward">
+            POSITIF
+          </span>
+
+        </div>
+
+
+        <div class="point-description">
+
+          Gunakan penghargaan untuk mencatat
+          prestasi, kedisiplinan, keaktifan,
+          atau pencapaian positif siswa.
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="point-card"
+        style="margin-top:10px;"
+      >
+
+        <div class="point-top">
+
+          <div>
+
+            <div class="point-student">
+              ⚠️ Pelanggaran
+            </div>
+
+            <div class="point-class">
+              Poin pelanggaran siswa
+            </div>
+
+          </div>
+
+          <span class="badge violation">
+            NEGATIF
+          </span>
+
+        </div>
+
+
+        <div class="point-description">
+
+          Gunakan pelanggaran untuk mencatat
+          keterlambatan, ketidaktertiban,
+          pelanggaran tata tertib, dan lainnya.
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="point-card"
+        style="margin-top:10px;"
+      >
+
+        <div class="point-top">
+
+          <div>
+
+            <div class="point-student">
+              🔐 Hak Guru
+            </div>
+
+            <div class="point-class">
+              Kontrol data
+            </div>
+
+          </div>
+
+          <span class="badge total">
+            TERBATAS
+          </span>
+
+        </div>
+
+
+        <div class="point-description">
+
+          Guru dapat mengelola poin yang dibuat
+          oleh dirinya sendiri. Poin guru lain
+          tidak dapat diedit atau dihapus.
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================================
+         POIN SAYA
+    ==================================================== -->
+
+    <div class="card full">
+
+      <div class="card-header">
+
+        <div>
+
+          <div class="card-title">
+            📋 Poin Saya
+          </div>
+
+          <div class="card-subtitle">
+            Daftar poin yang Anda tambahkan.
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="loadMyPoints()"
+        >
+          🔄 Refresh
+        </button>
+
+      </div>
+
+
+      <div
+        id="myPointsMessage"
+        class="message"
+      ></div>
+
+
+      <div
+        id="myPointsList"
+        class="my-points-list"
+      >
+
+        <div class="loading">
+          Memuat poin...
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="footer">
+    LENTERA SMANTI • Panel Manajemen Poin Guru
+  </div>
+
+</div>
+
+
+<!-- =======================================================
+     MODAL EDIT
+======================================================== -->
+
+<div
+  id="editModal"
+  class="modal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2>
+        ✏️ Edit Poin
+      </h2>
+
+      <button
+        type="button"
+        class="close"
+        onclick="closeEditModal()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div
+      id="editMessage"
+      class="message"
+    ></div>
+
+
+    <input
+      type="hidden"
+      id="editPointId"
+    >
+
+
+    <div class="form-group">
+
+      <label>
+        Siswa
+      </label>
+
+      <input
+        type="text"
+        id="editStudentName"
+        readonly
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="editType">
+        Jenis Poin
+      </label>
+
+      <select id="editType">
+
+        <option value="penghargaan">
+          🏆 Penghargaan
+        </option>
+
+        <option value="pelanggaran">
+          ⚠️ Pelanggaran
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="editValue">
+        Jumlah Poin
+      </label>
+
+      <input
+        type="number"
+        id="editValue"
+        min="1"
+        max="100"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="editDescription">
+        Keterangan
+      </label>
+
+      <textarea
+        id="editDescription"
+        maxlength="500"
+      ></textarea>
+
+    </div>
+
+
+    <div class="form-row">
+
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick="closeEditModal()"
+      >
+        Batal
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        onclick="saveEditPoint()"
+      >
+        💾 Simpan Perubahan
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   SESSION
+========================================================= */
+
+const guruSession =
+  JSON.parse(
+    sessionStorage.getItem(
+      "lentera_guru_session"
+    ) || "null"
+  );
+
+
+if (!guruSession) {
+
+  window.location.href =
+    "guru-login.html";
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+if (guruSession) {
+
+  document.getElementById(
+    "guruName"
+  ).textContent =
+    guruSession.nama ||
+    "Guru";
+
+
+  document.getElementById(
+    "guruUsername"
+  ).textContent =
+    "@" +
+    (
+      guruSession.username ||
+      ""
+    );
+
+}
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let students = [];
+
+let myPoints = [];
+
+let pointType =
+  "penghargaan";
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+  return String(
+    value ?? ""
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function showMessage(
+  elementId,
+  message,
+  type
+) {
+
+  const element =
+    document.getElementById(
+      elementId
+    );
+
+
+  if (!element) {
+    return;
+  }
+
+
+  element.textContent =
+    message;
+
+
+  element.className =
+    "message show " +
+    type;
+
+}
+
+
+function clearMessage(
+  elementId
+) {
+
+  const element =
+    document.getElementById(
+      elementId
+    );
+
+
+  if (!element) {
+    return;
+  }
+
+
+  element.textContent =
+    "";
+
+  element.className =
+    "message";
+
+}
+
+
+/* =========================================================
+   GET SISWA
+========================================================= */
+
+async function getStudents() {
+
+  const response =
+    await fetch(
+      "/.netlify/functions/guru-students",
+      {
+        method: "GET",
+
+        headers: {
+          "Accept":
+            "application/json"
+        }
+
+      }
+    );
+
+
+  const raw =
+    await response.text();
+
+
+  let result;
+
+
+  try {
+
+    result =
+      JSON.parse(raw);
+
+  } catch (error) {
+
+    throw new Error(
+      "Response server bukan JSON. Status: " +
+      response.status
+    );
+
+  }
+
+
+  if (
+    !response.ok ||
+    !result.success
+  ) {
+
+    throw new Error(
+      result.message ||
+      "Gagal mengambil data siswa."
+    );
+
+  }
+
+
+  return Array.isArray(
+    result.siswa
+  )
+    ? result.siswa
+    : [];
+
+}
+
+
+/* =========================================================
+   LOAD SEMUA DATA
+========================================================= */
+
+async function loadAllData() {
+
+  const results =
+    document.getElementById(
+      "studentResults"
+    );
+
+
+  results.innerHTML =
+    `<div class="loading">
+      Memuat data siswa...
+    </div>`;
+
+
+  try {
+
+    students =
+      await getStudents();
+
+
+    buildClassFilter();
+
+
+    filterPointStudents();
+
+
+    await loadMyPoints();
+
+
+  } catch (error) {
+
+    console.error(
+      "LOAD ALL DATA ERROR:",
+      error
+    );
+
+
+    results.innerHTML = `
+      <div class="empty">
+        ${escapeHtml(
+          error.message
+        )}
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* =========================================================
+   CLASS FILTER
+========================================================= */
+
+function buildClassFilter() {
+
+  const select =
+    document.getElementById(
+      "studentClass"
+    );
+
+
+  const current =
+    select.value;
+
+
+  const classes =
+    Array.from(
+      new Set(
+        students
+          .map(
+            siswa =>
+              String(
+                siswa.kelas ||
+                ""
+              ).trim()
+          )
+          .filter(Boolean)
+      )
+    )
+    .sort(
+      (a, b) =>
+        a.localeCompare(b)
+    );
+
+
+  select.innerHTML =
+    `<option value="">
+      Semua Kelas
+    </option>`;
+
+
+  classes.forEach(
+    kelas => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        kelas;
+
+
+      option.textContent =
+        kelas;
+
+
+      if (
+        kelas === current
+      ) {
+
+        option.selected =
+          true;
+
+      }
+
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   FILTER SISWA
+========================================================= */
+
+function filterPointStudents() {
+
+  const search =
+    document
+      .getElementById(
+        "studentSearch"
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const kelas =
+    document.getElementById(
+      "studentClass"
+    ).value;
+
+
+  const filtered =
+    students.filter(
+      siswa => {
+
+        const nama =
+          String(
+            siswa.nama ||
+            ""
+          )
+          .toLowerCase();
+
+
+        const nisn =
+          String(
+            siswa.nisn ||
+            ""
+          )
+          .toLowerCase();
+
+
+        const siswaKelas =
+          String(
+            siswa.kelas ||
+            ""
+          );
+
+
+        const matchSearch =
+          !search ||
+          nama.includes(search) ||
+          nisn.includes(search);
+
+
+        const matchClass =
+          !kelas ||
+          siswaKelas === kelas;
+
+
+        const status =
+          String(
+            siswa.status ||
+            "Aktif"
+          )
+          .toLowerCase();
+
+
+        return (
+          matchSearch &&
+          matchClass &&
+          status === "aktif"
+        );
+
+      }
+    );
+
+
+  renderStudentResults(
+    filtered
+  );
+
+}
+
+
+/* =========================================================
+   RENDER SISWA
+========================================================= */
+
+function renderStudentResults(
+  list
+) {
+
+  const container =
+    document.getElementById(
+      "studentResults"
+    );
+
+
+  if (!list.length) {
+
+    container.innerHTML =
+      `<div class="empty">
+        Tidak ada siswa ditemukan.
+      </div>`;
+
+    return;
+
+  }
+
+
+  /*
+   * Jika belum mencari,
+   * batasi tampilan agar halaman
+   * tidak terlalu panjang.
+   */
+
+  const search =
+    document
+      .getElementById(
+        "studentSearch"
+      )
+      .value
+      .trim();
+
+
+  const displayList =
+    search
+      ? list.slice(0, 50)
+      : list.slice(0, 20);
+
+
+  container.innerHTML =
+    displayList
+      .map(
+        siswa => `
+
+          <div
+            class="student-item"
+            onclick="selectStudent('${escapeHtml(
+              siswa.id
+            )}')"
+          >
+
+            <div class="student-name">
+
+              ${escapeHtml(
+                siswa.nama
+              )}
+
+            </div>
+
+            <div class="student-info">
+
+              NISN:
+              ${escapeHtml(
+                siswa.nisn
+              )}
+
+              •
+
+              Kelas:
+              ${escapeHtml(
+                siswa.kelas
+              )}
+
+            </div>
+
+            <div class="student-points">
+
+              <span class="badge reward">
+
+                🏆
+                ${Number(
+                  siswa.penghargaan ||
+                  0
+                )}
+
+              </span>
+
+              <span class="badge violation">
+
+                ⚠️
+                ${Number(
+                  siswa.pelanggaran ||
+                  0
+                )}
+
+              </span>
+
+              <span class="badge total">
+
+                Total:
+                ${Number(
+                  siswa.total ||
+                  0
+                )}
+
+              </span>
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+  if (
+    list.length >
+    displayList.length
+  ) {
+
+    container.innerHTML += `
+
+      <div
+        style="
+          text-align:center;
+          padding:8px;
+          color:var(--text-muted);
+          font-size:10px;
+        "
+      >
+
+        Menampilkan
+        ${displayList.length}
+        dari
+        ${list.length}
+        siswa.
+        Gunakan pencarian untuk
+        menemukan siswa lainnya.
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =========================================================
+   PILIH SISWA
+========================================================= */
+
+function selectStudent(
+  id
+) {
+
+  const siswa =
+    students.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+
+  if (!siswa) {
+    return;
+  }
+
+
+  document.getElementById(
+    "selectedStudentId"
+  ).value =
+    siswa.id;
+
+
+  const selected =
+    document.getElementById(
+      "selectedStudent"
+    );
+
+
+  selected.innerHTML = `
+
+    <strong>
+
+      ${escapeHtml(
+        siswa.nama
+      )}
+
+    </strong>
+
+    <small>
+
+      NISN:
+      ${escapeHtml(
+        siswa.nisn
+      )}
+
+      •
+
+      Kelas:
+      ${escapeHtml(
+        siswa.kelas
+      )}
+
+    </small>
+
+    <button
+      type="button"
+      class="clear-student"
+      onclick="clearSelectedStudent()"
+    >
+
+      × Ganti siswa
+
+    </button>
+
+  `;
+
+
+  selected.classList.add(
+    "show"
+  );
+
+
+  /*
+   * Scroll ke form poin
+   */
+
+  selected.scrollIntoView({
+    behavior: "smooth",
+    block: "nearest"
+  });
+
+}
+
+
+/* =========================================================
+   CLEAR SISWA
+========================================================= */
+
+function clearSelectedStudent() {
+
+  document.getElementById(
+    "selectedStudentId"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "selectedStudent"
+  ).innerHTML =
+    "";
+
+
+  document.getElementById(
+    "selectedStudent"
+  ).classList.remove(
+    "show"
+  );
+
+}
+
+
+/* =========================================================
+   TYPE
+========================================================= */
+
+function setPointType(
+  type
+) {
+
+  pointType =
+    type;
+
+
+  const rewardTab =
+    document.getElementById(
+      "rewardTab"
+    );
+
+
+  const violationTab =
+    document.getElementById(
+      "violationTab"
+    );
+
+
+  const button =
+    document.getElementById(
+      "submitPointButton"
+    );
+
+
+  if (
+    type ===
+    "penghargaan"
+  ) {
+
+    rewardTab.classList.add(
+      "active"
+    );
+
+    violationTab.classList.remove(
+      "active"
+    );
+
+
+    button.textContent =
+      "🏆 Tambahkan Penghargaan";
+
+
+  } else {
+
+    rewardTab.classList.remove(
+      "active"
+    );
+
+    violationTab.classList.add(
+      "active"
+    );
+
+
+    button.textContent =
+      "⚠️ Tambahkan Pelanggaran";
+
+  }
+
+
+  clearMessage(
+    "pointMessage"
+  );
+
+}
+
+
+/* =========================================================
+   SUBMIT POINT
+========================================================= */
+
+async function submitPoint() {
+
+  const siswaId =
+    document.getElementById(
+      "selectedStudentId"
+    ).value;
+
+
+  const poin =
+    Number(
+      document.getElementById(
+        "pointValue"
+      ).value
+    );
+
+
+  const keterangan =
+    document
+      .getElementById(
+        "pointDescription"
+      )
+      .value
+      .trim();
+
+
+  if (!siswaId) {
+
+    showMessage(
+      "pointMessage",
+      "Pilih siswa terlebih dahulu.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !Number.isInteger(poin) ||
+    poin < 1 ||
+    poin > 100
+  ) {
+
+    showMessage(
+      "pointMessage",
+      "Poin harus berupa angka 1 sampai 100.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (!keterangan) {
+
+    showMessage(
+      "pointMessage",
+      "Keterangan wajib diisi.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const button =
+    document.getElementById(
+      "submitPointButton"
+    );
+
+
+  const oldText =
+    button.textContent;
+
+
+  button.disabled =
+    true;
+
+
+  button.textContent =
+    "Menyimpan...";
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-points",
+        {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              siswaId,
+
+              poin,
+
+              keterangan,
+
+              jenis:
+                pointType,
+
+              guruId:
+                guruSession.id,
+
+              guruUsername:
+                guruSession.username
+
+            })
+
+        }
+      );
+
+
+    const raw =
+      await response.text();
+
+
+    let result;
+
+
+    try {
+
+      result =
+        JSON.parse(raw);
+
+    } catch (error) {
+
+      throw new Error(
+        "Response server bukan JSON."
+      );
+
+    }
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal menambahkan poin."
+      );
+
+    }
+
+
+    showMessage(
+      "pointMessage",
+
+      pointType ===
+        "penghargaan"
+
+        ? "Poin penghargaan berhasil ditambahkan."
+
+        : "Poin pelanggaran berhasil ditambahkan.",
+
+      "success"
+    );
+
+
+    /*
+     * Bersihkan form
+     */
+
+    document.getElementById(
+      "pointValue"
+    ).value =
+      "";
+
+
+    document.getElementById(
+      "pointDescription"
+    ).value =
+      "";
+
+
+    clearSelectedStudent();
+
+
+    /*
+     * Reload data
+     */
+
+    students =
+      await getStudents();
+
+
+    buildClassFilter();
+
+    filterPointStudents();
+
+    await loadMyPoints();
+
+
+  } catch (error) {
+
+    console.error(
+      "SUBMIT POINT ERROR:",
+      error
+    );
+
+
+    showMessage(
+      "pointMessage",
+      error.message,
+      "error"
+    );
+
+  } finally {
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      oldText;
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD MY POINTS
+========================================================= */
+
+async function loadMyPoints() {
+
+  const list =
+    document.getElementById(
+      "myPointsList"
+    );
+
+
+  list.innerHTML =
+    `<div class="loading">
+      Memuat poin...
+    </div>`;
+
+
+  try {
+
+    if (
+      !guruSession ||
+      !guruSession.id
+    ) {
+
+      throw new Error(
+        "Sesi guru tidak ditemukan."
+      );
+
+    }
+
+
+    const params =
+      new URLSearchParams({
+
+        guruId:
+          guruSession.id
+
+      });
+
+
+    const response =
+      await fetch(
+        `/.netlify/functions/guru-points?${params.toString()}`
+      );
+
+
+    const raw =
+      await response.text();
+
+
+    let result;
+
+
+    try {
+
+      result =
+        JSON.parse(raw);
+
+    } catch (error) {
+
+      throw new Error(
+        "Response server bukan JSON."
+      );
+
+    }
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengambil poin."
+      );
+
+    }
+
+
+    myPoints =
+      Array.isArray(
+        result.poin
+      )
+        ? result.poin
+        : [];
+
+
+    renderMyPoints();
+
+    updateStatistics();
+
+
+  } catch (error) {
+
+    console.error(
+      "LOAD MY POINTS ERROR:",
+      error
+    );
+
+
+    list.innerHTML = `
+
+      <div class="empty">
+
+        ${escapeHtml(
+          error.message
+        )}
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =========================================================
+   RENDER MY POINTS
+========================================================= */
+
+function renderMyPoints() {
+
+  const list =
+    document.getElementById(
+      "myPointsList"
+    );
+
+
+  if (!myPoints.length) {
+
+    list.innerHTML = `
+
+      <div class="empty">
+
+        Belum ada poin yang
+        Anda tambahkan.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    myPoints
+      .map(
+        point => {
+
+          const jenis =
+            String(
+              point.jenis ||
+              ""
+            )
+            .toLowerCase();
+
+
+          const isReward =
+            jenis ===
+            "penghargaan";
+
+
+          return `
+
+            <div class="point-card">
+
+              <div class="point-top">
+
+                <div>
+
+                  <div class="point-student">
+
+                    ${escapeHtml(
+                      point.siswaNama ||
+                      point.siswaId ||
+                      "-"
+                    )}
+
+                  </div>
+
+                  <div class="point-class">
+
+                    ${escapeHtml(
+                      point.siswaKelas ||
+                      "-"
+                    )}
+
+                    •
+
+                    NISN:
+                    ${escapeHtml(
+                      point.siswaNisn ||
+                      "-"
+                    )}
+
+                  </div>
+
+                </div>
+
+
+                <span
+                  class="badge ${
+                    isReward
+                      ? "reward"
+                      : "violation"
+                  }"
+                >
+
+                  ${
+                    isReward
+                      ? "🏆 Penghargaan"
+                      : "⚠️ Pelanggaran"
+                  }
+
+                  ·
+
+                  ${Number(
+                    point.poin ||
+                    0
+                  )}
+
+                </span>
+
+              </div>
+
+
+              <div class="point-description">
+
+                ${escapeHtml(
+                  point.keterangan ||
+                  "-"
+                )}
+
+              </div>
+
+
+              <div class="point-date">
+
+                📅
+                ${formatTanggal(
+                  point.tanggal
+                )}
+
+              </div>
+
+
+              <div class="point-actions">
+
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="openEditModal('${escapeHtml(
+                    point.id
+                  )}')"
+                >
+
+                  ✏️ Edit
+
+                </button>
+
+
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  onclick="deleteMyPoint('${escapeHtml(
+                    point.id
+                  )}')"
+                >
+
+                  🗑️ Hapus
+
+                </button>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+function updateStatistics() {
+
+  let reward =
+    0;
+
+  let violation =
+    0;
+
+
+  myPoints.forEach(
+    point => {
+
+      const nilai =
+        Number(
+          point.poin ||
+          0
+        );
+
+
+      const jenis =
+        String(
+          point.jenis ||
+          ""
+        )
+        .toLowerCase();
+
+
+      if (
+        jenis ===
+        "penghargaan"
+      ) {
+
+        reward +=
+          nilai;
+
+      }
+
+
+      if (
+        jenis ===
+        "pelanggaran"
+      ) {
+
+        violation +=
+          nilai;
+
+      }
+
+    }
+  );
+
+
+  document.getElementById(
+    "statReward"
+  ).textContent =
+    reward;
+
+
+  document.getElementById(
+    "statViolation"
+  ).textContent =
+    violation;
+
+
+  document.getElementById(
+    "statNet"
+  ).textContent =
+    reward -
+    violation;
+
+
+  document.getElementById(
+    "statTransaction"
+  ).textContent =
+    myPoints.length;
+
+}
+
+
+/* =========================================================
+   EDIT MODAL
+========================================================= */
+
+function openEditModal(
+  id
+) {
+
+  const point =
+    myPoints.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+
+  if (!point) {
+
+    alert(
+      "Data poin tidak ditemukan."
+    );
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    "editPointId"
+  ).value =
+    point.id;
+
+
+  document.getElementById(
+    "editStudentName"
+  ).value =
+    (
+      point.siswaNama ||
+      point.siswaId ||
+      "-"
+    );
+
+
+  document.getElementById(
+    "editType"
+  ).value =
+    String(
+      point.jenis ||
+      "penghargaan"
+    )
+    .toLowerCase();
+
+
+  document.getElementById(
+    "editValue"
+  ).value =
+    Number(
+      point.poin ||
+      0
+    );
+
+
+  document.getElementById(
+    "editDescription"
+  ).value =
+    point.keterangan ||
+    "";
+
+
+  clearMessage(
+    "editMessage"
+  );
+
+
+  document.getElementById(
+    "editModal"
+  ).classList.add(
+    "show"
+  );
+
+}
+
+
+/* =========================================================
+   CLOSE EDIT
+========================================================= */
+
+function closeEditModal() {
+
+  document.getElementById(
+    "editModal"
+  ).classList.remove(
+    "show"
+  );
+
+}
+
+
+/* =========================================================
+   SAVE EDIT
+========================================================= */
+
+async function saveEditPoint() {
+
+  const id =
+    document.getElementById(
+      "editPointId"
+    ).value;
+
+
+  const jenis =
+    document.getElementById(
+      "editType"
+    ).value;
+
+
+  const poin =
+    Number(
+      document.getElementById(
+        "editValue"
+      ).value
+    );
+
+
+  const keterangan =
+    document
+      .getElementById(
+        "editDescription"
+      )
+      .value
+      .trim();
+
+
+  if (!id) {
+
+    showMessage(
+      "editMessage",
+      "ID poin tidak ditemukan.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !Number.isInteger(poin) ||
+    poin < 1 ||
+    poin > 100
+  ) {
+
+    showMessage(
+      "editMessage",
+      "Poin harus berupa angka 1 sampai 100.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (!keterangan) {
+
+    showMessage(
+      "editMessage",
+      "Keterangan wajib diisi.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-points",
+        {
+
+          method: "PUT",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              id,
+
+              jenis,
+
+              poin,
+
+              keterangan,
+
+              guruUsername:
+                guruSession.username
+
+            })
+
+        }
+      );
+
+
+    const raw =
+      await response.text();
+
+
+    let result;
+
+
+    try {
+
+      result =
+        JSON.parse(raw);
+
+    } catch (error) {
+
+      throw new Error(
+        "Response server bukan JSON."
+      );
+
+    }
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengedit poin."
+      );
+
+    }
+
+
+    showMessage(
+      "editMessage",
+      "Poin berhasil diperbarui.",
+      "success"
+    );
+
+
+    await loadMyPoints();
+
+
+    setTimeout(
+      () => {
+
+        closeEditModal();
+
+      },
+      700
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "EDIT POINT ERROR:",
+      error
+    );
+
+
+    showMessage(
+      "editMessage",
+      error.message,
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   DELETE POINT
+========================================================= */
+
+async function deleteMyPoint(
+  id
+) {
+
+  const point =
+    myPoints.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+
+  if (!point) {
+    return;
+  }
+
+
+  const siswa =
+    point.siswaNama ||
+    point.siswaId ||
+    "-";
+
+
+  const jenis =
+    String(
+      point.jenis ||
+      ""
+    )
+    .toLowerCase();
+
+
+  const nilai =
+    Number(
+      point.poin ||
+      0
+    );
+
+
+  const yakin =
+    confirm(
+
+      "Hapus poin ini?\n\n" +
+
+      "Siswa: " +
+      siswa +
+      "\n" +
+
+      "Jenis: " +
+      jenis +
+      "\n" +
+
+      "Poin: " +
+      nilai +
+      "\n\n" +
+
+      "Data yang dihapus tidak dapat dikembalikan."
+
+    );
+
+
+  if (!yakin) {
+    return;
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-points",
+        {
+
+          method:
+            "DELETE",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              id:
+
+                point.id,
+
+              guruUsername:
+
+                guruSession.username
+
+            })
+
+        }
+      );
+
+
+    const raw =
+      await response.text();
+
+
+    let result;
+
+
+    try {
+
+      result =
+        JSON.parse(raw);
+
+    } catch (error) {
+
+      throw new Error(
+        "Response server bukan JSON."
+      );
+
+    }
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal menghapus poin."
+      );
+
+    }
+
+
+    showMessage(
+      "myPointsMessage",
+      "Poin berhasil dihapus.",
+      "success"
+    );
+
+
+    await loadMyPoints();
+
+
+  } catch (error) {
+
+    console.error(
+      "DELETE POINT ERROR:",
+      error
+    );
+
+
+    showMessage(
+      "myPointsMessage",
+      error.message,
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   FORMAT TANGGAL
+========================================================= */
+
+function formatTanggal(
+  value
+) {
+
+  if (!value) {
+    return "-";
+  }
+
+
+  const raw =
+    String(
+      value
+    ).trim();
+
+
+  /*
+   * Supabase date:
+   * YYYY-MM-DD
+   */
+
+  if (
+    /^\d{4}-\d{2}-\d{2}$/.test(
+      raw
+    )
+  ) {
+
+    const [
+      year,
+      month,
+      day
+    ] =
+      raw.split("-");
+
+
+    return (
+      day +
+      " " +
+      getMonthName(
+        Number(month)
+      ) +
+      " " +
+      year
+    );
+
+  }
+
+
+  const date =
+    new Date(raw);
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return raw;
+
+  }
+
+
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+
+      timeZone:
+        "Asia/Jakarta",
+
+      day:
+        "2-digit",
+
+      month:
+        "long",
+
+      year:
+        "numeric"
+
+    }
+  ).format(date);
+
+}
+
+
+function getMonthName(
+  month
+) {
+
+  const months = [
+
+    "Januari",
+
+    "Februari",
+
+    "Maret",
+
+    "April",
+
+    "Mei",
+
+    "Juni",
+
+    "Juli",
+
+    "Agustus",
+
+    "September",
+
+    "Oktober",
+
+    "November",
+
+    "Desember"
+
+  ];
+
+
+  return (
+    months[
+      month - 1
+    ] ||
+    ""
+  );
+
+}
+
+
+/* =========================================================
+   CLICK OUTSIDE MODAL
+========================================================= */
+
+document.addEventListener(
+  "click",
+  function(event) {
+
+    const modal =
+      document.getElementById(
+        "editModal"
+      );
+
+
+    if (
+      event.target ===
+      modal
+    ) {
+
+      closeEditModal();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   ESC CLOSE MODAL
+========================================================= */
+
+document.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key ===
+      "Escape"
+    ) {
+
+      closeEditModal();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+setPointType(
+  "penghargaan"
+);
+
+
+loadAllData();
+
+</script>
+
+</body>
+
+</html>
