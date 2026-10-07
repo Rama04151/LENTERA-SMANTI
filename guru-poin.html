@@ -596,6 +596,28 @@
         1px solid rgba(239,68,68,0.25);
     }
 
+    .my-points-search {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.my-points-search input {
+  flex: 1;
+}
+
+.search-info {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+@media (max-width: 600px) {
+  .my-points-search {
+    flex-direction: column;
+  }
+}
+
     /* POINT LIST */
 
     .my-points-list {
@@ -1263,14 +1285,39 @@
       </div>
 
       <div
-        id="myPointsMessage"
-        class="message"
-      ></div>
+  id="myPointsMessage"
+  class="message"
+></div>
 
-      <div
-        id="myPointsList"
-        class="my-points-list"
-      >
+<div class="my-points-search">
+
+  <input
+    type="text"
+    id="myPointsSearch"
+    placeholder="🔎 Cari nama siswa, NISN, kelas, atau keterangan..."
+    oninput="filterMyPoints()"
+    autocomplete="off"
+  >
+
+  <button
+    type="button"
+    class="btn btn-secondary"
+    onclick="clearMyPointsSearch()"
+  >
+    ✕
+  </button>
+
+</div>
+
+<div
+  id="myPointsSearchInfo"
+  class="search-info"
+></div>
+
+<div
+  id="myPointsList"
+  class="my-points-list"
+>
         <div class="loading">
           Memuat poin...
         </div>
@@ -2439,19 +2486,134 @@ async function loadMyPoints() {
   }
 }
 
+  /* =========================================================
+   SEARCH POIN SAYA
+========================================================= */
+
+function filterMyPoints() {
+
+  const input =
+    document.getElementById(
+      "myPointsSearch"
+    );
+
+  const search =
+    String(
+      input?.value || ""
+    )
+      .trim()
+      .toLowerCase();
+
+  if (!search) {
+
+    renderMyPoints();
+
+    const info =
+      document.getElementById(
+        "myPointsSearchInfo"
+      );
+
+    if (info) {
+      info.textContent = "";
+    }
+
+    return;
+  }
+
+  const filtered =
+    myPoints.filter(point => {
+
+      const nama =
+        String(
+          point.siswaNama || ""
+        ).toLowerCase();
+
+      const nisn =
+        String(
+          point.siswaNisn || ""
+        ).toLowerCase();
+
+      const kelas =
+        String(
+          point.siswaKelas || ""
+        ).toLowerCase();
+
+      const keterangan =
+        String(
+          point.keterangan || ""
+        ).toLowerCase();
+
+      const jenis =
+        String(
+          point.jenis || ""
+        ).toLowerCase();
+
+      const poin =
+        String(
+          point.poin || ""
+        ).toLowerCase();
+
+      return (
+        nama.includes(search) ||
+        nisn.includes(search) ||
+        kelas.includes(search) ||
+        keterangan.includes(search) ||
+        jenis.includes(search) ||
+        poin.includes(search)
+      );
+    });
+
+  renderMyPoints(filtered);
+
+  const info =
+    document.getElementById(
+      "myPointsSearchInfo"
+    );
+
+  if (info) {
+
+    info.textContent =
+      `Menampilkan ${filtered.length} dari ${myPoints.length} poin.`;
+  }
+}
+
+
+function clearMyPointsSearch() {
+
+  const input =
+    document.getElementById(
+      "myPointsSearch"
+    );
+
+  if (input) {
+    input.value = "";
+  }
+
+  const info =
+    document.getElementById(
+      "myPointsSearchInfo"
+    );
+
+  if (info) {
+    info.textContent = "";
+  }
+
+  renderMyPoints();
+}
+
 
 /* =========================================================
    RENDER POIN
 ========================================================= */
 
-function renderMyPoints() {
+function renderMyPoints(points = myPoints) {
 
   const list =
     document.getElementById(
       "myPointsList"
     );
 
-  if (!myPoints.length) {
+  if (!points.length) {
 
     list.innerHTML = `
       <div class="empty">
@@ -2463,8 +2625,8 @@ function renderMyPoints() {
   }
 
   list.innerHTML =
-    myPoints
-      .map(point => {
+    points
+  .map(point => {
 
         const jenis =
           String(
