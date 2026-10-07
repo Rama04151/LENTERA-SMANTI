@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Inbox Siswa - Guru | LENTERA SMANTI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+
+    :root {
+      --bg-dark: #0b132b;
+      --card-bg: #1c2541;
+      --accent-gold: #fbc02d;
+      --accent-gold-hover: #f57f17;
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255,255,255,0.08);
+      --success: #10b981;
+      --danger: #ef4444;
+      --input-bg: rgba(11,19,43,0.8);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 20px;
+
+      background:
+        radial-gradient(
+          circle at 10% 20%,
+          rgba(251,192,45,0.06),
+          transparent 40%
+        ),
+        radial-gradient(
+          circle at 90% 80%,
+          rgba(28,37,65,0.6),
+          transparent 50%
+        ),
+        var(--bg-dark);
+
+      color: var(--text-main);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+
+    .header {
+      padding: 22px;
+      margin-bottom: 18px;
+
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(28,37,65,0.98),
+          rgba(20,30,55,0.98)
+        );
+
+      box-shadow:
+        0 15px 40px rgba(0,0,0,0.35);
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .header-icon {
+      width: 50px;
+      height: 50px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 15px;
+
+      background:
+        rgba(251,192,45,0.12);
+
+      border:
+        1px solid
+        rgba(251,192,45,0.25);
+
+      font-size: 25px;
+    }
+
+    .header h1 {
+      color: var(--accent-gold);
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .header p {
+      margin-top: 3px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .profile {
+      margin-top: 16px;
+      padding: 11px 14px;
+
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+
+      background:
+        rgba(11,19,43,0.55);
+    }
+
+    .profile strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .profile span {
+      display: block;
+      margin-top: 3px;
+      color: var(--accent-gold);
+      font-size: 11px;
+    }
+
+    /* BUTTON */
+
+    button {
+      font-family: inherit;
+    }
+
+    .back-button {
+      width: 100%;
+
+      padding: 12px;
+
+      margin-bottom: 18px;
+
+      border:
+        1px solid
+        var(--border-color);
+
+      border-radius: 11px;
+
+      background:
+        rgba(255,255,255,0.07);
+
+      color: white;
+
+      font-size: 13px;
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition: 0.2s;
+    }
+
+    .back-button:hover {
+      background:
+        rgba(255,255,255,0.11);
+
+      transform:
+        translateY(-1px);
+    }
+
+    /* CARD */
+
+    .section {
+      padding: 19px;
+      margin-bottom: 18px;
+
+      border:
+        1px solid
+        var(--border-color);
+
+      border-radius: 18px;
+
+      background:
+        rgba(28,37,65,0.95);
+
+      box-shadow:
+        0 10px 30px rgba(0,0,0,0.22);
+    }
+
+    .section-title {
+      color: var(--accent-gold);
+      font-size: 15px;
+      font-weight: 800;
+
+      margin-bottom: 4px;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 11px;
+
+      margin-bottom: 17px;
+    }
+
+    /* FORM */
+
+    label {
+      display: block;
+
+      margin-bottom: 6px;
+
+      color: var(--text-muted);
+
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+
+      padding: 12px 13px;
+
+      margin-bottom: 13px;
+
+      color: white;
+      background: var(--input-bg);
+
+      border:
+        1px solid
+        var(--border-color);
+
+      border-radius: 11px;
+
+      outline: none;
+
+      font-size: 13px;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color:
+        var(--accent-gold);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(251,192,45,0.08);
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    select option {
+      color: white;
+      background: var(--card-bg);
+    }
+
+    /* STUDENT SEARCH */
+
+    .student-search-wrapper {
+      position: relative;
+    }
+
+    .student-results {
+      display: none;
+
+      max-height: 230px;
+
+      margin-top: -8px;
+      margin-bottom: 13px;
+
+      overflow-y: auto;
+
+      background: #141d35;
+
+      border:
+        1px solid
+        var(--border-color);
+
+      border-radius: 11px;
+    }
+
+    .student-result {
+      padding: 12px;
+
+      border-bottom:
+        1px solid
+        var(--border-color);
+
+      cursor: pointer;
+
+      transition: 0.15s;
+    }
+
+    .student-result:last-child {
+      border-bottom: none;
+    }
+
+    .student-result:hover {
+      background:
+        rgba(251,192,45,0.08);
+    }
+
+    .student-result strong {
+      display: block;
+
+      margin-bottom: 3px;
+
+      color: white;
+
+      font-size: 13px;
+    }
+
+    .student-result span {
+      color: var(--text-muted);
+      font-size: 10px;
+    }
+
+    .selected-student {
+      display: none;
+
+      padding: 12px;
+
+      margin-bottom: 13px;
+
+      border:
+        1px solid
+        rgba(16,185,129,0.25);
+
+      border-radius: 11px;
+
+      background:
+        rgba(16,185,129,0.08);
+    }
+
+    .selected-student strong {
+      display: block;
+
+      margin-bottom: 4px;
+
+      color: var(--success);
+
+      font-size: 12px;
+    }
+
+    .selected-student span {
+      color: var(--text-muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    /* SEND */
+
+    .send-button {
+      width: 100%;
+
+      padding: 13px;
+
+      border: none;
+      border-radius: 11px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--accent-gold),
+          #d48806
+        );
+
+      color: #111827;
+
+      font-size: 13px;
+      font-weight: 800;
+
+      cursor: pointer;
+
+      transition: 0.2s;
+    }
+
+    .send-button:hover {
+      transform:
+        translateY(-1px);
+
+      background:
+        var(--accent-gold-hover);
+    }
+
+    .send-button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* MESSAGE */
+
+    .message {
+      display: none;
+
+      padding: 11px 12px;
+
+      margin-top: 12px;
+
+      border-radius: 10px;
+
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .message.success {
+      display: block;
+
+      color: #34d399;
+
+      background:
+        rgba(16,185,129,0.12);
+
+      border:
+        1px solid
+        rgba(16,185,129,0.2);
+    }
+
+    .message.error {
+      display: block;
+
+      color: #f87171;
+
+      background:
+        rgba(239,68,68,0.12);
+
+      border:
+        1px solid
+        rgba(239,68,68,0.2);
+    }
+
+    /* INBOX */
+
+    .inbox-item {
+      padding: 15px;
+
+      margin-bottom: 10px;
+
+      border:
+        1px solid
+        var(--border-color);
+
+      border-radius: 14px;
+
+      background:
+        rgba(11,19,43,0.45);
+    }
+
+    .inbox-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .inbox-item-title {
+      color: white;
+
+      font-size: 14px;
+      font-weight: 800;
+
+      margin-bottom: 6px;
+    }
+
+    .inbox-item-text {
+      color: var(--text-muted);
+
+      font-size: 11px;
+      line-height: 1.6;
+
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .inbox-recipient {
+      margin-top: 11px;
+
+      padding: 10px;
+
+      border:
+        1px solid
+        rgba(251,192,45,0.12);
+
+      border-radius: 10px;
+
+      background:
+        rgba(251,192,45,0.05);
+    }
+
+    .inbox-recipient strong {
+      display: block;
+
+      margin-bottom: 4px;
+
+      color: var(--accent-gold);
+
+      font-size: 12px;
+    }
+
+    .inbox-recipient span {
+      display: block;
+
+      color: var(--text-muted);
+
+      font-size: 10px;
+      line-height: 1.6;
+    }
+
+    .inbox-item-meta {
+      margin-top: 10px;
+      padding-top: 9px;
+
+      border-top:
+        1px solid
+        var(--border-color);
+
+      color: var(--text-muted);
+
+      font-size: 10px;
+      line-height: 1.7;
+    }
+
+    .delete-message-button {
+      width: 100%;
+
+      padding: 10px;
+
+      margin-top: 12px;
+
+      border:
+        1px solid
+        rgba(239,68,68,0.25);
+
+      border-radius: 10px;
+
+      background:
+        rgba(239,68,68,0.08);
+
+      color: #f87171;
+
+      font-size: 11px;
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition: 0.2s;
+    }
+
+    .delete-message-button:hover {
+      background:
+        rgba(239,68,68,0.16);
+
+      border-color:
+        rgba(239,68,68,0.4);
+
+      transform:
+        translateY(-1px);
+    }
+
+    /* STATE */
+
+    .empty,
+    .loading {
+      padding: 25px 15px;
+
+      color: var(--text-muted);
+
+      font-size: 11px;
+
+      text-align: center;
+
+      border-radius: 11px;
+    }
+
+    .empty {
+      border:
+        1px dashed
+        var(--border-color);
+    }
+
+    /* FOOTER */
+
+    .footer {
+      padding: 15px;
+
+      color: var(--text-muted);
+
+      font-size: 9px;
+
+      text-align: center;
+
+      opacity: 0.7;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 600px) {
+
+      body {
+        padding: 10px;
+      }
+
+      .header {
+        padding: 18px;
+      }
+
+      .section {
+        padding: 16px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+
+  <div class="header">
+
+    <div class="header-title">
+
+      <div class="header-icon">
+        📬
+      </div>
+
+      <div>
+
+        <h1>
+          Inbox Siswa
+        </h1>
+
+        <p>
+          Kirim informasi langsung kepada siswa
+        </p>
+
+      </div>
+
+    </div>
+
+    <div class="profile">
+
+      <strong id="guruName">
+        Memuat...
+      </strong>
+
+      <span id="guruUsername">
+        @...
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <!-- BACK -->
+
+  <button
+    type="button"
+    class="back-button"
+    onclick="window.location.href='guru.html'"
+  >
+    ← Kembali ke Panel Guru
+  </button>
+
+
+  <!-- =========================
+       FORM KIRIM PESAN
+  ========================== -->
+
+  <div class="section">
+
+    <div class="section-title">
+      ✉️ Buat Pesan
+    </div>
+
+    <div class="section-subtitle">
+      Kirim pengumuman atau informasi langsung kepada siswa.
+    </div>
+
+
+    <label>
+      Siswa Tujuan
+    </label>
+
+    <div class="student-search-wrapper">
+
+      <input
+        type="text"
+        id="studentSearch"
+        placeholder="🔎 Cari nama atau NISN..."
+        autocomplete="off"
+        oninput="searchStudents()"
+      >
+
+      <div
+        id="studentResults"
+        class="student-results"
+      ></div>
+
+    </div>
+
+
+    <div
+      id="selectedStudent"
+      class="selected-student"
+    ></div>
+
+
+    <label>
+      Judul Pesan
+    </label>
+
+    <input
+      type="text"
+      id="messageTitle"
+      maxlength="100"
+      placeholder="Contoh: Informasi Kegiatan Sekolah"
+    >
+
+
+    <label>
+      Isi Pesan
+    </label>
+
+    <textarea
+      id="messageText"
+      maxlength="2000"
+      placeholder="Tulis pesan untuk siswa..."
+    ></textarea>
+
+
+    <label>
+      Pesan Berlaku Selama
+    </label>
+
+    <select id="messageDuration">
+
+      <option value="1h">
+        1 jam
+      </option>
+
+      <option value="3h">
+        3 jam
+      </option>
+
+      <option value="6h">
+        6 jam
+      </option>
+
+      <option value="12h">
+        12 jam
+      </option>
+
+      <option value="1d" selected>
+        1 hari
+      </option>
+
+      <option value="3d">
+        3 hari
+      </option>
+
+      <option value="7d">
+        7 hari
+      </option>
+
+    </select>
+
+
+    <button
+      type="button"
+      id="sendButton"
+      class="send-button"
+      onclick="sendMessage()"
+    >
+      📤 Kirim Pesan
+    </button>
+
+
+    <div
+      id="sendMessageResult"
+      class="message"
+    ></div>
+
+  </div>
+
+
+  <!-- =========================
+       PESAN TERKIRIM
+  ========================== -->
+
+  <div class="section">
+
+    <div class="section-title">
+      📋 Pesan Terkirim
+    </div>
+
+    <div class="section-subtitle">
+      Daftar pesan yang Anda kirim kepada siswa.
+    </div>
+
+    <div id="sentMessages">
+
+      <div class="loading">
+        Memuat pesan...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="footer">
+    LENTERA SMANTI • Inbox Siswa Guru
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   SESSION GURU
+========================================================= */
+
+const guruSession =
+  JSON.parse(
+    sessionStorage.getItem(
+      "lentera_guru_session"
+    ) || "null"
+  );
+
+if (!guruSession) {
+
+  window.location.href =
+    "guru-login.html";
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+if (guruSession) {
+
+  document.getElementById(
+    "guruName"
+  ).textContent =
+    guruSession.nama ||
+    "Guru";
+
+  document.getElementById(
+    "guruUsername"
+  ).textContent =
+    "@" +
+    (
+      guruSession.username ||
+      ""
+    );
+
+}
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let students = [];
+
+let selectedStudent = null;
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =========================================================
+   LOAD SISWA
+========================================================= */
+
+async function loadStudents() {
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-students"
+      );
+
+    const raw =
+      await response.text();
+
+    let result;
+
+    try {
+
+      result =
+        JSON.parse(raw);
+
+    } catch {
+
+      throw new Error(
+        "Response server bukan JSON."
+      );
+
+    }
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengambil data siswa."
+      );
+
+    }
+
+    students =
+      (
+        result.siswa ||
+        []
+      ).filter(
+        siswa =>
+          String(
+            siswa.status ||
+            "Aktif"
+          )
+            .trim()
+            .toLowerCase() ===
+          "aktif"
+      );
+
+  }
+  catch (error) {
+
+    console.error(
+      "LOAD STUDENTS ERROR:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CARI SISWA
+========================================================= */
+
+function searchStudents() {
+
+  const input =
+    document.getElementById(
+      "studentSearch"
+    );
+
+  const results =
+    document.getElementById(
+      "studentResults"
+    );
+
+  const keyword =
+    input.value
+      .trim()
+      .toLowerCase();
+
+
+  if (!keyword) {
+
+    results.style.display =
+      "none";
+
+    results.innerHTML =
+      "";
+
+    return;
+
+  }
+
+
+  const filtered =
+    students
+      .filter(siswa => {
+
+        const nama =
+          String(
+            siswa.nama ||
+            ""
+          )
+            .toLowerCase();
+
+        const nisn =
+          String(
+            siswa.nisn ||
+            ""
+          )
+            .toLowerCase();
+
+        return (
+          nama.includes(
+            keyword
+          ) ||
+          nisn.includes(
+            keyword
+          )
+        );
+
+      })
+      .slice(0, 30);
+
+
+  if (
+    filtered.length === 0
+  ) {
+
+    results.innerHTML = `
+      <div class="empty">
+        Siswa tidak ditemukan.
+      </div>
+    `;
+
+    results.style.display =
+      "block";
+
+    return;
+
+  }
+
+
+  results.innerHTML =
+    filtered
+      .map(
+        siswa => `
+
+          <div
+            class="student-result"
+            onclick="selectStudent('${escapeHtml(
+              siswa.id
+            )}')"
+          >
+
+            <strong>
+              ${escapeHtml(
+                siswa.nama
+              )}
+            </strong>
+
+            <span>
+              NISN:
+              ${escapeHtml(
+                siswa.nisn
+              )}
+
+              • Kelas:
+              ${escapeHtml(
+                siswa.kelas
+              )}
+            </span>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+  results.style.display =
+    "block";
+
+}
+
+
+/* =========================================================
+   PILIH SISWA
+========================================================= */
+
+function selectStudent(id) {
+
+  const siswa =
+    students.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+  if (!siswa) {
+    return;
+  }
+
+
+  selectedStudent =
+    siswa;
+
+
+  document.getElementById(
+    "studentSearch"
+  ).value =
+    siswa.nama;
+
+
+  const selected =
+    document.getElementById(
+      "selectedStudent"
+    );
+
+
+  selected.innerHTML = `
+
+    <strong>
+      ✓ Siswa dipilih
+    </strong>
+
+    <span>
+      ${escapeHtml(
+        siswa.nama
+      )}
+
+      • NISN:
+      ${escapeHtml(
+        siswa.nisn
+      )}
+
+      • Kelas:
+      ${escapeHtml(
+        siswa.kelas
+      )}
+    </span>
+
+  `;
+
+
+  selected.style.display =
+    "block";
+
+
+  document.getElementById(
+    "studentResults"
+  ).style.display =
+    "none";
+
+}
+
+
+/* =========================================================
+   KIRIM PESAN
+========================================================= */
+
+async function sendMessage() {
+
+  const title =
+    document.getElementById(
+      "messageTitle"
+    ).value.trim();
+
+
+  const message =
+    document.getElementById(
+      "messageText"
+    ).value.trim();
+
+
+  const duration =
+    document.getElementById(
+      "messageDuration"
+    ).value;
+
+
+  const resultBox =
+    document.getElementById(
+      "sendMessageResult"
+    );
+
+
+  const button =
+    document.getElementById(
+      "sendButton"
+    );
+
+
+  function showResult(
+    text,
+    type
+  ) {
+
+    resultBox.textContent =
+      text;
+
+    resultBox.className =
+      "message " +
+      type;
+
+  }
+
+
+  if (!selectedStudent) {
+
+    showResult(
+      "Silakan pilih siswa tujuan.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (!title) {
+
+    showResult(
+      "Judul pesan wajib diisi.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (!message) {
+
+    showResult(
+      "Isi pesan wajib diisi.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  button.disabled =
+    true;
+
+  button.textContent =
+    "Mengirim...";
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-inbox",
+        {
+
+          method:
+            "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              siswaId:
+                selectedStudent.id,
+
+              judul:
+                title,
+
+              pesan:
+                message,
+
+              durasi:
+                duration,
+
+              guruId:
+                guruSession.id,
+
+              guruUsername:
+                guruSession.username
+
+            })
+
+        }
+      );
+
+
+    const raw =
+      await response.text();
+
+
+    let result;
+
+    try {
+
+      result =
+        JSON.parse(raw);
+
+    } catch {
+
+      throw new Error(
+        "Response server bukan JSON."
+      );
+
+    }
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Pesan gagal dikirim."
+      );
+
+    }
+
+
+    showResult(
+      "✓ Pesan berhasil dikirim ke siswa.",
+      "success"
+    );
+
+
+    /* RESET FORM */
+
+    selectedStudent =
+      null;
+
+
+    document.getElementById(
+      "studentSearch"
+    ).value =
+      "";
+
+
+    document.getElementById(
+      "messageTitle"
+    ).value =
+      "";
+
+
+    document.getElementById(
+      "messageText"
+    ).value =
+      "";
+
+
+    document.getElementById(
+      "studentResults"
+    ).style.display =
+      "none";
+
+
+    document.getElementById(
+      "selectedStudent"
+    ).style.display =
+      "none";
+
+
+    await loadSentMessages();
+
+  }
+  catch (error) {
+
+    console.error(
+      "SEND MESSAGE ERROR:",
+      error
+    );
+
+
+    showResult(
+      error.message ||
+      "Terjadi kesalahan koneksi.",
+      "error"
+    );
+
+  }
+  finally {
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "📤 Kirim Pesan";
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD PESAN TERKIRIM
+========================================================= */
+
+async function loadSentMessages() {
+
+  const container =
+    document.getElementById(
+      "sentMessages"
+    );
+
+
+  container.innerHTML = `
+    <div class="loading">
+      Memuat pesan...
+    </div>
+  `;
+
+
+  try {
+
+    if (
+      !guruSession ||
+      !guruSession.id
+    ) {
+
+      throw new Error(
+        "Sesi guru tidak ditemukan."
+      );
+
+    }
+
+
+    const params =
+      new URLSearchParams({
+
+        guruId:
+          guruSession.id
+
+      });
+
+
+    const response =
+      await fetch(
+        `/.netlify/functions/guru-inbox?${params.toString()}`
+      );
+
+
+    const raw =
+      await response.text();
+
+
+    let result;
+
+    try {
+
+      result =
+        JSON.parse(raw);
+
+    } catch {
+
+      throw new Error(
+        "Response server bukan JSON."
+      );
+
+    }
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal mengambil pesan."
+      );
+
+    }
+
+
+    const messages =
+      result.pesan ||
+      [];
+
+
+    if (
+      messages.length === 0
+    ) {
+
+      container.innerHTML = `
+        <div class="empty">
+          📭 Belum ada pesan yang Anda kirim.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      messages
+        .map(
+          item => `
+
+            <div class="inbox-item">
+
+              <div class="inbox-item-title">
+                ${escapeHtml(
+                  item.judul
+                )}
+              </div>
+
+
+              <div class="inbox-item-text">
+                ${escapeHtml(
+                  item.pesan
+                )}
+              </div>
+
+
+              <div class="inbox-recipient">
+
+                <strong>
+                  👤 ${escapeHtml(
+                    item.siswaNama
+                  )}
+                </strong>
+
+                <span>
+                  NISN:
+                  ${escapeHtml(
+                    item.siswaNisn
+                  )}
+                </span>
+
+                <span>
+                  Kelas:
+                  ${escapeHtml(
+                    item.siswaKelas
+                  )}
+                </span>
+
+              </div>
+
+
+              <div class="inbox-item-meta">
+
+                🕒 Dibuat:
+                ${formatDate(
+                  item.dibuat
+                )}
+
+                <br>
+
+                ⏳ Kedaluwarsa:
+                ${formatDate(
+                  item.kedaluwarsa
+                )}
+
+              </div>
+
+
+              <button
+                type="button"
+                class="delete-message-button"
+                onclick="deleteInboxMessage('${escapeHtml(
+                  item.id
+                )}')"
+              >
+                🗑️ Hapus Pesan
+              </button>
+
+            </div>
+
+          `
+        )
+        .join("");
+
+  }
+  catch (error) {
+
+    console.error(
+      "LOAD SENT MESSAGES ERROR:",
+      error
+    );
+
+
+    container.innerHTML = `
+      <div class="empty">
+        ${escapeHtml(
+          error.message ||
+          "Gagal memuat pesan."
+        )}
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* =========================================================
+   FORMAT TANGGAL
+========================================================= */
+
+function formatDate(
+  dateString
+) {
+
+  if (!dateString) {
+    return "-";
+  }
+
+
+  const date =
+    new Date(
+      dateString
+    );
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return "-";
+
+  }
+
+
+  return date.toLocaleString(
+    "id-ID",
+    {
+      timeZone:
+        "Asia/Jakarta",
+
+      day:
+        "2-digit",
+
+      month:
+        "short",
+
+      year:
+        "numeric",
+
+      hour:
+        "2-digit",
+
+      minute:
+        "2-digit"
+    }
+  );
+
+}
+
+
+/* =========================================================
+   HAPUS PESAN
+========================================================= */
+
+async function deleteInboxMessage(
+  id
+) {
+
+  if (!id) {
+    return;
+  }
+
+
+  const confirmed =
+    confirm(
+      "Hapus pesan ini?\n\n" +
+      "Pesan akan dihapus dari Inbox siswa " +
+      "dan tidak dapat dikembalikan."
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/.netlify/functions/guru-inbox",
+        {
+
+          method:
+            "DELETE",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              id,
+
+              guruId:
+                guruSession.id,
+
+              guruUsername:
+                guruSession.username
+
+            })
+
+        }
+      );
+
+
+    const raw =
+      await response.text();
+
+
+    let result;
+
+    try {
+
+      result =
+        JSON.parse(raw);
+
+    } catch {
+
+      throw new Error(
+        "Response server bukan JSON."
+      );
+
+    }
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Gagal menghapus pesan."
+      );
+
+    }
+
+
+    alert(
+      "Pesan berhasil dihapus."
+    );
+
+
+    await loadSentMessages();
+
+  }
+  catch (error) {
+
+    console.error(
+      "DELETE INBOX ERROR:",
+      error
+    );
+
+
+    alert(
+      error.message ||
+      "Terjadi kesalahan koneksi."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   TUTUP HASIL SEARCH KETIKA KLIK DI LUAR
+========================================================= */
+
+document.addEventListener(
+  "click",
+  function(event) {
+
+    const wrapper =
+      document.querySelector(
+        ".student-search-wrapper"
+      );
+
+    const results =
+      document.getElementById(
+        "studentResults"
+      );
+
+
+    if (
+      wrapper &&
+      !wrapper.contains(
+        event.target
+      )
+    ) {
+
+      results.style.display =
+        "none";
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+loadStudents();
+
+loadSentMessages();
+
+</script>
+
+</body>
+
+</html>
