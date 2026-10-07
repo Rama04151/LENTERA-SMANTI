@@ -1694,11 +1694,38 @@
 
       <!-- JUMLAH -->
 
-      <div class="form-group">
+      <!-- TANGGAL POIN -->
 
-        <label for="pointValue">
-          Jumlah Poin
-        </label>
+<div class="form-group">
+
+  <label for="pointDate">
+    Tanggal Poin
+  </label>
+
+  <input
+    type="date"
+    id="pointDate"
+    aria-describedby="pointDateHelp"
+  >
+
+  <div
+    id="pointDateHelp"
+    style="margin-top:6px;font-size:11px;color:var(--text-muted);"
+  >
+    Bisa memilih tanggal hari ini atau tanggal sebelumnya.
+    Tanggal mendatang tidak diperbolehkan.
+  </div>
+
+</div>
+
+
+<!-- JUMLAH -->
+
+<div class="form-group">
+
+  <label for="pointValue">
+    Jumlah Poin
+  </label>
 
         <input
           type="number"
@@ -2844,6 +2871,60 @@ function setPointType(
 
 }
 
+  function getTodayIndonesia() {
+
+  const parts = new Intl.DateTimeFormat(
+    "en-CA",
+    {
+      timeZone: "Asia/Jakarta",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }
+  ).formatToParts(new Date());
+
+  const values = {};
+
+  for (const part of parts) {
+
+    if (part.type !== "literal") {
+      values[part.type] = part.value;
+    }
+
+  }
+
+  return (
+    values.year +
+    "-" +
+    values.month +
+    "-" +
+    values.day
+  );
+}
+
+
+function setupDateInputs() {
+
+  const today =
+    getTodayIndonesia();
+
+  const pointDate =
+    document.getElementById(
+      "pointDate"
+    );
+
+  if (pointDate) {
+
+    pointDate.max =
+      today;
+
+    pointDate.value =
+      today;
+
+  }
+
+}
+
 
 /* =========================================================
    SUBMIT POINT
@@ -2872,6 +2953,14 @@ async function submitPoint() {
       )
       .value
       .trim();
+
+  const tanggal =
+  document.getElementById(
+    "pointDate"
+  ).value;
+
+const today =
+  getTodayIndonesia();
 
 
   if (!siswaId) {
@@ -2915,6 +3004,31 @@ async function submitPoint() {
     return;
 
   }
+
+  if (!tanggal) {
+
+  showMessage(
+    "pointMessage",
+    "Tanggal poin wajib dipilih.",
+    "error"
+  );
+
+  return;
+
+}
+
+
+if (tanggal > today) {
+
+  showMessage(
+    "pointMessage",
+    "Tanggal poin tidak boleh melebihi tanggal hari ini.",
+    "error"
+  );
+
+  return;
+
+}
 
 
   const button =
@@ -3646,21 +3760,15 @@ async function saveEditPoint() {
               "application/json"
           },
 
-          body:
-            JSON.stringify({
-
-              id,
-
-              jenis,
-
-              poin,
-
-              keterangan,
-
-              guruUsername:
-                guruSession.username
-
-            })
+         body: JSON.stringify({
+  siswaId,
+  poin,
+  keterangan,
+  jenis: pointType,
+  tanggal,
+  guruId: guruSession.id,
+  guruUsername: guruSession.username
+})
 
         }
       );
@@ -4090,6 +4198,7 @@ setPointType(
   "penghargaan"
 );
 
+setupDateInputs();
 
 loadAllData();
 
