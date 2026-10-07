@@ -1,90 +1,112 @@
 const supabase = require("./_supabase");
 
-// =====================================================
-// RESPONSE
-// =====================================================
-
 function response(statusCode, body) {
   return {
     statusCode,
-
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-store"
     },
-
     body: JSON.stringify(body)
   };
 }
 
+/**
+ * Normalisasi tanggal menjadi YYYY-MM-DD.
+ *
+ * Menerima:
+ * - YYYY-MM-DD
+ * - DD/MM/YYYY
+ * - DD-MM-YYYY
+ */
+function normalizeDate(value) {
+  const raw = String(value || "").trim();
 
-// =====================================================
-// HANDLER
-// =====================================================
+  if (!raw) {
+    return "";
+  }
 
-exports.handler = async (event) => {
+  // YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const [year, month, day] = raw.split("-");
 
+    const date = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    );
+
+    if (
+      date.getFullYear() !== Number(year) ||
+      date.getMonth() !== Number(month) - 1 ||
+      date.getDate() !== Number(day)
+    ) {
+      return "";
+    }
+
+    return raw;
+  }
+
+  // DD/MM/YYYY
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
+    const [day, month, year] = raw.split("/");
+
+    const date = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    );
+
+    if (
+      date.getFullYear() !== Number(year) ||
+      date.getMonth() !== Number(month) - 1 ||
+      date.getDate() !== Number(day)
+    ) {
+      return "";
+    }
+
+    return `${year}-${month}-${day}`;
+  }
+
+  // DD-MM-YYYY
+  if (/^\d{2}-\d{2}-\d{4}$/.test(raw)) {
+    const [day, month, year] = raw.split("-");
+
+    const date = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    );
+
+    if (
+      date.getFullYear() !== Number(year) ||
+      date.getMonth() !== Number(month) - 1 ||
+      date.getDate() !== Number(day)
+    ) {
+      return "";
+    }
+
+    return `${year}-${month}-${day}`;
+  }
+
+  return "";
+}
+
+function createPointId() {
+  return "P" + Date.now().toString().slice(-8);
+}
+
+exports.handler = async function (event) {
   try {
+    const method = event.httpMethod;
 
-    // ===================================================
-    // GET — DATA POIN
-    // ===================================================
+    /*
+    ============================================================
+    GET
+    ============================================================
+    */
 
-    if (event.httpMethod === "GET") {
-
-      // Ambil siswa
-      const {
-        data: siswaRows,
-        error: siswaError
-      } = await supabase
-        .from("siswa")
-        .select(`
-          id,
-          nama,
-          nisn,
-          kelas_id
-        `);
-
-      if (siswaError) {
-        console.error(
-          "SUPABASE ADMIN POINTS SISWA ERROR:",
-          siswaError
-        );
-
-        return response(500, {
-          success: false,
-          message: "Gagal mengambil data siswa."
-        });
-      }
-
-
-      // Map siswa
-      const siswaMap = {};
-
-      for (const siswa of siswaRows || []) {
-
-        const id =
-          String(siswa.id || "").trim();
-
-        if (!id) {
-          continue;
-        }
-
-        siswaMap[id] = {
-          nama:
-            String(siswa.nama || "").trim(),
-
-          nisn:
-            String(siswa.nisn || "").trim(),
-
-          kelasId:
-            String(siswa.kelas_id || "").trim()
-        };
-
-      }
-
-
-      // Ambil poin
+    if (method === "GET") {
       const {
         data: poinRows,
         error: poinError
@@ -106,45 +128,115 @@ exports.handler = async (event) => {
 
       if (poinError) {
         console.error(
-          "SUPABASE ADMIN POINTS ERROR:",
+          "SUPABASE ADMIN POINTS GET ERROR:",
           poinError
         );
 
         return response(500, {
           success: false,
-          message: "Gagal mengambil data poin."
+          message: "Gagal mengambil data poin.",
+          error: poinError.message
         });
       }
 
+      const {
+        data: siswaRows,
+        error: siswaError
+      } = await supabase
+        .from("siswa")
+        .select(`
+          id,
+          nisn,
+          nama,
+          kelas_id,
+          status
+        `);
 
-      // Bentuk response
-      const poin = [];
+      if (siswaError) {
+        console.error(
+          "SUPABASE ADMIN POINTS SISWA ERROR:",
+          siswaError
+        );
 
-      for (const row of poinRows || []) {
+        return response(500, {
+          success: false,
+          message: "Gagal mengambil data siswa.",
+          error: siswaError.message
+        });
+      }
 
-        const pointId =
-          String(row.id || "").trim();
+      const {
+        data: kelasRows,
+        error: kelasError
+      } = await supabase
+        .from("kelas")
+        .select(`
+          id,
+          nama_kelas,
+          tingkat,
+          status
+        `);
 
-        if (!pointId) {
-          continue;
-        }
+      if (kelasError) {
+        console.error(
+          "SUPABASE ADMIN POINTS KELAS ERROR:",
+          kelasError
+        );
 
+        return response(500, {
+          success: false,
+          message: "Gagal mengambil data kelas.",
+          error: kelasError.message
+        });
+      }
 
-        const siswaId =
-          String(row.siswa_id || "").trim();
+      const siswaMap = {};
+      const kelasMap = {};
 
+      for (const kelas of kelasRows || []) {
+        kelasMap[String(kelas.id)] = {
+          id: String(kelas.id),
+          nama: String(kelas.nama_kelas || "").trim(),
+          tingkat: String(kelas.tingkat || "").trim(),
+          status: String(kelas.status || "").trim()
+        };
+      }
 
-        poin.push({
+      for (const siswa of siswaRows || []) {
+        const kelasId = String(
+          siswa.kelas_id || ""
+        ).trim();
 
-          id: pointId,
+        siswaMap[String(siswa.id)] = {
+          id: String(siswa.id),
+          nisn: String(siswa.nisn || "").trim(),
+          nama: String(siswa.nama || "").trim(),
+          kelasId,
+          kelas:
+            kelasMap[kelasId]?.nama || "-",
+          status:
+            String(siswa.status || "").trim()
+        };
+      }
 
-          siswaId,
+      const poin = (poinRows || []).map(row => {
+        const siswa =
+          siswaMap[String(row.siswa_id)];
 
-          nama:
-            siswaMap[siswaId]?.nama || "-",
+        return {
+          id: String(row.id || "").trim(),
+
+          siswaId:
+            String(row.siswa_id || "").trim(),
 
           nisn:
-            siswaMap[siswaId]?.nisn || "-",
+            siswa?.nisn || "-",
+
+          nama:
+            siswa?.nama || "-",
+
+          kelas:
+            siswa?.kelas || "-",
 
           jenis:
             String(row.jenis || "").trim(),
@@ -163,451 +255,322 @@ exports.handler = async (event) => {
 
           peran:
             String(row.peran || "").trim()
-
-        });
-
-      }
-
-
-      return response(200, {
-
-        success: true,
-
-        poin
-
+        };
       });
 
+      return response(200, {
+        success: true,
+        poin
+      });
     }
 
+    /*
+    ============================================================
+    POST
+    ============================================================
+    */
 
-    // ===================================================
-    // POST — TAMBAH POIN
-    // ===================================================
+    if (method === "POST") {
+      const body = JSON.parse(
+        event.body || "{}"
+      );
 
-    if (event.httpMethod === "POST") {
+      const siswaId = String(
+        body.siswaId || ""
+      ).trim();
 
-      const body =
-        JSON.parse(event.body || "{}");
+      const jenis = String(
+        body.jenis || ""
+      )
+        .trim()
+        .toLowerCase();
 
+      const nilai = Number(body.poin);
 
-      const {
-        siswaId,
-        jenis,
-        poin,
-        keterangan,
-        tanggal,
-        admin
-      } = body;
+      const keterangan = String(
+        body.keterangan || ""
+      ).trim();
 
+      const tanggal = normalizeDate(
+        body.tanggal
+      );
 
-      // =================================================
-      // VALIDASI DATA
-      // =================================================
+      const admin = String(
+        body.admin || ""
+      ).trim();
+
+      /*
+      ------------------------------------------------------------
+      VALIDASI
+      ------------------------------------------------------------
+      */
 
       if (
         !siswaId ||
         !jenis ||
-        poin === undefined ||
-        poin === null ||
-        !keterangan
+        !body.poin ||
+        !keterangan ||
+        !tanggal
       ) {
-
         return response(400, {
-
           success: false,
-
-          message:
-            "Data poin belum lengkap."
-
+          message: "Semua data wajib diisi."
         });
-
       }
 
-
-      const jenisNormal =
-        String(jenis)
-          .trim()
-          .toLowerCase();
-
-
       if (
-        jenisNormal !== "penghargaan" &&
-        jenisNormal !== "pelanggaran"
+        jenis !== "penghargaan" &&
+        jenis !== "pelanggaran"
       ) {
-
         return response(400, {
-
           success: false,
-
           message:
             "Jenis poin tidak valid."
-
         });
-
       }
-
-
-      const nilaiPoin =
-        Number(poin);
-
 
       if (
-        !Number.isFinite(nilaiPoin) ||
-        nilaiPoin <= 0
+        !Number.isFinite(nilai) ||
+        nilai <= 0
       ) {
-
         return response(400, {
-
           success: false,
-
           message:
             "Nilai poin harus lebih dari 0."
-
         });
-
       }
 
-
-      // =================================================
-      // CEK SISWA
-      // =================================================
-
-      const siswaIdNormal =
-        String(siswaId).trim();
-
+      /*
+      ------------------------------------------------------------
+      CEK SISWA
+      ------------------------------------------------------------
+      */
 
       const {
         data: siswa,
         error: siswaError
       } = await supabase
         .from("siswa")
-        .select("id")
-        .eq("id", siswaIdNormal)
+        .select(`
+          id,
+          nama,
+          status
+        `)
+        .eq("id", siswaId)
         .maybeSingle();
 
-
       if (siswaError) {
-
         console.error(
-          "SUPABASE CHECK SISWA ERROR:",
+          "SUPABASE ADMIN POINTS CHECK SISWA ERROR:",
           siswaError
         );
 
         return response(500, {
-
           success: false,
-
           message:
-            "Gagal memeriksa siswa."
-
+            "Gagal memeriksa siswa.",
+          error: siswaError.message
         });
-
       }
-
 
       if (!siswa) {
-
         return response(404, {
-
           success: false,
-
           message:
             "Siswa tidak ditemukan."
-
         });
-
       }
 
+      if (
+        String(siswa.status || "")
+          .trim() !== "Aktif"
+      ) {
+        return response(400, {
+          success: false,
+          message:
+            "Siswa tidak aktif."
+        });
+      }
 
-      // =================================================
-      // ID POIN
-      // =================================================
+      /*
+      ------------------------------------------------------------
+      INSERT
+      ------------------------------------------------------------
+      */
 
       const pointId =
-        "P" +
-        String(Date.now()).slice(-8);
-
-
-      // =================================================
-      // TANGGAL
-      //
-      // Supabase menggunakan DATE.
-      // Format yang disimpan:
-      // YYYY-MM-DD
-      // =================================================
-
-      let tanggalFinal =
-        String(tanggal || "").trim();
-
-
-      if (!tanggalFinal) {
-
-        const now =
-          new Date();
-
-
-        tanggalFinal =
-          now.toISOString()
-            .slice(0, 10);
-
-      }
-
-
-      // =================================================
-      // PEMBUAT
-      // =================================================
-
-      const dibuatOleh =
-        String(admin || "").trim();
-
-
-      const peran =
-        "Admin";
-
-
-      // =================================================
-      // INSERT POIN
-      // =================================================
+        createPointId();
 
       const {
+        data: inserted,
         error: insertError
       } = await supabase
         .from("poin")
         .insert({
-
           id: pointId,
 
-          siswa_id:
-            siswaIdNormal,
+          siswa_id: siswaId,
 
-          jenis:
-            jenisNormal,
+          jenis,
 
-          poin:
-            nilaiPoin,
+          poin: nilai,
 
-          keterangan:
-            String(keterangan).trim(),
+          keterangan,
 
-          tanggal:
-            tanggalFinal,
+          tanggal,
 
-          dibuat_oleh:
-            dibuatOleh,
+          dibuat_oleh: admin,
 
+          peran: "Admin"
+        })
+        .select(`
+          id,
+          siswa_id,
+          jenis,
+          poin,
+          keterangan,
+          tanggal,
+          dibuat_oleh,
           peran
-
-        });
-
+        `)
+        .single();
 
       if (insertError) {
-
         console.error(
-          "SUPABASE INSERT POINT ERROR:",
+          "SUPABASE ADMIN POINTS INSERT ERROR:",
           insertError
         );
 
         return response(500, {
-
           success: false,
-
           message:
-            "Gagal menambahkan poin."
-
+            "Gagal menyimpan poin.",
+          error: insertError.message
         });
-
       }
 
-
-      return response(201, {
-
+      return response(200, {
         success: true,
-
         message:
           "Poin berhasil ditambahkan.",
-
         poin: {
-
           id:
-            pointId,
+            String(inserted.id || "").trim(),
 
           siswaId:
-            siswaIdNormal,
+            String(
+              inserted.siswa_id || ""
+            ).trim(),
 
           jenis:
-            jenisNormal,
+            String(
+              inserted.jenis || ""
+            ).trim(),
 
           poin:
-            nilaiPoin,
+            Number(
+              inserted.poin || 0
+            ),
 
           keterangan:
-            String(keterangan).trim(),
+            String(
+              inserted.keterangan || ""
+            ).trim(),
 
           tanggal:
-            tanggalFinal,
+            String(
+              inserted.tanggal || ""
+            ).trim(),
 
-          dibuatOleh,
+          dibuatOleh:
+            String(
+              inserted.dibuat_oleh || ""
+            ).trim(),
 
-          peran
-
+          peran:
+            String(
+              inserted.peran || ""
+            ).trim()
         }
-
       });
-
     }
 
+    /*
+    ============================================================
+    PUT
+    ============================================================
+    */
 
-    // ===================================================
-    // PUT — EDIT POIN
-    // ===================================================
+    if (method === "PUT") {
+      const body = JSON.parse(
+        event.body || "{}"
+      );
 
-    if (event.httpMethod === "PUT") {
+      const id = String(
+        body.id || ""
+      ).trim();
 
-      const body =
-        JSON.parse(event.body || "{}");
+      const jenis = String(
+        body.jenis || ""
+      )
+        .trim()
+        .toLowerCase();
 
+      const nilai = Number(body.poin);
 
-      const {
-        id,
-        siswaId,
-        jenis,
-        poin,
-        keterangan,
-        tanggal
-      } = body;
+      const keterangan = String(
+        body.keterangan || ""
+      ).trim();
 
-
-      // =================================================
-      // VALIDASI
-      // =================================================
+      const tanggal = normalizeDate(
+        body.tanggal
+      );
 
       if (
         !id ||
-        !siswaId ||
         !jenis ||
-        poin === undefined ||
-        poin === null ||
-        !keterangan
+        !body.poin ||
+        !keterangan ||
+        !tanggal
       ) {
-
         return response(400, {
-
           success: false,
-
           message:
             "Semua data wajib diisi."
-
         });
-
       }
 
-
-      const jenisNormal =
-        String(jenis)
-          .trim()
-          .toLowerCase();
-
-
       if (
-        jenisNormal !== "penghargaan" &&
-        jenisNormal !== "pelanggaran"
+        jenis !== "penghargaan" &&
+        jenis !== "pelanggaran"
       ) {
-
         return response(400, {
-
           success: false,
-
           message:
             "Jenis poin tidak valid."
-
         });
-
       }
-
-
-      const nilaiPoin =
-        Number(poin);
-
 
       if (
-        !Number.isFinite(nilaiPoin) ||
-        nilaiPoin <= 0
+        !Number.isFinite(nilai) ||
+        nilai <= 0
       ) {
-
         return response(400, {
-
           success: false,
-
           message:
-            "Jumlah poin harus lebih dari 0."
-
+            "Nilai poin harus lebih dari 0."
         });
-
       }
 
-
-      const pointIdNormal =
-        String(id).trim();
-
-
-      const siswaIdNormal =
-        String(siswaId).trim();
-
-
-      // =================================================
-      // CEK SISWA
-      // =================================================
+      /*
+      ------------------------------------------------------------
+      CEK POIN
+      ------------------------------------------------------------
+      */
 
       const {
-        data: siswa,
-        error: siswaError
-      } = await supabase
-        .from("siswa")
-        .select("id")
-        .eq("id", siswaIdNormal)
-        .maybeSingle();
-
-
-      if (siswaError) {
-
-        console.error(
-          "SUPABASE CHECK SISWA ERROR:",
-          siswaError
-        );
-
-        return response(500, {
-
-          success: false,
-
-          message:
-            "Gagal memeriksa siswa."
-
-        });
-
-      }
-
-
-      if (!siswa) {
-
-        return response(404, {
-
-          success: false,
-
-          message:
-            "Siswa tidak ditemukan."
-
-        });
-
-      }
-
-
-      // =================================================
-      // CEK POIN
-      // =================================================
-
-      const {
-        data: existingPoint,
-        error: pointError
+        data: existing,
+        error: existingError
       } = await supabase
         .from("poin")
         .select(`
@@ -615,206 +578,142 @@ exports.handler = async (event) => {
           dibuat_oleh,
           peran
         `)
-        .eq("id", pointIdNormal)
+        .eq("id", id)
         .maybeSingle();
 
-
-      if (pointError) {
-
+      if (existingError) {
         console.error(
-          "SUPABASE CHECK POINT ERROR:",
-          pointError
+          "SUPABASE ADMIN POINTS CHECK ERROR:",
+          existingError
         );
 
         return response(500, {
-
           success: false,
-
           message:
-            "Gagal memeriksa data poin."
-
+            "Gagal memeriksa data poin.",
+          error:
+            existingError.message
         });
-
       }
 
-
-      if (!existingPoint) {
-
+      if (!existing) {
         return response(404, {
-
           success: false,
-
           message:
             "Data poin tidak ditemukan."
-
         });
-
       }
 
-
-      // =================================================
-      // TANGGAL
-      // =================================================
-
-      let tanggalFinal =
-        String(tanggal || "").trim();
-
-
-      if (!tanggalFinal) {
-
-        const sekarang =
-          new Date();
-
-
-        tanggalFinal =
-          sekarang.toISOString()
-            .slice(0, 10);
-
-      }
-
-
-      // =================================================
-      // UPDATE
-      //
-      // HANYA DATA POIN.
-      //
-      // dibuat_oleh dan peran TIDAK DIUBAH.
-      // =================================================
+      /*
+      ------------------------------------------------------------
+      UPDATE
+      ------------------------------------------------------------
+      */
 
       const {
+        data: updated,
         error: updateError
       } = await supabase
         .from("poin")
         .update({
+          jenis,
 
-          siswa_id:
-            siswaIdNormal,
+          poin: nilai,
 
-          jenis:
-            jenisNormal,
+          keterangan,
 
-          poin:
-            nilaiPoin,
-
-          keterangan:
-            String(keterangan).trim(),
-
-          tanggal:
-            tanggalFinal
-
+          tanggal
         })
-        .eq("id", pointIdNormal);
-
+        .eq("id", id)
+        .select(`
+          id,
+          siswa_id,
+          jenis,
+          poin,
+          keterangan,
+          tanggal,
+          dibuat_oleh,
+          peran
+        `)
+        .single();
 
       if (updateError) {
-
         console.error(
-          "SUPABASE UPDATE POINT ERROR:",
+          "SUPABASE ADMIN POINTS UPDATE ERROR:",
           updateError
         );
 
         return response(500, {
-
           success: false,
-
           message:
-            "Gagal memperbarui poin."
-
+            "Gagal memperbarui poin.",
+          error:
+            updateError.message
         });
-
       }
-
 
       return response(200, {
-
         success: true,
-
         message:
-          "Poin berhasil diperbarui."
-
+          "Poin berhasil diperbarui.",
+        poin: updated
       });
-
     }
 
+    /*
+    ============================================================
+    DELETE
+    ============================================================
+    */
 
-    // ===================================================
-    // DELETE — HAPUS POIN
-    // ===================================================
+    if (method === "DELETE") {
+      const body = JSON.parse(
+        event.body || "{}"
+      );
 
-    if (event.httpMethod === "DELETE") {
-
-      const body =
-        JSON.parse(event.body || "{}");
-
-
-      const id =
-        String(body.id || "").trim();
-
+      const id = String(
+        body.id || ""
+      ).trim();
 
       if (!id) {
-
         return response(400, {
-
           success: false,
-
           message:
             "ID poin wajib diisi."
-
         });
-
       }
 
-
-      // =================================================
-      // CEK POIN
-      // =================================================
-
       const {
-        data: existingPoint,
-        error: pointError
+        data: existing,
+        error: existingError
       } = await supabase
         .from("poin")
         .select("id")
         .eq("id", id)
         .maybeSingle();
 
-
-      if (pointError) {
-
+      if (existingError) {
         console.error(
-          "SUPABASE CHECK DELETE POINT ERROR:",
-          pointError
+          "SUPABASE ADMIN POINTS DELETE CHECK ERROR:",
+          existingError
         );
 
         return response(500, {
-
           success: false,
-
           message:
-            "Gagal memeriksa data poin."
-
+            "Gagal memeriksa poin.",
+          error:
+            existingError.message
         });
-
       }
 
-
-      if (!existingPoint) {
-
+      if (!existing) {
         return response(404, {
-
           success: false,
-
           message:
-            "Poin tidak ditemukan."
-
+            "Data poin tidak ditemukan."
         });
-
       }
-
-
-      // =================================================
-      // DELETE
-      // =================================================
 
       const {
         error: deleteError
@@ -823,70 +722,51 @@ exports.handler = async (event) => {
         .delete()
         .eq("id", id);
 
-
       if (deleteError) {
-
         console.error(
-          "SUPABASE DELETE POINT ERROR:",
+          "SUPABASE ADMIN POINTS DELETE ERROR:",
           deleteError
         );
 
         return response(500, {
-
           success: false,
-
           message:
-            "Gagal menghapus poin."
-
+            "Gagal menghapus poin.",
+          error:
+            deleteError.message
         });
-
       }
 
-
       return response(200, {
-
         success: true,
-
         message:
           "Poin berhasil dihapus."
-
       });
-
     }
 
-
-    // ===================================================
-    // METHOD TIDAK DIIZINKAN
-    // ===================================================
+    /*
+    ============================================================
+    METHOD TIDAK DIIZINKAN
+    ============================================================
+    */
 
     return response(405, {
-
       success: false,
-
       message:
         "Method tidak diizinkan."
-
     });
 
-  }
-
-  catch (error) {
-
+  } catch (error) {
     console.error(
       "ADMIN POINTS ERROR:",
       error
     );
 
     return response(500, {
-
       success: false,
-
       message:
-        error.message ||
-        "Terjadi kesalahan pada server."
-
+        "Terjadi kesalahan server.",
+      error: error.message
     });
-
   }
-
 };
