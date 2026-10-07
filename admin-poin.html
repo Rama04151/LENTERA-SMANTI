@@ -40,7 +40,7 @@
       justify-content: center;
       align-items: flex-start;
       padding: 20px;
-      background-image: 
+      background-image:
         radial-gradient(circle at 10% 20%, rgba(251, 192, 45, 0.06) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(28, 37, 65, 0.6) 0%, transparent 50%);
     }
@@ -68,7 +68,6 @@
       color: var(--text-muted);
     }
 
-    /* Top Action Buttons Grid */
     .action-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -77,7 +76,6 @@
       margin-bottom: 20px;
     }
 
-    /* Form & Input Styling */
     input[type="text"],
     input[type="number"],
     input[type="date"],
@@ -94,7 +92,9 @@
       transition: all 0.3s ease;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
       border-color: var(--accent-gold);
       box-shadow: 0 0 0 3px var(--gold-glow);
     }
@@ -113,7 +113,6 @@
       margin-bottom: 6px;
     }
 
-    /* History & Item Cards */
     .history-section {
       background: rgba(11, 19, 43, 0.5);
       border-radius: 16px;
@@ -146,7 +145,6 @@
       margin-top: 14px;
     }
 
-    /* Buttons */
     .logout-button {
       width: 100%;
       padding: 12px;
@@ -195,8 +193,8 @@
       color: #ffffff;
     }
 
-    /* Modal Overlay & Inner Design */
-    #pointModal, #editPointModal {
+    #pointModal,
+    #editPointModal {
       position: fixed;
       top: 0;
       left: 0;
@@ -237,7 +235,6 @@
       margin-top: 18px;
     }
 
-    /* Custom Student Search Card Result */
     .student-item-select {
       padding: 12px;
       margin-bottom: 6px;
@@ -263,11 +260,33 @@
       color: var(--text-main);
     }
 
-    #pointMessage, #editPointMessage {
+    #pointMessage,
+    #editPointMessage {
       font-size: 13px;
       color: var(--danger-color);
       margin-top: 10px;
       text-align: center;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .action-grid,
+      .card-actions,
+      .modal-actions {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
@@ -280,6 +299,7 @@
     <p>Kelola penghargaan dan pelanggaran siswa.</p>
 
     <div class="action-grid">
+
       <button
         type="button"
         class="logout-button secondary"
@@ -295,27 +315,42 @@
       >
         ➕ Tambah Poin
       </button>
+
     </div>
 
     <!-- FILTER -->
+
     <div style="margin-bottom: 12px;">
+
       <input
         type="text"
         id="searchPoint"
         placeholder="Cari nama atau NISN..."
         oninput="filterPoints()"
       >
+
     </div>
 
     <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+
       <select
         id="filterJenis"
         onchange="filterPoints()"
         style="flex: 1; min-width: 150px;"
       >
-        <option value="">Semua Jenis Poin</option>
-        <option value="penghargaan">🏆 Penghargaan</option>
-        <option value="pelanggaran">⚠️ Pelanggaran</option>
+
+        <option value="">
+          Semua Jenis Poin
+        </option>
+
+        <option value="penghargaan">
+          🏆 Penghargaan
+        </option>
+
+        <option value="pelanggaran">
+          ⚠️ Pelanggaran
+        </option>
+
       </select>
 
       <select
@@ -323,24 +358,40 @@
         onchange="filterPoints()"
         style="flex: 1; min-width: 150px;"
       >
-        <option value="">Semua Kelas</option>
+
+        <option value="">
+          Semua Kelas
+        </option>
+
       </select>
+
     </div>
 
     <!-- DAFTAR POIN -->
+
     <div id="pointList">
-      <p style="text-align: center; padding: 20px;">Memuat data poin...</p>
+
+      <p style="text-align: center; padding: 20px;">
+        Memuat data poin...
+      </p>
+
     </div>
 
   </div>
 
-  <!-- MODAL TAMBAH POIN -->
+
+  <!-- =========================================================
+       MODAL TAMBAH POIN
+  ========================================================== -->
+
   <div id="pointModal" style="display:none;">
+
     <div class="modal-box">
+
       <h2>➕ Tambah Poin</h2>
 
-      <!-- SISWA SEARCH -->
       <label>Siswa</label>
+
       <input
         type="text"
         id="searchStudentPoint"
@@ -349,22 +400,43 @@
         autocomplete="off"
       >
 
-      <div id="studentSearchResult" style="max-height: 180px; overflow-y: auto; margin-top: 8px;"></div>
+      <div
+        id="studentSearchResult"
+        style="max-height: 180px; overflow-y: auto; margin-top: 8px;"
+      ></div>
 
-      <div id="selectedStudent" style="display:none;"></div>
+      <div
+        id="selectedStudent"
+        style="display:none;"
+      ></div>
 
-      <input type="hidden" id="pointSiswa">
+      <input
+        type="hidden"
+        id="pointSiswa"
+      >
 
-      <!-- JENIS -->
+
       <label>Jenis Poin</label>
+
       <select id="pointJenis">
-        <option value="">-- Pilih Jenis --</option>
-        <option value="penghargaan">🏆 Penghargaan</option>
-        <option value="pelanggaran">⚠️ Pelanggaran</option>
+
+        <option value="">
+          -- Pilih Jenis --
+        </option>
+
+        <option value="penghargaan">
+          🏆 Penghargaan
+        </option>
+
+        <option value="pelanggaran">
+          ⚠️ Pelanggaran
+        </option>
+
       </select>
 
-      <!-- NILAI -->
+
       <label>Jumlah Poin</label>
+
       <input
         type="number"
         id="pointNilai"
@@ -372,508 +444,1625 @@
         placeholder="Contoh: 10"
       >
 
-      <!-- KETERANGAN -->
+
       <label>Keterangan</label>
+
       <textarea
         id="pointKeterangan"
         placeholder="Contoh: Juara lomba, terlambat, dll."
       ></textarea>
 
-      <!-- TANGGAL -->
+
       <label>Tanggal</label>
-      <input type="date" id="pointTanggal">
+
+      <input
+        type="date"
+        id="pointTanggal"
+      >
+
 
       <div id="pointMessage"></div>
 
-      <!-- BUTTONS -->
+
       <div class="modal-actions">
-        <button type="button" class="logout-button secondary" onclick="closePointModal()">
+
+        <button
+          type="button"
+          class="logout-button secondary"
+          onclick="closePointModal()"
+        >
           Batal
         </button>
-        <button type="button" class="logout-button" onclick="savePoint()">
+
+        <button
+          type="button"
+          class="logout-button"
+          onclick="savePoint()"
+        >
           💾 Simpan
         </button>
+
       </div>
+
     </div>
+
   </div>
 
-  <!-- MODAL EDIT POIN -->
+
+  <!-- =========================================================
+       MODAL EDIT POIN
+  ========================================================== -->
+
   <div id="editPointModal" style="display:none;">
+
     <div class="modal-box">
+
       <h2>✏️ Edit Poin</h2>
 
-      <input type="hidden" id="editPointId">
+      <input
+        type="hidden"
+        id="editPointId"
+      >
 
-      <!-- SISWA -->
+
       <label>Siswa</label>
+
       <select id="editPointSiswa"></select>
 
-      <!-- JENIS -->
+
       <label>Jenis Poin</label>
+
       <select id="editPointJenis">
-        <option value="penghargaan">🏆 Penghargaan</option>
-        <option value="pelanggaran">⚠️ Pelanggaran</option>
+
+        <option value="penghargaan">
+          🏆 Penghargaan
+        </option>
+
+        <option value="pelanggaran">
+          ⚠️ Pelanggaran
+        </option>
+
       </select>
 
-      <!-- NILAI -->
+
       <label>Jumlah Poin</label>
-      <input type="number" id="editPointNilai" min="1">
 
-      <!-- KETERANGAN -->
+      <input
+        type="number"
+        id="editPointNilai"
+        min="1"
+      >
+
+
       <label>Keterangan</label>
-      <textarea id="editPointKeterangan"></textarea>
 
-      <!-- TANGGAL -->
+      <textarea
+        id="editPointKeterangan"
+      ></textarea>
+
+
       <label>Tanggal</label>
-      <input type="date" id="editPointTanggal">
+
+      <input
+        type="date"
+        id="editPointTanggal"
+      >
+
 
       <div id="editPointMessage"></div>
 
+
       <div class="modal-actions">
-        <button type="button" class="logout-button secondary" onclick="closeEditPoint()">
+
+        <button
+          type="button"
+          class="logout-button secondary"
+          onclick="closeEditPoint()"
+        >
           Batal
         </button>
-        <button type="button" class="logout-button" onclick="saveEditPoint()">
+
+        <button
+          type="button"
+          class="logout-button"
+          onclick="saveEditPoint()"
+        >
           💾 Simpan
         </button>
+
       </div>
+
     </div>
+
   </div>
 
+
   <script>
-    // =========================
+
+    // =========================================================
     // CEK LOGIN ADMIN
-    // =========================
-    const adminSession = sessionStorage.getItem("lentera_admin_session");
+    // =========================================================
+
+    const adminSession =
+      sessionStorage.getItem(
+        "lentera_admin_session"
+      );
 
     if (!adminSession) {
-      window.location.href = "admin-login.html";
+
+      window.location.href =
+        "admin-login.html";
+
     }
+
 
     let points = [];
     let students = [];
 
-    // =========================
-    // LOAD DATA
-    // =========================
-    async function loadPoints() {
-      try {
-        const response = await fetch("/.netlify/functions/admin-points");
-        const result = await response.json();
 
-        if (!response.ok || !result.success) {
-          document.getElementById("pointList").innerHTML = "<p style='text-align:center;'>Data poin gagal dimuat.</p>";
+    // =========================================================
+    // LOAD DATA POIN
+    // =========================================================
+
+    async function loadPoints() {
+
+      try {
+
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-points"
+          );
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          document.getElementById(
+            "pointList"
+          ).innerHTML =
+            "<p style='text-align:center;'>Data poin gagal dimuat.</p>";
+
           return;
+
         }
 
-        points = result.poin || [];
+
+        points =
+          result.poin || [];
+
+
         await loadStudents();
+
+
         renderPoints(points);
 
+
       } catch (error) {
-        console.error("LOAD POINTS ERROR:", error);
-        document.getElementById("pointList").innerHTML = "<p style='text-align:center;'>Terjadi kesalahan koneksi.</p>";
-      }
-    }
 
-    // =========================
-    // LOAD SISWA
-    // =========================
-    async function loadStudents() {
-      try {
-        const response = await fetch("/.netlify/functions/admin-students");
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-          return;
-        }
-
-        students = (result.siswa || []).filter(
-          siswa => siswa.status.toLowerCase() === "aktif"
+        console.error(
+          "LOAD POINTS ERROR:",
+          error
         );
 
+
+        document.getElementById(
+          "pointList"
+        ).innerHTML =
+          "<p style='text-align:center;'>Terjadi kesalahan koneksi.</p>";
+
+      }
+
+    }
+
+
+    // =========================================================
+    // LOAD SISWA
+    // =========================================================
+
+    async function loadStudents() {
+
+      try {
+
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-students"
+          );
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          return;
+
+        }
+
+
+        students =
+          (result.siswa || []).filter(
+            siswa =>
+              String(
+                siswa.status || ""
+              ).toLowerCase() === "aktif"
+          );
+
+
         renderStudentOptions();
+
         renderClassFilter();
 
+
       } catch (error) {
-        console.error("LOAD STUDENTS ERROR:", error);
+
+        console.error(
+          "LOAD STUDENTS ERROR:",
+          error
+        );
+
       }
+
     }
+
+
+    // =========================================================
+    // FILTER KELAS
+    // =========================================================
 
     function renderClassFilter() {
-      const select = document.getElementById("filterKelas");
+
+      const select =
+        document.getElementById(
+          "filterKelas"
+        );
+
+
       if (!select) return;
 
-      const kelasSet = new Set();
-      students.forEach(siswa => {
-        if (siswa.kelas) kelasSet.add(siswa.kelas);
-      });
 
-      const kelasList = Array.from(kelasSet).sort();
+      const kelasSet =
+        new Set();
 
-      select.innerHTML = `<option value="">Semua Kelas</option>`;
 
-      kelasList.forEach(kelas => {
-        const option = document.createElement("option");
-        option.value = kelas;
-        option.textContent = kelas;
-        select.appendChild(option);
-      });
+      students.forEach(
+        siswa => {
+
+          if (siswa.kelas) {
+
+            kelasSet.add(
+              siswa.kelas
+            );
+
+          }
+
+        }
+      );
+
+
+      const kelasList =
+        Array.from(kelasSet)
+          .sort();
+
+
+      select.innerHTML =
+        `<option value="">Semua Kelas</option>`;
+
+
+      kelasList.forEach(
+        kelas => {
+
+          const option =
+            document.createElement(
+              "option"
+            );
+
+          option.value =
+            kelas;
+
+          option.textContent =
+            kelas;
+
+          select.appendChild(
+            option
+          );
+
+        }
+      );
+
     }
 
-    // =========================
+
+    // =========================================================
     // OPTION SISWA
-    // =========================
+    // =========================================================
+
     function renderStudentOptions() {
-      const result = document.getElementById("studentSearchResult");
-      result.innerHTML = "<p style='font-size:12px; color:var(--text-muted);'>Ketik nama atau NISN untuk mencari siswa.</p>";
+
+      const result =
+        document.getElementById(
+          "studentSearchResult"
+        );
+
+
+      result.innerHTML =
+        "<p style='font-size:12px; color:var(--text-muted);'>Ketik nama atau NISN untuk mencari siswa.</p>";
+
     }
+
+
+    // =========================================================
+    // CARI SISWA
+    // =========================================================
 
     function searchStudentsForPoint() {
-      const keyword = document.getElementById("searchStudentPoint").value.trim().toLowerCase();
-      const result = document.getElementById("studentSearchResult");
+
+      const keyword =
+        document
+          .getElementById(
+            "searchStudentPoint"
+          )
+          .value
+          .trim()
+          .toLowerCase();
+
+
+      const result =
+        document.getElementById(
+          "studentSearchResult"
+        );
+
 
       if (!keyword) {
-        result.innerHTML = "<p style='font-size:12px; color:var(--text-muted);'>Ketik nama atau NISN untuk mencari siswa.</p>";
+
+        result.innerHTML =
+          "<p style='font-size:12px; color:var(--text-muted);'>Ketik nama atau NISN untuk mencari siswa.</p>";
+
         return;
+
       }
 
-      const filtered = students.filter(
-        siswa => siswa.nama.toLowerCase().includes(keyword) || siswa.nisn.toLowerCase().includes(keyword)
-      );
 
-      if (filtered.length === 0) {
-        result.innerHTML = "<p style='font-size:12px; color:var(--text-muted);'>Siswa tidak ditemukan.</p>";
+      const filtered =
+        students.filter(
+          siswa => {
+
+            const nama =
+              String(
+                siswa.nama || ""
+              ).toLowerCase();
+
+            const nisn =
+              String(
+                siswa.nisn || ""
+              ).toLowerCase();
+
+
+            return (
+              nama.includes(keyword) ||
+              nisn.includes(keyword)
+            );
+
+          }
+        );
+
+
+      if (
+        filtered.length === 0
+      ) {
+
+        result.innerHTML =
+          "<p style='font-size:12px; color:var(--text-muted);'>Siswa tidak ditemukan.</p>";
+
         return;
+
       }
 
-      result.innerHTML = filtered.map(
-        siswa => `
-          <div class="student-item-select" onclick="selectStudentForPoint('${escapeHtml(siswa.id)}')">
-            <strong>${escapeHtml(siswa.nama)}</strong><br>
-            <small style="color:var(--text-muted);">NISN: ${escapeHtml(siswa.nisn)} — Kelas: ${escapeHtml(siswa.kelas)}</small>
-          </div>
-        `
-      ).join("");
+
+      result.innerHTML =
+        filtered.map(
+          siswa => `
+
+            <div
+              class="student-item-select"
+              onclick="selectStudentForPoint('${escapeHtml(siswa.id)}')"
+            >
+
+              <strong>
+                ${escapeHtml(siswa.nama)}
+              </strong>
+
+              <br>
+
+              <small style="color:var(--text-muted);">
+
+                NISN:
+                ${escapeHtml(siswa.nisn)}
+
+                —
+
+                Kelas:
+                ${escapeHtml(siswa.kelas)}
+
+              </small>
+
+            </div>
+
+          `
+        )
+        .join("");
+
     }
+
+
+    // =========================================================
+    // PILIH SISWA
+    // =========================================================
 
     function selectStudentForPoint(id) {
-      const siswa = students.find(siswa => siswa.id === id);
+
+      const siswa =
+        students.find(
+          siswa =>
+            siswa.id === id
+        );
+
+
       if (!siswa) return;
 
-      document.getElementById("pointSiswa").value = siswa.id;
-      document.getElementById("searchStudentPoint").value = siswa.nama;
-      document.getElementById("studentSearchResult").innerHTML = "";
 
-      const selected = document.getElementById("selectedStudent");
-      selected.style.display = "block";
+      document.getElementById(
+        "pointSiswa"
+      ).value =
+        siswa.id;
+
+
+      document.getElementById(
+        "searchStudentPoint"
+      ).value =
+        siswa.nama;
+
+
+      document.getElementById(
+        "studentSearchResult"
+      ).innerHTML =
+        "";
+
+
+      const selected =
+        document.getElementById(
+          "selectedStudent"
+        );
+
+
+      selected.style.display =
+        "block";
+
+
       selected.innerHTML = `
-        <strong style="color: var(--success-color);">✅ Siswa terpilih:</strong><br>
-        <strong>${escapeHtml(siswa.nama)}</strong><br>
-        <small style="color:var(--text-muted);">NISN: ${escapeHtml(siswa.nisn)} — Kelas: ${escapeHtml(siswa.kelas)}</small>
+
+        <strong style="color:var(--success-color);">
+          ✅ Siswa terpilih:
+        </strong>
+
+        <br>
+
+        <strong>
+          ${escapeHtml(siswa.nama)}
+        </strong>
+
+        <br>
+
+        <small style="color:var(--text-muted);">
+
+          NISN:
+          ${escapeHtml(siswa.nisn)}
+
+          —
+
+          Kelas:
+          ${escapeHtml(siswa.kelas)}
+
+        </small>
+
       `;
+
     }
 
-    // =========================
-    // TAMPILKAN POIN
-    // =========================
-    function renderPoints(data) {
-      const container = document.getElementById("pointList");
 
-      if (!data || data.length === 0) {
-        container.innerHTML = "<p style='text-align:center; padding: 20px; color: var(--text-muted);'>Belum ada data poin.</p>";
+    // =========================================================
+    // TAMPILKAN POIN
+    // =========================================================
+
+    function renderPoints(data) {
+
+      const container =
+        document.getElementById(
+          "pointList"
+        );
+
+
+      if (
+        !data ||
+        data.length === 0
+      ) {
+
+        container.innerHTML =
+          "<p style='text-align:center; padding:20px; color:var(--text-muted);'>Belum ada data poin.</p>";
+
         return;
+
       }
 
-      container.innerHTML = data.map(
-        point => {
-          const isPenghargaan = String(point.jenis).toLowerCase() === "penghargaan";
-          return `
-            <div class="history-section">
-              <h3>${escapeHtml(point.nama)}</h3>
 
-              <p><strong>NISN:</strong> ${escapeHtml(point.nisn)}</p>
-              <p><strong>Jenis:</strong> <span style="color: ${isPenghargaan ? 'var(--accent-gold)' : 'var(--danger-color)'}; font-weight:600;">${escapeHtml(point.jenis)}</span></p>
-              <p><strong>Poin:</strong> ${point.poin}</p>
-              <p><strong>Keterangan:</strong> ${escapeHtml(point.keterangan)}</p>
-              <p><strong>Tanggal:</strong> ${escapeHtml(point.tanggal)}</p>
-              <p><strong>Dibuat oleh:</strong> ${escapeHtml(point.dibuatOleh || "-")}</p>
-<p><strong>Peran:</strong> ${escapeHtml(point.peran || "-")}</p>
+      container.innerHTML =
+        data.map(
+          point => {
 
-              <div class="card-actions">
-                <button type="button" class="logout-button secondary" onclick="openEditPoint('${escapeHtml(point.id)}')">
-                  ✏️ Edit
-                </button>
-                <button type="button" class="logout-button danger" onclick="deletePoint('${escapeHtml(point.id)}')">
-                  🗑️ Hapus
-                </button>
+            const isPenghargaan =
+              String(
+                point.jenis
+              ).toLowerCase() ===
+              "penghargaan";
+
+
+            return `
+
+              <div class="history-section">
+
+                <h3>
+                  ${escapeHtml(point.nama)}
+                </h3>
+
+                <p>
+                  <strong>NISN:</strong>
+                  ${escapeHtml(point.nisn)}
+                </p>
+
+                <p>
+
+                  <strong>Jenis:</strong>
+
+                  <span
+                    style="
+                      color:
+                        ${isPenghargaan
+                          ? "var(--accent-gold)"
+                          : "var(--danger-color)"};
+                      font-weight:600;
+                    "
+                  >
+
+                    ${escapeHtml(point.jenis)}
+
+                  </span>
+
+                </p>
+
+                <p>
+
+                  <strong>Poin:</strong>
+                  ${Number(point.poin || 0)}
+
+                </p>
+
+                <p>
+
+                  <strong>Keterangan:</strong>
+                  ${escapeHtml(point.keterangan)}
+
+                </p>
+
+                <p>
+
+                  <strong>Tanggal:</strong>
+                  ${formatDisplayDate(point.tanggal)}
+
+                </p>
+
+                <p>
+
+                  <strong>Dibuat oleh:</strong>
+                  ${escapeHtml(point.dibuatOleh || "-")}
+
+                </p>
+
+                <p>
+
+                  <strong>Peran:</strong>
+                  ${escapeHtml(point.peran || "-")}
+
+                </p>
+
+
+                <div class="card-actions">
+
+                  <button
+                    type="button"
+                    class="logout-button secondary"
+                    onclick="openEditPoint('${escapeHtml(point.id)}')"
+                  >
+                    ✏️ Edit
+                  </button>
+
+
+                  <button
+                    type="button"
+                    class="logout-button danger"
+                    onclick="deletePoint('${escapeHtml(point.id)}')"
+                  >
+                    🗑️ Hapus
+                  </button>
+
+                </div>
+
               </div>
-            </div>
-          `;
-        }
-      ).join("");
+
+            `;
+
+          }
+        )
+        .join("");
+
     }
 
-    // =========================
-    // FILTER
-    // =========================
+
+    // =========================================================
+    // FILTER POIN
+    // =========================================================
+
     function filterPoints() {
-      const keyword = document.getElementById("searchPoint").value.trim().toLowerCase();
-      const jenis = document.getElementById("filterJenis").value.toLowerCase();
-      const kelas = document.getElementById("filterKelas").value;
 
-      const filtered = points.filter(
-        point => {
-          const cocokNama = point.nama.toLowerCase().includes(keyword);
-          const cocokNisn = point.nisn.toLowerCase().includes(keyword);
-          const cocokJenis = !jenis || point.jenis.toLowerCase() === jenis;
+      const keyword =
+        document
+          .getElementById(
+            "searchPoint"
+          )
+          .value
+          .trim()
+          .toLowerCase();
 
-          const siswa = students.find(siswa => siswa.id === point.siswaId);
-          const cocokKelas = !kelas || (siswa && siswa.kelas === kelas);
 
-          return (cocokNama || cocokNisn) && cocokJenis && cocokKelas;
+      const jenis =
+        document
+          .getElementById(
+            "filterJenis"
+          )
+          .value
+          .toLowerCase();
+
+
+      const kelas =
+        document.getElementById(
+          "filterKelas"
+        ).value;
+
+
+      const filtered =
+        points.filter(
+          point => {
+
+            const nama =
+              String(
+                point.nama || ""
+              ).toLowerCase();
+
+
+            const nisn =
+              String(
+                point.nisn || ""
+              ).toLowerCase();
+
+
+            const pointJenis =
+              String(
+                point.jenis || ""
+              ).toLowerCase();
+
+
+            const cocokNama =
+              nama.includes(
+                keyword
+              );
+
+
+            const cocokNisn =
+              nisn.includes(
+                keyword
+              );
+
+
+            const cocokJenis =
+              !jenis ||
+              pointJenis ===
+              jenis;
+
+
+            const siswa =
+              students.find(
+                siswa =>
+                  siswa.id ===
+                  point.siswaId
+              );
+
+
+            const cocokKelas =
+              !kelas ||
+              (
+                siswa &&
+                siswa.kelas ===
+                kelas
+              );
+
+
+            return (
+              (
+                cocokNama ||
+                cocokNisn
+              ) &&
+              cocokJenis &&
+              cocokKelas
+            );
+
+          }
+        );
+
+
+      renderPoints(
+        filtered
+      );
+
+    }
+
+
+    // =========================================================
+    // BUKA MODAL TAMBAH
+    // =========================================================
+
+    function openAddPoint() {
+
+      document.getElementById(
+        "pointModal"
+      ).style.display =
+        "flex";
+
+
+      document.getElementById(
+        "pointSiswa"
+      ).value =
+        "";
+
+
+      document.getElementById(
+        "searchStudentPoint"
+      ).value =
+        "";
+
+
+      document.getElementById(
+        "studentSearchResult"
+      ).innerHTML =
+        "<p style='font-size:12px; color:var(--text-muted);'>Ketik nama atau NISN untuk mencari siswa.</p>";
+
+
+      document.getElementById(
+        "selectedStudent"
+      ).style.display =
+        "none";
+
+
+      document.getElementById(
+        "pointJenis"
+      ).value =
+        "";
+
+
+      document.getElementById(
+        "pointNilai"
+      ).value =
+        "";
+
+
+      document.getElementById(
+        "pointKeterangan"
+      ).value =
+        "";
+
+
+      document.getElementById(
+        "pointTanggal"
+      ).value =
+        "";
+
+
+      document.getElementById(
+        "pointMessage"
+      ).textContent =
+        "";
+
+    }
+
+
+    function closePointModal() {
+
+      document.getElementById(
+        "pointModal"
+      ).style.display =
+        "none";
+
+    }
+
+
+    // =========================================================
+    // SIMPAN POIN BARU
+    // =========================================================
+
+    async function savePoint() {
+
+      const siswaId =
+        document.getElementById(
+          "pointSiswa"
+        ).value;
+
+
+      const jenis =
+        document.getElementById(
+          "pointJenis"
+        ).value;
+
+
+      const poin =
+        document.getElementById(
+          "pointNilai"
+        ).value;
+
+
+      const keterangan =
+        document
+          .getElementById(
+            "pointKeterangan"
+          )
+          .value
+          .trim();
+
+
+      const tanggalInput =
+        document.getElementById(
+          "pointTanggal"
+        ).value;
+
+
+      const message =
+        document.getElementById(
+          "pointMessage"
+        );
+
+
+      if (
+        !siswaId ||
+        !jenis ||
+        !poin ||
+        !keterangan ||
+        !tanggalInput
+      ) {
+
+        message.textContent =
+          "Semua data wajib diisi.";
+
+        return;
+
+      }
+
+
+      /*
+       * PENTING:
+       *
+       * input type="date" sudah menghasilkan
+       * YYYY-MM-DD.
+       *
+       * JANGAN diubah menjadi DD/MM/YYYY.
+       */
+
+      const tanggal =
+        tanggalInput;
+
+
+      let admin = "";
+
+
+      try {
+
+        const session =
+          JSON.parse(
+            adminSession
+          );
+
+
+        admin =
+          session.username ||
+          "";
+
+      } catch (error) {
+
+        console.error(
+          "ADMIN SESSION ERROR:",
+          error
+        );
+
+      }
+
+
+      message.textContent =
+        "Menyimpan poin...";
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-points",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body:
+                JSON.stringify({
+
+                  siswaId,
+
+                  jenis,
+
+                  poin:
+                    Number(poin),
+
+                  keterangan,
+
+                  tanggal,
+
+                  admin
+
+                })
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          message.textContent =
+            result.message ||
+            "Poin gagal disimpan.";
+
+          return;
+
+        }
+
+
+        alert(
+          "Poin berhasil ditambahkan."
+        );
+
+
+        closePointModal();
+
+
+        await loadPoints();
+
+
+      } catch (error) {
+
+        console.error(
+          "SAVE POINT ERROR:",
+          error
+        );
+
+
+        message.textContent =
+          "Terjadi kesalahan koneksi.";
+
+      }
+
+    }
+
+
+    // =========================================================
+    // BUKA EDIT POIN
+    // =========================================================
+
+    function openEditPoint(id) {
+
+      const point =
+        points.find(
+          point =>
+            point.id === id
+        );
+
+
+      if (!point) {
+
+        alert(
+          "Data poin tidak ditemukan."
+        );
+
+        return;
+
+      }
+
+
+      document.getElementById(
+        "editPointId"
+      ).value =
+        point.id;
+
+
+      const select =
+        document.getElementById(
+          "editPointSiswa"
+        );
+
+
+      select.innerHTML =
+        `<option value="">-- Pilih Siswa --</option>`;
+
+
+      students.forEach(
+        siswa => {
+
+          const option =
+            document.createElement(
+              "option"
+            );
+
+
+          option.value =
+            siswa.id;
+
+
+          option.textContent =
+            `${siswa.nama} — ${siswa.nisn} — ${siswa.kelas}`;
+
+
+          if (
+            siswa.id ===
+            point.siswaId
+          ) {
+
+            option.selected =
+              true;
+
+          }
+
+
+          select.appendChild(
+            option
+          );
+
         }
       );
 
-      renderPoints(filtered);
+
+      document.getElementById(
+        "editPointJenis"
+      ).value =
+        point.jenis;
+
+
+      document.getElementById(
+        "editPointNilai"
+      ).value =
+        point.poin;
+
+
+      document.getElementById(
+        "editPointKeterangan"
+      ).value =
+        point.keterangan;
+
+
+      /*
+       * Supabase mengembalikan:
+       *
+       * YYYY-MM-DD
+       *
+       * Tetapi kita tetap mendukung
+       * data lama dengan format:
+       *
+       * DD/MM/YYYY
+       */
+
+      const tanggal =
+        normalizeDateForInput(
+          point.tanggal
+        );
+
+
+      document.getElementById(
+        "editPointTanggal"
+      ).value =
+        tanggal;
+
+
+      document.getElementById(
+        "editPointMessage"
+      ).textContent =
+        "";
+
+
+      document.getElementById(
+        "editPointModal"
+      ).style.display =
+        "flex";
+
     }
 
-    // =========================
-    // BUKA / TUTUP MODAL
-    // =========================
-    function openAddPoint() {
-      document.getElementById("pointModal").style.display = "flex";
-      document.getElementById("pointSiswa").value = "";
-      document.getElementById("searchStudentPoint").value = "";
-      document.getElementById("studentSearchResult").innerHTML = "<p style='font-size:12px; color:var(--text-muted);'>Ketik nama atau NISN untuk mencari siswa.</p>";
-      document.getElementById("selectedStudent").style.display = "none";
-      document.getElementById("pointJenis").value = "";
-      document.getElementById("pointNilai").value = "";
-      document.getElementById("pointKeterangan").value = "";
-      document.getElementById("pointTanggal").value = "";
-      document.getElementById("pointMessage").textContent = "";
-    }
-
-    function closePointModal() {
-      document.getElementById("pointModal").style.display = "none";
-    }
-
-    // =========================
-    // SIMPAN POIN
-    // =========================
-    async function savePoint() {
-      const siswaId = document.getElementById("pointSiswa").value;
-      const jenis = document.getElementById("pointJenis").value;
-      const poin = document.getElementById("pointNilai").value;
-      const keterangan = document.getElementById("pointKeterangan").value.trim();
-      const tanggalInput = document.getElementById("pointTanggal").value;
-      const message = document.getElementById("pointMessage");
-
-      if (!siswaId || !jenis || !poin || !keterangan) {
-        message.textContent = "Semua data wajib diisi.";
-        return;
-      }
-
-      let tanggal = "";
-      if (tanggalInput) {
-        const parts = tanggalInput.split("-");
-        tanggal = `${parts[2]}/${parts[1]}/${parts[0]}`;
-      }
-
-      let admin = "";
-      try {
-        const session = JSON.parse(adminSession);
-        admin = session.username || "";
-      } catch (error) {
-        console.error("ADMIN SESSION ERROR:", error);
-      }
-
-      message.textContent = "Menyimpan poin...";
-
-      try {
-        const response = await fetch("/.netlify/functions/admin-points", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            siswaId,
-            jenis,
-            poin: Number(poin),
-            keterangan,
-            tanggal,
-            admin
-          })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-          message.textContent = result.message || "Poin gagal disimpan.";
-          return;
-        }
-
-        alert("Poin berhasil ditambahkan.");
-        closePointModal();
-        await loadPoints();
-
-      } catch (error) {
-        console.error("SAVE POINT ERROR:", error);
-        message.textContent = "Terjadi kesalahan koneksi.";
-      }
-    }
-
-    // =========================
-    // EDIT POIN
-    // =========================
-    function openEditPoint(id) {
-      const point = points.find(point => point.id === id);
-
-      if (!point) {
-        alert("Data poin tidak ditemukan.");
-        return;
-      }
-
-      document.getElementById("editPointId").value = point.id;
-
-      const select = document.getElementById("editPointSiswa");
-      select.innerHTML = `<option value="">-- Pilih Siswa --</option>`;
-
-      students.forEach(siswa => {
-        const option = document.createElement("option");
-        option.value = siswa.id;
-        option.textContent = `${siswa.nama} — ${siswa.nisn} — ${siswa.kelas}`;
-        if (siswa.id === point.siswaId) {
-          option.selected = true;
-        }
-        select.appendChild(option);
-      });
-
-      document.getElementById("editPointJenis").value = point.jenis;
-      document.getElementById("editPointNilai").value = point.poin;
-      document.getElementById("editPointKeterangan").value = point.keterangan;
-
-      if (point.tanggal) {
-        const parts = point.tanggal.split("/");
-        if (parts.length === 3) {
-          document.getElementById("editPointTanggal").value = `${parts[2]}-${parts[1]}-${parts[0]}`;
-        }
-      }
-
-      document.getElementById("editPointMessage").textContent = "";
-      document.getElementById("editPointModal").style.display = "flex";
-    }
 
     function closeEditPoint() {
-      document.getElementById("editPointModal").style.display = "none";
+
+      document.getElementById(
+        "editPointModal"
+      ).style.display =
+        "none";
+
     }
+
+
+    // =========================================================
+    // SIMPAN EDIT POIN
+    // =========================================================
 
     async function saveEditPoint() {
-      const id = document.getElementById("editPointId").value;
-      const siswaId = document.getElementById("editPointSiswa").value;
-      const jenis = document.getElementById("editPointJenis").value;
-      const poin = document.getElementById("editPointNilai").value;
-      const keterangan = document.getElementById("editPointKeterangan").value.trim();
-      const tanggalInput = document.getElementById("editPointTanggal").value;
-      const message = document.getElementById("editPointMessage");
 
-      if (!id || !siswaId || !jenis || !poin || !keterangan) {
-        message.textContent = "Semua data wajib diisi.";
+      const id =
+        document.getElementById(
+          "editPointId"
+        ).value;
+
+
+      const siswaId =
+        document.getElementById(
+          "editPointSiswa"
+        ).value;
+
+
+      const jenis =
+        document.getElementById(
+          "editPointJenis"
+        ).value;
+
+
+      const poin =
+        document.getElementById(
+          "editPointNilai"
+        ).value;
+
+
+      const keterangan =
+        document
+          .getElementById(
+            "editPointKeterangan"
+          )
+          .value
+          .trim();
+
+
+      const tanggalInput =
+        document.getElementById(
+          "editPointTanggal"
+        ).value;
+
+
+      const message =
+        document.getElementById(
+          "editPointMessage"
+        );
+
+
+      if (
+        !id ||
+        !siswaId ||
+        !jenis ||
+        !poin ||
+        !keterangan ||
+        !tanggalInput
+      ) {
+
+        message.textContent =
+          "Semua data wajib diisi.";
+
         return;
+
       }
 
-      let tanggal = "";
-      if (tanggalInput) {
-        const parts = tanggalInput.split("-");
-        tanggal = `${parts[2]}/${parts[1]}/${parts[0]}`;
-      }
+
+      /*
+       * PENTING:
+       *
+       * Kirim langsung YYYY-MM-DD.
+       */
+
+      const tanggal =
+        tanggalInput;
+
 
       let admin = "";
+
+
       try {
-        const session = JSON.parse(adminSession);
-        admin = session.username || "";
+
+        const session =
+          JSON.parse(
+            adminSession
+          );
+
+
+        admin =
+          session.username ||
+          "";
+
       } catch (error) {
-        console.error("ADMIN SESSION ERROR:", error);
+
+        console.error(
+          "ADMIN SESSION ERROR:",
+          error
+        );
+
       }
 
-      message.textContent = "Menyimpan perubahan...";
+
+      message.textContent =
+        "Menyimpan perubahan...";
+
 
       try {
-        const response = await fetch("/.netlify/functions/admin-points", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id,
-            siswaId,
-            jenis,
-            poin: Number(poin),
-            keterangan,
-            tanggal,
-            admin
-          })
-        });
 
-        const result = await response.json();
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-points",
+            {
+              method: "PUT",
 
-        if (!response.ok || !result.success) {
-          message.textContent = result.message || "Poin gagal diperbarui.";
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body:
+                JSON.stringify({
+
+                  id,
+
+                  siswaId,
+
+                  jenis,
+
+                  poin:
+                    Number(poin),
+
+                  keterangan,
+
+                  tanggal,
+
+                  admin
+
+                })
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          message.textContent =
+            result.message ||
+            "Poin gagal diperbarui.";
+
           return;
+
         }
 
-        alert("Poin berhasil diperbarui.");
+
+        alert(
+          "Poin berhasil diperbarui."
+        );
+
+
         closeEditPoint();
+
+
         await loadPoints();
 
+
       } catch (error) {
-        console.error("EDIT POINT ERROR:", error);
-        message.textContent = "Terjadi kesalahan koneksi.";
+
+        console.error(
+          "EDIT POINT ERROR:",
+          error
+        );
+
+
+        message.textContent =
+          "Terjadi kesalahan koneksi.";
+
       }
+
     }
 
-    // =========================
+
+    // =========================================================
     // HAPUS POIN
-    // =========================
+    // =========================================================
+
     async function deletePoint(id) {
-      const yakin = confirm("Apakah kamu yakin ingin menghapus poin ini?");
+
+      const yakin =
+        confirm(
+          "Apakah kamu yakin ingin menghapus poin ini?"
+        );
+
+
       if (!yakin) return;
 
+
       try {
-        const response = await fetch("/.netlify/functions/admin-points", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id })
-        });
 
-        const result = await response.json();
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-points",
+            {
+              method: "DELETE",
 
-        if (!response.ok || !result.success) {
-          alert(result.message || "Poin gagal dihapus.");
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body:
+                JSON.stringify({
+                  id
+                })
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          alert(
+            result.message ||
+            "Poin gagal dihapus."
+          );
+
           return;
+
         }
 
-        alert("Poin berhasil dihapus.");
+
+        alert(
+          "Poin berhasil dihapus."
+        );
+
+
         await loadPoints();
 
+
       } catch (error) {
-        console.error("DELETE POINT ERROR:", error);
-        alert("Terjadi kesalahan koneksi.");
+
+        console.error(
+          "DELETE POINT ERROR:",
+          error
+        );
+
+
+        alert(
+          "Terjadi kesalahan koneksi."
+        );
+
       }
+
     }
 
-    // =========================
+
+    // =========================================================
+    // FORMAT TANGGAL UNTUK INPUT DATE
+    // =========================================================
+
+    function normalizeDateForInput(value) {
+
+      const raw =
+        String(
+          value || ""
+        ).trim();
+
+
+      if (!raw) {
+        return "";
+      }
+
+
+      // YYYY-MM-DD
+
+      if (
+        /^\d{4}-\d{2}-\d{2}$/.test(
+          raw
+        )
+      ) {
+
+        return raw;
+
+      }
+
+
+      // DD/MM/YYYY
+
+      if (
+        /^\d{2}\/\d{2}\/\d{4}$/.test(
+          raw
+        )
+      ) {
+
+        const parts =
+          raw.split("/");
+
+
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+
+      }
+
+
+      // DD-MM-YYYY
+
+      if (
+        /^\d{2}-\d{2}-\d{4}$/.test(
+          raw
+        )
+      ) {
+
+        const parts =
+          raw.split("-");
+
+
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+
+      }
+
+
+      return "";
+
+    }
+
+
+    // =========================================================
+    // FORMAT TANGGAL UNTUK TAMPILAN
+    // =========================================================
+
+    function formatDisplayDate(value) {
+
+      const raw =
+        String(
+          value || ""
+        ).trim();
+
+
+      if (!raw) {
+        return "-";
+      }
+
+
+      // YYYY-MM-DD
+
+      if (
+        /^\d{4}-\d{2}-\d{2}$/.test(
+          raw
+        )
+      ) {
+
+        const [
+          year,
+          month,
+          day
+        ] =
+          raw.split("-");
+
+
+        return `${day}/${month}/${year}`;
+
+      }
+
+
+      // DD/MM/YYYY
+
+      if (
+        /^\d{2}\/\d{2}\/\d{4}$/.test(
+          raw
+        )
+      ) {
+
+        return raw;
+
+      }
+
+
+      return raw;
+
+    }
+
+
+    // =========================================================
     // ESCAPE HTML
-    // =========================
+    // =========================================================
+
     function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+      return String(
+        value ?? ""
+      )
+
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+
+        .replace(
+          /</g,
+          "&lt;"
+        )
+
+        .replace(
+          />/g,
+          "&gt;"
+        )
+
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
     }
 
-    // =========================
+
+    // =========================================================
     // MULAI
-    // =========================
+    // =========================================================
+
     loadPoints();
+
   </script>
 
 </body>
