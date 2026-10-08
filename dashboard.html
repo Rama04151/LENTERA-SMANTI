@@ -940,18 +940,33 @@
     <section class="dashboard-card">
 
       <div class="dashboard-header">
-        <div class="logo-small">L</div>
+  <div class="logo-small">L</div>
 
-        <div>
-          <h1>LENTERA SMANTI</h1>
-          <p>Dashboard Siswa</p>
-        </div>
-      </div>
+  <div>
+    <h1>LENTERA SMANTI</h1>
+    <p>Dashboard Siswa</p>
+  </div>
+</div>
 
-      <div class="welcome">
-        <p>Selamat datang,</p>
-        <h2 id="namaSiswa">Memuat...</h2>
-      </div>
+<!-- INBOX -->
+<button
+  type="button"
+  class="inbox-button"
+  onclick="openStudentInbox()"
+>
+  <span>📥</span>
+  <span>Inbox</span>
+  <span
+    id="inboxBadge"
+    class="inbox-badge"
+    style="display:none;"
+  >0</span>
+</button>
+
+<div class="welcome">
+  <p>Selamat datang,</p>
+  <h2 id="namaSiswa">Memuat...</h2>
+</div>
 
       <div class="student-info">
 
@@ -1034,16 +1049,6 @@
           Poin bersih kamu: <strong id="rankPointBersih">0</strong>
         </div>
       </section>
-
-      <button
-  type="button"
-  class="inbox-button"
-  onclick="openStudentInbox()"
->
-  <span>📥</span>
-  <span>Inbox</span>
-  <span id="inboxBadge" class="inbox-badge" style="display:none;">0</span>
-</button>
 
       <button
   type="button"
