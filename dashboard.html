@@ -188,6 +188,25 @@
       color: var(--danger-color);
     }
 
+
+    .net-point-card{margin-top:12px;padding:18px 20px;border-radius:16px;background:linear-gradient(135deg,rgba(251,192,45,.12),rgba(11,19,43,.55));border:1px solid rgba(251,192,45,.22);display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .net-point-card .label{color:var(--text-muted);font-size:13px;font-weight:600}
+    .net-point-card .value{color:var(--accent-gold);font-size:30px;font-weight:800}
+    .chart-section,.ranking-section{margin-top:16px;background:rgba(11,19,43,.5);border-radius:18px;padding:20px;border:1px solid var(--border-color)}
+    .chart-wrap{margin-top:15px;height:190px}
+    .chart-bars{height:145px;display:flex;align-items:flex-end;justify-content:space-around;gap:8px;padding:0 5px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .chart-column{flex:1;max-width:48px;height:100%;display:flex;align-items:flex-end;justify-content:center;position:relative}
+    .chart-bar{width:100%;min-height:4px;border-radius:8px 8px 0 0;background:linear-gradient(180deg,var(--accent-gold),#d48806);box-shadow:0 4px 15px var(--gold-glow)}
+    .chart-value{position:absolute;bottom:calc(var(--bar-height) + 5px);font-size:9px;color:var(--text-main);white-space:nowrap}
+    .chart-labels{display:flex;justify-content:space-around;gap:8px;padding-top:8px}
+    .chart-labels span{flex:1;max-width:48px;text-align:center;font-size:9px;color:var(--text-muted)}
+    .chart-empty{height:145px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .ranking-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}
+    .rank-card{background:rgba(11,19,43,.6);border:1px solid var(--border-color);border-radius:14px;padding:15px;text-align:center}
+    .rank-card .rank-icon{font-size:23px}.rank-card .rank-number{display:block;color:var(--accent-gold);font-size:25px;font-weight:800;margin-top:4px}
+    .rank-card .rank-title{color:var(--text-muted);font-size:11px;margin-top:3px}.rank-card .rank-total{color:#cbd5e1;font-size:10px;margin-top:5px}
+    .rank-points{margin-top:13px;text-align:center;color:var(--text-muted);font-size:11px}.rank-points strong{color:var(--accent-gold)}
+
     /* History Section */
     .history-section {
       background: rgba(11, 19, 43, 0.5);
@@ -949,7 +968,6 @@
       </div>
 
       <div class="points-container">
-
         <div class="point-card penghargaan">
           <span>🏆</span>
           <p>Poin Penghargaan</p>
@@ -962,20 +980,60 @@
           <strong id="poinPelanggaran">0</strong>
         </div>
 
-        <section class="history-section">
-          <div class="section-title">
-            <h3>Riwayat Poin</h3>
-            <p>Catatan penghargaan dan pelanggaran</p>
-          </div>
-
-          <div id="riwayatPoin" class="history-list">
-            <div class="history-empty">
-              Memuat riwayat...
+        <div class="net-point-card">
+          <div>
+            <div class="label">🏅 Poin Bersih</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+              Penghargaan − Pelanggaran
             </div>
           </div>
-        </section>
-
+          <div class="value" id="poinBersih">0</div>
+        </div>
       </div>
+
+      <section class="chart-section">
+        <div class="section-title">
+          <h3>📈 Perkembangan Poin</h3>
+          <p>Poin bersih berdasarkan bulan</p>
+        </div>
+        <div id="pointChart" class="chart-wrap">
+          <div class="chart-empty">Memuat grafik...</div>
+        </div>
+      </section>
+
+      <section class="history-section" style="margin-top:16px">
+        <div class="section-title">
+          <h3>📋 Aktivitas Terbaru</h3>
+          <p>Poin terbaru ditampilkan paling atas</p>
+        </div>
+        <div id="riwayatPoin" class="history-list">
+          <div class="history-empty">Memuat riwayat...</div>
+        </div>
+      </section>
+
+      <section class="ranking-section">
+        <div class="section-title">
+          <h3>🏆 Ranking</h3>
+          <p>Berdasarkan poin bersih siswa aktif</p>
+        </div>
+        <div class="ranking-grid">
+          <div class="rank-card">
+            <div class="rank-icon">🏫</div>
+            <span class="rank-number" id="rankSekolah">-</span>
+            <div class="rank-title">Ranking Sekolah</div>
+            <div class="rank-total" id="totalRankSekolah">-</div>
+          </div>
+          <div class="rank-card">
+            <div class="rank-icon">🏅</div>
+            <span class="rank-number" id="rankKelas">-</span>
+            <div class="rank-title">Ranking Kelas</div>
+            <div class="rank-total" id="totalRankKelas">-</div>
+          </div>
+        </div>
+        <div class="rank-points">
+          Poin bersih kamu: <strong id="rankPointBersih">0</strong>
+        </div>
+      </section>
 
       <button
   type="button"
@@ -1030,29 +1088,20 @@
           return;
         }
 
-        const riwayatContainer =
-          document.getElementById("riwayatPoin");
+        const riwayatContainer = document.getElementById("riwayatPoin");
 
         try {
           const siswa = JSON.parse(session);
 
-          // Timeout 10 detik
           const controller = new AbortController();
-
-          const timeout = setTimeout(() => {
-            controller.abort();
-          }, 10000);
+          const timeout = setTimeout(() => controller.abort(), 10000);
 
           const response = await fetch(
             "/.netlify/functions/student-dashboard",
             {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                siswaId: siswa.id
-              }),
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({siswaId: siswa.id}),
               signal: controller.signal
             }
           );
@@ -1062,65 +1111,62 @@
           const result = await response.json();
 
           if (!response.ok || !result.success) {
-            throw new Error(
-              result.message || "Gagal mengambil data."
-            );
+            throw new Error(result.message || "Gagal mengambil data.");
           }
 
-          // Total poin
-          document.getElementById("poinPenghargaan").textContent =
-            result.poin.penghargaan;
+          const penghargaan = Number(result.poin?.penghargaan) || 0;
+          const pelanggaran = Number(result.poin?.pelanggaran) || 0;
+          const bersih = penghargaan - pelanggaran;
 
-          document.getElementById("poinPelanggaran").textContent =
-            result.poin.pelanggaran;
+          document.getElementById("poinPenghargaan").textContent = penghargaan;
+          document.getElementById("poinPelanggaran").textContent = pelanggaran;
+          document.getElementById("poinBersih").textContent = bersih;
+          document.getElementById("rankPointBersih").textContent = bersih;
 
-          // Bersihkan loading
+          const riwayat = Array.isArray(result.riwayat)
+            ? [...result.riwayat].sort((a,b) => {
+                const da = new Date(a.tanggal || 0).getTime();
+                const db = new Date(b.tanggal || 0).getTime();
+                return db - da;
+              })
+            : [];
+
+          renderPointChart(riwayat);
+
           riwayatContainer.innerHTML = "";
 
-          if (!result.riwayat || result.riwayat.length === 0) {
-            riwayatContainer.innerHTML = `
-              <div class="history-empty">
-                Belum ada riwayat poin.
-              </div>
-            `;
+          if (!riwayat.length) {
+            riwayatContainer.innerHTML =
+              '<div class="history-empty">Belum ada riwayat poin.</div>';
             return;
           }
 
-          // Terbaru di atas
-          const riwayat = [...result.riwayat].reverse();
-
-          riwayat.forEach((item) => {
+          riwayat.forEach(item => {
             const div = document.createElement("div");
-
             div.className = "history-item";
 
-            const jenis = String(item.jenis).toLowerCase();
-
             const isPenghargaan =
-              jenis === "penghargaan";
+              String(item.jenis || "").trim().toLowerCase() === "penghargaan";
 
-            const tanda =
-              isPenghargaan ? "+" : "-";
+            const tanda = isPenghargaan ? "+" : "-";
+            const warna = isPenghargaan
+              ? "var(--accent-gold)"
+              : "var(--danger-color)";
 
             div.innerHTML = `
               <div class="history-top">
-                <span class="history-type" style="color: ${isPenghargaan ? 'var(--accent-gold)' : 'var(--danger-color)'}">
-                  ${isPenghargaan
-                    ? "🏆 Penghargaan"
-                    : "⚠️ Pelanggaran"}
+                <span class="history-type" style="color:${warna}">
+                  ${isPenghargaan ? "🏆 Penghargaan" : "⚠️ Pelanggaran"}
                 </span>
-
-                <span class="history-poin" style="color: ${isPenghargaan ? 'var(--accent-gold)' : 'var(--danger-color)'}">
-                  ${tanda}${item.poin}
+                <span class="history-poin" style="color:${warna}">
+                  ${tanda}${Math.abs(Number(item.poin) || 0)}
                 </span>
               </div>
-
               <div class="history-description">
-                ${item.keterangan || "Tidak ada keterangan"}
+                ${escapeHtml(item.keterangan || "Tidak ada keterangan")}
               </div>
-
               <div class="history-date">
-                ${item.tanggal || "-"}
+                ${escapeHtml(formatPointDate(item.tanggal))}
               </div>
             `;
 
@@ -1130,23 +1176,167 @@
         } catch (error) {
           console.error("Gagal mengambil data:", error);
 
-          if (error.name === "AbortError") {
-            riwayatContainer.innerHTML = `
-              <div class="history-empty">
-                Waktu memuat habis. Silakan refresh halaman.
-              </div>
-            `;
-          } else {
-            riwayatContainer.innerHTML = `
-              <div class="history-empty">
-                Gagal memuat riwayat poin.
-              </div>
-            `;
-          }
+          riwayatContainer.innerHTML = `
+            <div class="history-empty">
+              ${error.name === "AbortError"
+                ? "Waktu memuat habis. Silakan refresh halaman."
+                : "Gagal memuat riwayat poin."}
+            </div>
+          `;
         }
       }
 
+      function formatPointDate(value) {
+        if (!value) return "-";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return String(value);
+
+        return date.toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        });
+      }
+
+      function renderPointChart(riwayat) {
+        const chart = document.getElementById("pointChart");
+        if (!chart) return;
+
+        if (!riwayat.length) {
+          chart.innerHTML =
+            '<div class="chart-empty">Belum ada data poin untuk ditampilkan.</div>';
+          return;
+        }
+
+        const monthly = {};
+
+        riwayat.forEach(item => {
+          const date = new Date(item.tanggal);
+          if (Number.isNaN(date.getTime())) return;
+
+          const key =
+            `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`;
+
+          if (!monthly[key]) monthly[key] = 0;
+
+          const value = Math.abs(Number(item.poin) || 0);
+          const jenis = String(item.jenis || "").trim().toLowerCase();
+
+          monthly[key] += jenis === "penghargaan" ? value : -value;
+        });
+
+        const entries = Object.entries(monthly)
+          .sort((a,b) => a[0].localeCompare(b[0]))
+          .slice(-6);
+
+        if (!entries.length) {
+          chart.innerHTML =
+            '<div class="chart-empty">Belum ada data grafik.</div>';
+          return;
+        }
+
+        const maxAbs = Math.max(
+          ...entries.map(([,value]) => Math.abs(value)),
+          1
+        );
+
+        const bars = entries.map(([key,value]) => {
+          const height = Math.max(
+            4,
+            Math.abs(value) / maxAbs * 125
+          );
+
+          const [year,month] = key.split("-");
+
+          const label = new Date(
+            Number(year),
+            Number(month)-1,
+            1
+          ).toLocaleDateString("id-ID",{month:"short"});
+
+          return `
+            <div class="chart-column">
+              <span class="chart-value" style="--bar-height:${height}px">
+                ${value > 0 ? "+" : ""}${value}
+              </span>
+              <div
+                class="chart-bar"
+                style="height:${height}px;opacity:${value < 0 ? ".65" : "1"}"
+                title="${label}: ${value}"
+              ></div>
+            </div>
+          `;
+        }).join("");
+
+        const labels = entries.map(([key]) => {
+          const [year,month] = key.split("-");
+          return `
+            <span>
+              ${new Date(
+                Number(year),
+                Number(month)-1,
+                1
+              ).toLocaleDateString("id-ID",{month:"short"})}
+            </span>
+          `;
+        }).join("");
+
+        chart.innerHTML = `
+          <div class="chart-bars">${bars}</div>
+          <div class="chart-labels">${labels}</div>
+        `;
+      }
+
       loadPoints();
+
+      async function loadRanking() {
+        const session = sessionStorage.getItem("lentera_session");
+        if (!session) return;
+
+        try {
+          const siswa = JSON.parse(session);
+
+          const response = await fetch(
+            "/.netlify/functions/student-ranking",
+            {
+              method: "POST",
+              headers: {"Content-Type":"application/json"},
+              body: JSON.stringify({siswaId:siswa.id})
+            }
+          );
+
+          const result = await response.json();
+
+          if (!response.ok || !result.success) {
+            throw new Error(result.message || "Gagal mengambil ranking.");
+          }
+
+          document.getElementById("rankSekolah").textContent =
+            "#" + result.rankSekolah;
+
+          document.getElementById("totalRankSekolah").textContent =
+            "dari " + result.totalSekolah + " siswa";
+
+          document.getElementById("rankKelas").textContent =
+            "#" + result.rankKelas;
+
+          document.getElementById("totalRankKelas").textContent =
+            "dari " + result.totalKelas + " siswa";
+
+          document.getElementById("rankPointBersih").textContent =
+            result.poinBersih;
+
+        } catch (error) {
+          console.error("RANKING ERROR:", error);
+          document.getElementById("rankSekolah").textContent = "-";
+          document.getElementById("totalRankSekolah").textContent = "Belum tersedia";
+          document.getElementById("rankKelas").textContent = "-";
+          document.getElementById("totalRankKelas").textContent = "Belum tersedia";
+        }
+      }
+
+      loadRanking();
+
 
     } catch (error) {
       sessionStorage.removeItem("lentera_session");
@@ -1622,7 +1812,7 @@ async function openStudentInbox() {
           <h2>📥 Inbox</h2>
 
           <p>
-            Pesan dari administrator
+            Pesan dari Admin / Guru
           </p>
 
         </div>
@@ -1845,7 +2035,7 @@ function renderStudentInbox(
         </strong>
 
         <span>
-          Belum ada pesan dari administrator.
+          Belum ada pesan dari Admin / Guru.
         </span>
 
       </div>
