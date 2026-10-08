@@ -235,6 +235,12 @@ td.net.negative{
   border:1px solid var(--border);
 }
 
+.loading{
+  text-align:center;
+  color:var(--muted);
+  padding:30px;
+}
+
 @media(max-width:800px){
 
   .filters{
@@ -324,16 +330,18 @@ td.net.negative{
   </h3>
 
   <p style="color:#94a3b8;font-size:12px">
-    Ranking dihitung berdasarkan
+    Seluruh siswa aktif masuk ranking, termasuk
+    siswa yang belum memiliki transaksi poin.
+    Poin bersih dihitung dari:
     <b style="color:#34d399">
-      Poin Bersih = Penghargaan - Pelanggaran
+      Penghargaan - Pelanggaran
     </b>.
   </p>
 
 
   <div class="filters">
 
-    <!-- NAMA / NISN -->
+    <!-- SEARCH -->
 
     <div class="field">
 
@@ -521,14 +529,11 @@ td.net.negative{
   </div>
 
 
-  <!-- KETERANGAN FILTER -->
-
   <div
     class="filter-note"
     id="filterInfo"
   >
-    Menampilkan seluruh siswa,
-    termasuk siswa dengan poin bersih minus.
+    Memuat seluruh siswa aktif...
   </div>
 
 </section>
@@ -599,9 +604,9 @@ td.net.negative{
 
           <td
             colspan="7"
-            class="empty"
+            class="loading"
           >
-            Memuat data...
+            Memuat seluruh siswa...
           </td>
 
         </tr>
@@ -640,6 +645,8 @@ if(
    VARIABLE
 ========================================= */
 
+let students = [];
+
 let points = [];
 
 let rows = [];
@@ -667,77 +674,137 @@ const esc = x => {
 
 
 /* =========================================
-   LOAD DATA
+   LOAD SELURUH DATA
 ========================================= */
 
 async function load(){
 
   try{
 
-    const response =
-      await fetch(
+    /*
+      PENTING:
+
+      Sumber utama adalah SISWA,
+      bukan poin.
+
+      Jadi siswa tanpa transaksi
+      tetap akan masuk ranking.
+    */
+
+    const [
+      studentsResponse,
+      pointsResponse
+    ] = await Promise.all([
+
+      fetch(
+        '/.netlify/functions/admin-students'
+      ),
+
+      fetch(
         '/.netlify/functions/admin-points'
-      );
+      )
+
+    ]);
 
 
-    const data =
-      await response.json();
+    const studentsData =
+      await studentsResponse.json();
+
+
+    const pointsData =
+      await pointsResponse.json();
 
 
     if(
-      !response.ok ||
-      !data.success
+      !studentsResponse.ok ||
+      !studentsData.success
     ){
 
       throw new Error(
-        data.message ||
+        studentsData.message ||
+        'Gagal memuat data siswa.'
+      );
+
+    }
+
+
+    if(
+      !pointsResponse.ok ||
+      !pointsData.success
+    ){
+
+      throw new Error(
+        pointsData.message ||
         'Gagal memuat data poin.'
       );
 
     }
 
 
-    points =
-      Array.isArray(data.poin)
-        ? data.poin
+    /*
+      Ambil siswa aktif saja.
+    */
+
+    students =
+      Array.isArray(
+        studentsData.siswa
+      )
+        ? studentsData.siswa.filter(
+            student =>
+              String(
+                student.status || ''
+              )
+              .trim()
+              .toLowerCase() ===
+              'aktif'
+          )
         : [];
 
 
     /*
-      Gabungkan seluruh poin
-      berdasarkan siswa.
+      Ambil semua poin.
     */
 
-    const map =
+    points =
+      Array.isArray(
+        pointsData.poin
+      )
+        ? pointsData.poin
+        : [];
+
+
+    /*
+      Buat Map transaksi poin
+      berdasarkan siswaId.
+    */
+
+    const pointMap =
       new Map();
 
 
     points.forEach(point => {
 
-      const id =
-        point.siswaId ||
-        point.nisn ||
-        point.nama;
+      const siswaId =
+        String(
+          point.siswaId ||
+          point.siswa_id ||
+          ''
+        ).trim();
+
+
+      if(!siswaId){
+        return;
+      }
 
 
       if(
-        !map.has(id)
+        !pointMap.has(siswaId)
       ){
 
-        map.set(
-          id,
+        pointMap.set(
+          siswaId,
           {
-            nama:
-              point.nama || '-',
-
-            nisn:
-              point.nisn || '-',
-
-            kelas:
-              point.kelas || '-',
-
             reward:0,
-
             violation:0
           }
         );
@@ -745,13 +812,17 @@ async function load(){
       }
 
 
-      const student =
-        map.get(id);
+      const data =
+        pointMap.get(
+          siswaId
+        );
 
 
       const value =
         Math.abs(
-          Number(point.poin) || 0
+          Number(
+            point.poin
+          ) || 0
         );
 
 
@@ -764,19 +835,21 @@ async function load(){
 
 
       if(
-        jenis === 'penghargaan'
+        jenis ===
+        'penghargaan'
       ){
 
-        student.reward += value;
+        data.reward += value;
 
       }
 
 
-      if(
-        jenis === 'pelanggaran'
+      else if(
+        jenis ===
+        'pelanggaran'
       ){
 
-        student.violation += value;
+        data.violation += value;
 
       }
 
@@ -784,30 +857,97 @@ async function load(){
 
 
     /*
-      HITUNG POIN BERSIH
+      BUAT RANKING DARI SELURUH SISWA.
 
-      Penghargaan - Pelanggaran
+      Bahkan jika siswa tidak mempunyai
+      transaksi poin, dia tetap dibuat
+      dengan reward = 0,
+      violation = 0,
+      net = 0.
     */
 
     rows =
-      [...map.values()]
-      .map(student => ({
+      students.map(student => {
 
-        ...student,
+        const siswaId =
+          String(
+            student.id
+          );
 
-        net:
-          student.reward -
-          student.violation
 
-      }));
+        const pointData =
+          pointMap.get(
+            siswaId
+          ) || {
+            reward:0,
+            violation:0
+          };
 
+
+        const reward =
+          Number(
+            pointData.reward
+          ) || 0;
+
+
+        const violation =
+          Number(
+            pointData.violation
+          ) || 0;
+
+
+        return {
+
+          id:
+            siswaId,
+
+          nama:
+            student.nama || '-',
+
+          nisn:
+            student.nisn || '-',
+
+          kelas:
+            student.kelas ||
+            student.nama_kelas ||
+            '-',
+
+          reward:
+
+            reward,
+
+          violation:
+
+            violation,
+
+          /*
+            Poin Bersih
+          */
+
+          net:
+            reward -
+            violation
+
+        };
+
+      });
+
+
+    /*
+      Isi daftar kelas
+    */
 
     fillClasses();
 
+
+    /*
+      Tampilkan ranking
+    */
+
     apply();
 
-  }
 
+  }
 
   catch(error){
 
@@ -835,13 +975,17 @@ async function load(){
     info.textContent =
       'Gagal memuat data ranking.';
 
+
+    filterInfo.textContent =
+      'Terjadi kesalahan saat memuat data.';
+
   }
 
 }
 
 
 /* =========================================
-   ISI DROPDOWN KELAS
+   DROPDOWN KELAS
 ========================================= */
 
 function fillClasses(){
@@ -849,12 +993,18 @@ function fillClasses(){
   const classes =
     [
       ...new Set(
+
         rows
           .map(
             student =>
               student.kelas
           )
-          .filter(Boolean)
+          .filter(
+            value =>
+              value &&
+              value !== '-'
+          )
+
       )
     ]
     .sort();
@@ -882,7 +1032,7 @@ function fillClasses(){
 
 
 /* =========================================
-   FILTER + SORTING
+   APPLY FILTER
 ========================================= */
 
 function apply(){
@@ -902,16 +1052,17 @@ function apply(){
 
 
   /*
-    Kalau input minimal kosong,
-    SEMUA poin bersih diperbolehkan.
+    Jika kosong:
+    TIDAK ADA FILTER MINIMAL.
 
-    Artinya:
-    +100 masuk
-    +20 masuk
-    0 masuk
-    -10 masuk
-    -50 masuk
-    -100 masuk
+    Maka poin:
+    +100
+    +50
+    0
+    -20
+    -100
+
+    semuanya tetap masuk.
   */
 
   const hasMinimum =
@@ -920,7 +1071,9 @@ function apply(){
 
   const minimumNet =
     hasMinimum
-      ? Number(min.value)
+      ? Number(
+          min.value
+        )
       : null;
 
 
@@ -929,50 +1082,55 @@ function apply(){
   */
 
   let result =
-    rows.filter(student => {
+    rows.filter(
+      student => {
 
 
-      const matchSearch =
-        !query ||
+        const matchSearch =
+          !query ||
 
-        (
-          student.nama +
-          ' ' +
-          student.nisn +
-          ' ' +
-          student.kelas
-        )
-        .toLowerCase()
-        .includes(query);
-
-
-      const matchClass =
-        !selectedClass ||
-        student.kelas === selectedClass;
+          (
+            student.nama +
+            ' ' +
+            student.nisn +
+            ' ' +
+            student.kelas
+          )
+          .toLowerCase()
+          .includes(
+            query
+          );
 
 
-      /*
-        Filter minimal poin
-        hanya digunakan jika
-        admin mengisinya.
-      */
-
-      const matchMinimum =
-        !hasMinimum ||
-        student.net >= minimumNet;
+        const matchClass =
+          !selectedClass ||
+          student.kelas ===
+          selectedClass;
 
 
-      return (
-        matchSearch &&
-        matchClass &&
-        matchMinimum
-      );
+        /*
+          Filter minimal hanya aktif
+          jika admin mengisinya.
+        */
 
-    });
+        const matchMinimum =
+          !hasMinimum ||
+          student.net >=
+          minimumNet;
+
+
+        return (
+          matchSearch &&
+          matchClass &&
+          matchMinimum
+        );
+
+      }
+    );
 
 
   /*
-    TENTUKAN KOLOM SORTING
+    KOLOM SORTING
   */
 
   let field;
@@ -1009,8 +1167,7 @@ function apply(){
 
 
   /*
-    DESC = terbesar ke terkecil
-    ASC  = terkecil ke terbesar
+    ARAH SORTING
   */
 
   const direction =
@@ -1044,6 +1201,11 @@ function apply(){
 
       }
 
+
+      /*
+        Jika nilai sama,
+        urutkan berdasarkan nama.
+      */
 
       return a.nama.localeCompare(
         b.nama
@@ -1082,7 +1244,10 @@ function render(
 
   r.textContent =
     data.reduce(
-      (total,student) =>
+      (
+        total,
+        student
+      ) =>
         total +
         student.reward,
       0
@@ -1091,7 +1256,10 @@ function render(
 
   v.textContent =
     data.reduce(
-      (total,student) =>
+      (
+        total,
+        student
+      ) =>
         total +
         student.violation,
       0
@@ -1100,7 +1268,10 @@ function render(
 
   net.textContent =
     data.reduce(
-      (total,student) =>
+      (
+        total,
+        student
+      ) =>
         total +
         student.net,
       0
@@ -1108,7 +1279,7 @@ function render(
 
 
   /*
-    LABEL SORTING
+    LABEL
   */
 
   const labels = {
@@ -1135,12 +1306,14 @@ function render(
 
 
   info.textContent =
-    labels[selectedMode] ||
+    labels[
+      selectedMode
+    ] ||
     'Ranking';
 
 
   /*
-    KETERANGAN FILTER
+    INFO FILTER
   */
 
   if(
@@ -1148,22 +1321,29 @@ function render(
   ){
 
     filterInfo.textContent =
-      'Menampilkan siswa dengan poin bersih minimal ' +
+      'Menampilkan ' +
+      data.length +
+      ' siswa dengan poin bersih minimal ' +
       minimumNet +
-      ' poin.';
+      '.';
 
   }
 
   else{
 
     filterInfo.textContent =
-      'Menampilkan seluruh siswa, termasuk poin bersih minus.';
+      'Menampilkan ' +
+      data.length +
+      ' dari ' +
+      rows.length +
+      ' siswa aktif. ' +
+      'Siswa tanpa transaksi poin memiliki poin bersih 0.';
 
   }
 
 
   /*
-    KALAU KOSONG
+    TIDAK ADA DATA
   */
 
   if(
@@ -1196,7 +1376,10 @@ function render(
   body.innerHTML =
     data
       .map(
-        (student,index) => {
+        (
+          student,
+          index
+        ) => {
 
 
           let netClass;
@@ -1245,18 +1428,24 @@ function render(
 
             <td>
               <b>
-                ${esc(student.nama)}
+                ${esc(
+                  student.nama
+                )}
               </b>
             </td>
 
 
             <td>
-              ${esc(student.nisn)}
+              ${esc(
+                student.nisn
+              )}
             </td>
 
 
             <td>
-              ${esc(student.kelas)}
+              ${esc(
+                student.kelas
+              )}
             </td>
 
 
@@ -1330,7 +1519,7 @@ function resetF(){
 
 
 /* =========================================
-   JALANKAN
+   MULAI
 ========================================= */
 
 load();
