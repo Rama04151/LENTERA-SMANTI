@@ -14,7 +14,7 @@
       --gold: #fbc02d;
       --muted: #94a3b8;
       --danger: #ef4444;
-      --border: rgba(255, 255, 255, 0.08);
+      --border: rgba(255,255,255,.08);
     }
 
     * {
@@ -24,9 +24,9 @@
 
     body {
       margin: 0;
-      background: var(--bg);
-      color: #fff;
       padding: 20px;
+      background: var(--bg);
+      color: white;
     }
 
     .container {
@@ -53,7 +53,6 @@
     h1 {
       margin: 0 0 7px;
       color: var(--gold);
-      font-size: 25px;
     }
 
     .subtitle {
@@ -65,36 +64,24 @@
       margin-top: 18px;
       padding: 14px;
       border-radius: 12px;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.25);
+      background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.25);
       color: #fca5a5;
       line-height: 1.6;
     }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 18px;
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
     }
 
-    .stat {
-      background: rgba(11, 19, 43, 0.55);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 17px;
-    }
-
-    .stat span {
+    .selected-info {
       color: var(--muted);
-      font-size: 13px;
-    }
-
-    .stat strong {
-      display: block;
-      color: var(--gold);
-      font-size: 24px;
-      margin-top: 5px;
+      font-size: 14px;
+      margin-left: auto;
     }
 
     button {
@@ -116,14 +103,46 @@
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
+      background: rgba(255,255,255,.08);
+      color: white;
     }
 
     .btn-danger {
-      background: rgba(239, 68, 68, 0.15);
+      background: rgba(239,68,68,.15);
       color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      border: 1px solid rgba(239,68,68,.3);
+    }
+
+    .btn-danger:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      background: rgba(11,19,43,.55);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 17px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--gold);
+      font-size: 24px;
+      margin-top: 5px;
     }
 
     .table-wrapper {
@@ -132,8 +151,8 @@
 
     table {
       width: 100%;
+      min-width: 950px;
       border-collapse: collapse;
-      min-width: 900px;
     }
 
     th,
@@ -152,10 +171,11 @@
       font-size: 14px;
     }
 
-    .actions {
-      display: flex;
-      gap: 7px;
-      flex-wrap: wrap;
+    .checkbox {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: var(--gold);
     }
 
     .empty {
@@ -168,21 +188,28 @@
       display: none;
     }
 
-    @media (max-width: 700px) {
+    @media(max-width:700px) {
+
       .stats {
         grid-template-columns: 1fr;
       }
+
+      .selected-info {
+        margin-left: 0;
+        width: 100%;
+      }
+
     }
 
-    /* =========================================
+    /* =========================
        PRINT
-    ========================================= */
+    ========================= */
 
     @media print {
 
       body {
-        background: #fff;
-        color: #000;
+        background: white;
+        color: black;
         padding: 0;
       }
 
@@ -193,22 +220,22 @@
       #printArea {
         display: block !important;
         border: none;
-        color: #000;
+        color: black;
         padding: 0;
       }
 
       #printArea h1 {
-        color: #000;
+        color: black;
       }
 
       #printArea p,
       #printArea td {
-        color: #000;
+        color: black;
       }
 
       #printArea th {
-        color: #000;
-        border-bottom: 2px solid #000;
+        color: black;
+        border-bottom: 2px solid black;
       }
 
       #printArea td {
@@ -220,869 +247,1176 @@
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <!-- HEADER -->
-    <div class="card no-print">
+  <!-- HEADER -->
+  <div class="card no-print">
 
-      <div class="header">
+    <div class="header">
 
-        <div>
-          <h1>🎓 Data Siswa Lulus</h1>
+      <div>
+        <h1>🎓 Data Siswa Lulus</h1>
 
-          <p class="subtitle">
-            Arsip poin dan pengelolaan data siswa yang sudah lulus.
-          </p>
-        </div>
-
-        <button
-          class="btn-secondary"
-          onclick="window.location.href='admin.html'"
-        >
-          ← Kembali
-        </button>
-
+        <p class="subtitle">
+          Arsip dan pengelolaan data siswa yang sudah berstatus Lulus.
+        </p>
       </div>
 
-      <div class="warning">
-
-        ⚠️ <b>Perhatian:</b><br>
-
-        Halaman ini hanya menampilkan siswa dengan status
-        <b>Lulus</b>.
-
-        <br><br>
-
-        Penghapusan bersifat <b>PERMANEN</b> dan akan menghapus
-        data siswa beserta poin, inbox, riwayat kelas, dan login control.
-
-        <br><br>
-
-        <b>Siswa Aktif tidak dapat dihapus melalui fitur ini.</b>
-
-      </div>
+      <button
+        class="btn-secondary"
+        onclick="window.location.href='admin.html'"
+      >
+        ← Kembali
+      </button>
 
     </div>
 
+    <div class="warning">
 
-    <!-- STATISTIK -->
-    <div class="stats no-print">
+      ⚠️ <b>Perhatian:</b><br>
 
-      <div class="stat">
-        <span>Siswa Lulus</span>
-        <strong id="totalLulus">0</strong>
-      </div>
+      Halaman ini hanya menampilkan siswa dengan status
+      <b>Lulus</b>.
 
-      <div class="stat">
-        <span>Total Penghargaan</span>
-        <strong id="totalPenghargaan">0</strong>
-      </div>
+      <br><br>
 
-      <div class="stat">
-        <span>Total Pelanggaran</span>
-        <strong id="totalPelanggaran">0</strong>
-      </div>
+      Penghapusan bersifat <b>PERMANEN</b> dan akan menghapus:
 
-    </div>
+      <br>
 
+      • Data siswa<br>
+      • Seluruh poin<br>
+      • Seluruh inbox<br>
+      • Riwayat kelas<br>
+      • Login control
 
-    <!-- DATA -->
-    <div class="card no-print">
+      <br><br>
 
-      <div id="status">
-        Memuat data...
-      </div>
-
-      <div class="table-wrapper">
-
-        <table>
-
-          <thead>
-
-            <tr>
-              <th>NISN</th>
-              <th>Nama</th>
-              <th>Kelas</th>
-              <th>Penghargaan</th>
-              <th>Pelanggaran</th>
-              <th>Poin Bersih</th>
-              <th>Aksi</th>
-            </tr>
-
-          </thead>
-
-          <tbody id="studentTable">
-          </tbody>
-
-        </table>
-
-      </div>
+      <b>Siswa Aktif tidak dapat dihapus melalui fitur ini.</b>
 
     </div>
-
-
-    <!-- AREA PRINT -->
-    <div
-      id="printArea"
-      class="card"
-    ></div>
 
   </div>
 
 
-  <script>
+  <!-- STATISTIK -->
+  <div class="stats no-print">
 
-    /* =========================================
-       SESSION
-    ========================================= */
+    <div class="stat">
+      <span>Siswa Lulus</span>
+      <strong id="totalLulus">0</strong>
+    </div>
 
-    const session =
-      sessionStorage.getItem(
-        "lentera_admin_session"
-      );
+    <div class="stat">
+      <span>Total Penghargaan</span>
+      <strong id="totalPenghargaan">0</strong>
+    </div>
 
-    if (!session) {
-      window.location.replace(
-        "admin-login.html"
-      );
-    }
+    <div class="stat">
+      <span>Total Pelanggaran</span>
+      <strong id="totalPelanggaran">0</strong>
+    </div>
 
-
-    /* =========================================
-       DATA
-    ========================================= */
-
-    let students = [];
-    let points = [];
+  </div>
 
 
-    /* =========================================
-       UTIL
-    ========================================= */
+  <!-- DATA -->
+  <div class="card no-print">
 
-    function escapeHtml(value) {
+    <div class="toolbar">
 
-      return String(
-        value ?? ""
-      ).replace(
-        /[&<>"']/g,
-        function (char) {
+      <button
+        class="btn-secondary"
+        onclick="toggleSelectAll()"
+        id="selectAllButton"
+      >
+        ☑️ Pilih Semua
+      </button>
 
-          const map = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            "\"": "&quot;",
-            "'": "&#039;"
-          };
+      <button
+        class="btn-danger"
+        onclick="deleteSelected()"
+        id="deleteSelectedButton"
+        disabled
+      >
+        🗑️ Hapus yang Dipilih
+      </button>
 
-          return map[char];
+      <span
+        class="selected-info"
+        id="selectedInfo"
+      >
+        0 siswa dipilih
+      </span>
 
-        }
-      );
-
-    }
-
-
-    function numberValue(value) {
-
-      return Number(value) || 0;
-
-    }
+    </div>
 
 
-    /* =========================================
-       LOAD DATA
-    ========================================= */
-
-    async function loadData() {
-
-      try {
-
-        const [
-          studentResponse,
-          pointResponse
-        ] = await Promise.all([
-
-          fetch(
-            "/.netlify/functions/admin-students"
-          ),
-
-          fetch(
-            "/.netlify/functions/admin-points"
-          )
-
-        ]);
+    <div id="status">
+      Memuat data...
+    </div>
 
 
-        const studentResult =
-          await studentResponse.json();
+    <div class="table-wrapper">
 
-        const pointResult =
-          await pointResponse.json();
+      <table>
 
+        <thead>
 
-        if (
-          !studentResponse.ok ||
-          !studentResult.success
-        ) {
+          <tr>
 
-          throw new Error(
-            studentResult.message ||
-            "Gagal mengambil data siswa."
-          );
+            <th>
+              <input
+                type="checkbox"
+                class="checkbox"
+                id="selectAllCheckbox"
+                onchange="selectAllChanged()"
+              >
+            </th>
 
-        }
+            <th>NISN</th>
+            <th>Nama</th>
+            <th>Kelas</th>
+            <th>Penghargaan</th>
+            <th>Pelanggaran</th>
+            <th>Poin Bersih</th>
+            <th>Aksi</th>
 
+          </tr>
 
-        if (
-          !pointResponse.ok ||
-          !pointResult.success
-        ) {
+        </thead>
 
-          throw new Error(
-            pointResult.message ||
-            "Gagal mengambil data poin."
-          );
+        <tbody id="studentTable">
+        </tbody>
 
-        }
+      </table>
 
+    </div>
 
-        /*
-         * PENGAMAN FRONTEND
-         *
-         * Hanya status Lulus.
-         */
-
-        students =
-          (
-            studentResult.siswa || []
-          ).filter(function (student) {
-
-            return (
-              String(
-                student.status || ""
-              )
-                .trim()
-                .toLowerCase() ===
-              "lulus"
-            );
-
-          });
+  </div>
 
 
-        points =
-          pointResult.points ||
-          pointResult.poin ||
-          [];
+  <!-- PRINT -->
+  <div
+    id="printArea"
+    class="card"
+  ></div>
+
+</div>
 
 
-        render();
+<script>
+
+  /* =========================================
+     SESSION
+  ========================================= */
+
+  if (
+    !sessionStorage.getItem(
+      "lentera_admin_session"
+    )
+  ) {
+
+    window.location.replace(
+      "admin-login.html"
+    );
+
+  }
 
 
-      } catch (error) {
+  /* =========================================
+     DATA
+  ========================================= */
 
-        console.error(
-          "LOAD DATA LULUS ERROR:",
-          error
+  let students = [];
+  let points = [];
+
+  let selectedStudents = new Set();
+
+
+  /* =========================================
+     UTIL
+  ========================================= */
+
+  function escapeHtml(value) {
+
+    return String(
+      value ?? ""
+    ).replace(
+      /[&<>"']/g,
+      function(char) {
+
+        const map = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        };
+
+        return map[char];
+
+      }
+    );
+
+  }
+
+
+  function numberValue(value) {
+
+    return Number(value) || 0;
+
+  }
+
+
+  /* =========================================
+     LOAD DATA
+  ========================================= */
+
+  async function loadData() {
+
+    try {
+
+      document.getElementById(
+        "status"
+      ).textContent =
+        "Memuat data...";
+
+
+      const [
+        studentResponse,
+        pointResponse
+      ] = await Promise.all([
+
+        fetch(
+          "/.netlify/functions/admin-students"
+        ),
+
+        fetch(
+          "/.netlify/functions/admin-points"
+        )
+
+      ]);
+
+
+      const studentResult =
+        await studentResponse.json();
+
+      const pointResult =
+        await pointResponse.json();
+
+
+      if (
+        !studentResponse.ok ||
+        !studentResult.success
+      ) {
+
+        throw new Error(
+          studentResult.message ||
+          "Gagal mengambil data siswa."
         );
-
-        document.getElementById(
-          "status"
-        ).textContent =
-          "Gagal memuat data: " +
-          error.message;
 
       }
 
-    }
+
+      if (
+        !pointResponse.ok ||
+        !pointResult.success
+      ) {
+
+        throw new Error(
+          pointResult.message ||
+          "Gagal mengambil data poin."
+        );
+
+      }
 
 
-    /* =========================================
-       RINGKASAN POIN SISWA
-    ========================================= */
+      /*
+       * HANYA SISWA LULUS
+       */
 
-    function getPointSummary(
-      siswaId
-    ) {
+      students =
+        (
+          studentResult.siswa || []
+        ).filter(function(student) {
 
-      const siswaPoints =
-        points.filter(function (point) {
-
-          return String(
-            point.siswaId ||
-            point.siswa_id ||
-            ""
-          ) === String(
-            siswaId
+          return (
+            String(
+              student.status || ""
+            )
+            .trim()
+            .toLowerCase() ===
+            "lulus"
           );
 
         });
 
 
-      let penghargaan = 0;
-      let pelanggaran = 0;
+      points =
+        pointResult.points ||
+        pointResult.poin ||
+        [];
 
 
-      siswaPoints.forEach(
-        function (point) {
+      /*
+       * Bersihkan selection
+       * dari siswa yang sudah tidak ada
+       */
 
-          const value =
-            Math.abs(
-              numberValue(
-                point.poin
-              )
-            );
+      selectedStudents =
+        new Set(
+          [...selectedStudents]
+            .filter(function(id) {
+
+              return students.some(
+                function(student) {
+
+                  return String(
+                    student.id
+                  ) === String(id);
+
+                }
+              );
+
+            })
+        );
 
 
-          const jenis =
-            String(
-              point.jenis || ""
-            )
-              .trim()
-              .toLowerCase();
+      render();
 
 
-          if (
-            jenis ===
-            "penghargaan"
-          ) {
+    } catch(error) {
 
-            penghargaan +=
-              value;
+      console.error(
+        "LOAD LULUS ERROR:",
+        error
+      );
 
-          } else {
+      document.getElementById(
+        "status"
+      ).textContent =
+        "Gagal memuat data: " +
+        error.message;
 
-            pelanggaran +=
-              value;
+    }
 
-          }
+  }
+
+
+  /* =========================================
+     RINGKASAN POIN
+  ========================================= */
+
+  function getPointSummary(
+    siswaId
+  ) {
+
+    const siswaPoints =
+      points.filter(
+        function(point) {
+
+          return String(
+            point.siswaId ||
+            point.siswa_id ||
+            ""
+          ) ===
+          String(siswaId);
 
         }
       );
 
 
-      return {
+    let penghargaan = 0;
+    let pelanggaran = 0;
 
-        list: siswaPoints,
 
-        penghargaan,
+    siswaPoints.forEach(
+      function(point) {
 
-        pelanggaran,
+        const value =
+          Math.abs(
+            numberValue(
+              point.poin
+            )
+          );
 
-        bersih:
-          penghargaan -
-          pelanggaran
 
-      };
+        const jenis =
+          String(
+            point.jenis || ""
+          )
+          .trim()
+          .toLowerCase();
+
+
+        if (
+          jenis ===
+          "penghargaan"
+        ) {
+
+          penghargaan += value;
+
+        } else {
+
+          pelanggaran += value;
+
+        }
+
+      }
+    );
+
+
+    return {
+
+      list: siswaPoints,
+
+      penghargaan,
+
+      pelanggaran,
+
+      bersih:
+        penghargaan -
+        pelanggaran
+
+    };
+
+  }
+
+
+  /* =========================================
+     RENDER
+  ========================================= */
+
+  function render() {
+
+    const table =
+      document.getElementById(
+        "studentTable"
+      );
+
+
+    document.getElementById(
+      "totalLulus"
+    ).textContent =
+      students.length;
+
+
+    let totalPenghargaan = 0;
+    let totalPelanggaran = 0;
+
+
+    students.forEach(
+      function(student) {
+
+        const summary =
+          getPointSummary(
+            student.id
+          );
+
+        totalPenghargaan +=
+          summary.penghargaan;
+
+        totalPelanggaran +=
+          summary.pelanggaran;
+
+      }
+    );
+
+
+    document.getElementById(
+      "totalPenghargaan"
+    ).textContent =
+      totalPenghargaan;
+
+
+    document.getElementById(
+      "totalPelanggaran"
+    ).textContent =
+      totalPelanggaran;
+
+
+    document.getElementById(
+      "status"
+    ).innerHTML =
+      "Total siswa berstatus <b>Lulus</b>: " +
+      students.length;
+
+
+    if (
+      students.length === 0
+    ) {
+
+      table.innerHTML = `
+        <tr>
+          <td
+            colspan="8"
+            class="empty"
+          >
+            Belum ada siswa yang berstatus Lulus.
+          </td>
+        </tr>
+      `;
+
+      updateSelectionUI();
+
+      return;
 
     }
 
 
-    /* =========================================
-       RENDER
-    ========================================= */
-
-    function render() {
-
-      const table =
-        document.getElementById(
-          "studentTable"
-        );
-
-
-      document.getElementById(
-        "totalLulus"
-      ).textContent =
-        students.length;
-
-
-      let totalPenghargaan = 0;
-      let totalPelanggaran = 0;
-
-
-      students.forEach(
-        function (student) {
+    table.innerHTML =
+      students.map(
+        function(student) {
 
           const summary =
             getPointSummary(
               student.id
             );
 
-          totalPenghargaan +=
-            summary.penghargaan;
 
-          totalPelanggaran +=
-            summary.pelanggaran;
+          const checked =
+            selectedStudents.has(
+              String(student.id)
+            );
+
+
+          return `
+
+            <tr>
+
+              <td>
+
+                <input
+                  type="checkbox"
+                  class="checkbox student-checkbox"
+                  value="${escapeHtml(student.id)}"
+                  ${checked ? "checked" : ""}
+                  onchange="studentSelectionChanged('${escapeHtml(student.id)}', this.checked)"
+                >
+
+              </td>
+
+
+              <td>
+                ${escapeHtml(
+                  student.nisn
+                )}
+              </td>
+
+
+              <td>
+                ${escapeHtml(
+                  student.nama
+                )}
+              </td>
+
+
+              <td>
+                ${escapeHtml(
+                  student.kelas ||
+                  "-"
+                )}
+              </td>
+
+
+              <td>
+                +${summary.penghargaan}
+              </td>
+
+
+              <td>
+                -${summary.pelanggaran}
+              </td>
+
+
+              <td>
+                ${summary.bersih}
+              </td>
+
+
+              <td>
+
+                <button
+                  class="btn-gold"
+                  onclick="printStudent('${escapeHtml(student.id)}')"
+                >
+                  🖨️ Cetak
+                </button>
+
+              </td>
+
+            </tr>
+
+          `;
+
+        }
+      ).join("");
+
+
+    updateSelectionUI();
+
+  }
+
+
+  /* =========================================
+     PILIH SATU SISWA
+  ========================================= */
+
+  function studentSelectionChanged(
+    siswaId,
+    checked
+  ) {
+
+    const id =
+      String(siswaId);
+
+
+    if (checked) {
+
+      selectedStudents.add(id);
+
+    } else {
+
+      selectedStudents.delete(id);
+
+    }
+
+
+    updateSelectionUI();
+
+  }
+
+
+  /* =========================================
+     PILIH SEMUA CHECKBOX
+  ========================================= */
+
+  function selectAllChanged() {
+
+    const checkbox =
+      document.getElementById(
+        "selectAllCheckbox"
+      );
+
+
+    if (checkbox.checked) {
+
+      students.forEach(
+        function(student) {
+
+          selectedStudents.add(
+            String(student.id)
+          );
+
+        }
+      );
+
+    } else {
+
+      selectedStudents.clear();
+
+    }
+
+
+    render();
+
+  }
+
+
+  /* =========================================
+     TOMBOL PILIH SEMUA
+  ========================================= */
+
+  function toggleSelectAll() {
+
+    const allSelected =
+      students.length > 0 &&
+      selectedStudents.size ===
+      students.length;
+
+
+    if (allSelected) {
+
+      selectedStudents.clear();
+
+    } else {
+
+      students.forEach(
+        function(student) {
+
+          selectedStudents.add(
+            String(student.id)
+          );
+
+        }
+      );
+
+    }
+
+
+    render();
+
+  }
+
+
+  /* =========================================
+     UPDATE UI SELECTION
+  ========================================= */
+
+  function updateSelectionUI() {
+
+    const count =
+      selectedStudents.size;
+
+
+    document.getElementById(
+      "selectedInfo"
+    ).textContent =
+      count +
+      " siswa dipilih";
+
+
+    const deleteButton =
+      document.getElementById(
+        "deleteSelectedButton"
+      );
+
+
+    deleteButton.disabled =
+      count === 0;
+
+
+    const selectAllCheckbox =
+      document.getElementById(
+        "selectAllCheckbox"
+      );
+
+
+    const selectAllButton =
+      document.getElementById(
+        "selectAllButton"
+      );
+
+
+    if (
+      students.length > 0 &&
+      count === students.length
+    ) {
+
+      selectAllCheckbox.checked =
+        true;
+
+      selectAllCheckbox.indeterminate =
+        false;
+
+      selectAllButton.textContent =
+        "☑️ Batalkan Semua";
+
+    } else {
+
+      selectAllCheckbox.checked =
+        false;
+
+      selectAllCheckbox.indeterminate =
+        count > 0;
+
+      selectAllButton.textContent =
+        "☑️ Pilih Semua";
+
+    }
+
+  }
+
+
+  /* =========================================
+     HAPUS MASSAL
+  ========================================= */
+
+  async function deleteSelected() {
+
+    const ids =
+      [...selectedStudents];
+
+
+    if (ids.length === 0) {
+
+      alert(
+        "Belum ada siswa yang dipilih."
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * Cari nama untuk konfirmasi
+     */
+
+    const selectedNames =
+      students
+
+        .filter(function(student) {
+
+          return selectedStudents.has(
+            String(student.id)
+          );
+
+        })
+
+        .map(function(student) {
+
+          return "• " + student.nama;
+
+        })
+
+        .join("\n");
+
+
+    const confirmation =
+      confirm(
+
+        "⚠️ HAPUS " +
+        ids.length +
+        " SISWA SEKALIGUS?\n\n" +
+
+        selectedNames +
+
+        "\n\n" +
+
+        "Data berikut akan dihapus PERMANEN:\n" +
+
+        "• Data siswa\n" +
+        "• Seluruh poin\n" +
+        "• Seluruh inbox\n" +
+        "• Riwayat kelas\n" +
+        "• Login control\n\n" +
+
+        "Tindakan ini tidak dapat dibatalkan.\n\n" +
+
+        "Lanjutkan?"
+
+      );
+
+
+    if (!confirmation) {
+      return;
+    }
+
+
+    const verification =
+      prompt(
+        'Ketik "HAPUS LULUS" untuk melanjutkan:'
+      );
+
+
+    if (
+      verification !==
+      "HAPUS LULUS"
+    ) {
+
+      alert(
+        "Penghapusan dibatalkan."
+      );
+
+      return;
+
+    }
+
+
+    const deleteButton =
+      document.getElementById(
+        "deleteSelectedButton"
+      );
+
+
+    deleteButton.disabled =
+      true;
+
+
+    deleteButton.textContent =
+      "⏳ Menghapus...";
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/.netlify/functions/admin-lulus",
+          {
+
+            method: "DELETE",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify({
+                siswaIds: ids
+              })
+
+          }
+        );
+
+
+      const result =
+        await response.json();
+
+
+      if (
+        !response.ok ||
+        !result.success
+      ) {
+
+        throw new Error(
+          result.message ||
+          "Gagal menghapus siswa."
+        );
+
+      }
+
+
+      alert(
+        result.message
+      );
+
+
+      selectedStudents.clear();
+
+
+      await loadData();
+
+
+    } catch(error) {
+
+      console.error(
+        "DELETE MASSAL ERROR:",
+        error
+      );
+
+      alert(
+        "Gagal menghapus:\n" +
+        error.message
+      );
+
+    } finally {
+
+      deleteButton.disabled =
+        false;
+
+      deleteButton.textContent =
+        "🗑️ Hapus yang Dipilih";
+
+      updateSelectionUI();
+
+    }
+
+  }
+
+
+  /* =========================================
+     CETAK SATU SISWA
+  ========================================= */
+
+  function printStudent(
+    siswaId
+  ) {
+
+    const student =
+      students.find(
+        function(item) {
+
+          return String(
+            item.id
+          ) ===
+          String(siswaId);
 
         }
       );
 
 
+    if (!student) {
+
+      alert(
+        "Data siswa tidak ditemukan."
+      );
+
+      return;
+
+    }
+
+
+    const summary =
+      getPointSummary(
+        siswaId
+      );
+
+
+    const printArea =
       document.getElementById(
-        "totalPenghargaan"
-      ).textContent =
-        totalPenghargaan;
+        "printArea"
+      );
 
 
-      document.getElementById(
-        "totalPelanggaran"
-      ).textContent =
-        totalPelanggaran;
+    printArea.innerHTML = `
 
+      <h1>
+        REKAP POIN SISWA LULUS
+      </h1>
 
-      document.getElementById(
-        "status"
-      ).innerHTML =
-        "Total siswa berstatus <b>Lulus</b>: " +
-        students.length;
+      <p>
+        <b>Nama:</b>
+        ${escapeHtml(
+          student.nama
+        )}
+      </p>
 
+      <p>
+        <b>NISN:</b>
+        ${escapeHtml(
+          student.nisn
+        )}
+      </p>
 
-      if (
-        students.length === 0
-      ) {
+      <p>
+        <b>Kelas terakhir:</b>
+        ${escapeHtml(
+          student.kelas || "-"
+        )}
+      </p>
 
-        table.innerHTML = `
+      <hr>
+
+      <p>
+        <b>Penghargaan:</b>
+        ${summary.penghargaan}
+      </p>
+
+      <p>
+        <b>Pelanggaran:</b>
+        ${summary.pelanggaran}
+      </p>
+
+      <p>
+        <b>Poin Bersih:</b>
+        ${summary.bersih}
+      </p>
+
+      <br>
+
+      <h3>
+        DETAIL TRANSAKSI POIN
+      </h3>
+
+      <table>
+
+        <thead>
+
           <tr>
-            <td
-              colspan="7"
-              class="empty"
-            >
-              Belum ada siswa yang berstatus Lulus.
-            </td>
+            <th>Tanggal</th>
+            <th>Jenis</th>
+            <th>Poin</th>
+            <th>Keterangan</th>
+            <th>Dibuat Oleh</th>
+            <th>Peran</th>
           </tr>
-        `;
 
-        return;
+        </thead>
 
-      }
+        <tbody>
 
+          ${
+            summary.list.length
 
-      table.innerHTML =
-        students.map(
-          function (student) {
+            ?
 
-            const summary =
-              getPointSummary(
-                student.id
-              );
+            summary.list.map(
+              function(point) {
 
+                return `
 
-            return `
+                  <tr>
 
+                    <td>
+                      ${escapeHtml(
+                        point.tanggal
+                      )}
+                    </td>
+
+                    <td>
+                      ${escapeHtml(
+                        point.jenis
+                      )}
+                    </td>
+
+                    <td>
+                      ${escapeHtml(
+                        point.poin
+                      )}
+                    </td>
+
+                    <td>
+                      ${escapeHtml(
+                        point.keterangan ||
+                        "-"
+                      )}
+                    </td>
+
+                    <td>
+                      ${escapeHtml(
+                        point.dibuatOleh ||
+                        point.dibuat_oleh ||
+                        "-"
+                      )}
+                    </td>
+
+                    <td>
+                      ${escapeHtml(
+                        point.peran ||
+                        "-"
+                      )}
+                    </td>
+
+                  </tr>
+
+                `;
+
+              }
+            ).join("")
+
+            :
+
+            `
               <tr>
-
-                <td>
-                  ${escapeHtml(
-                    student.nisn
-                  )}
+                <td colspan="6">
+                  Tidak ada transaksi poin.
                 </td>
-
-                <td>
-                  ${escapeHtml(
-                    student.nama
-                  )}
-                </td>
-
-                <td>
-                  ${escapeHtml(
-                    student.kelas ||
-                    "-"
-                  )}
-                </td>
-
-                <td>
-                  +${summary.penghargaan}
-                </td>
-
-                <td>
-                  -${summary.pelanggaran}
-                </td>
-
-                <td>
-                  ${summary.bersih}
-                </td>
-
-                <td>
-
-                  <div class="actions">
-
-                    <button
-                      class="btn-gold"
-                      onclick="printStudent('${escapeHtml(student.id)}')"
-                    >
-                      🖨️ Cetak
-                    </button>
-
-                    <button
-                      class="btn-danger"
-                      onclick="deleteStudent('${escapeHtml(student.id)}')"
-                    >
-                      🗑️ Hapus
-                    </button>
-
-                  </div>
-
-                </td>
-
               </tr>
-
-            `;
-
+            `
           }
-        ).join("");
 
-    }
+        </tbody>
 
+      </table>
 
-    /* =========================================
-       CETAK POIN SISWA
-    ========================================= */
+    `;
 
-    function printStudent(
-      siswaId
-    ) {
 
-      const student =
-        students.find(
-          function (item) {
+    window.print();
 
-            return String(
-              item.id
-            ) === String(
-              siswaId
-            );
+  }
 
-          }
-        );
 
+  /* =========================================
+     START
+  ========================================= */
 
-      if (!student) {
+  loadData();
 
-        alert(
-          "Data siswa tidak ditemukan."
-        );
-
-        return;
-
-      }
-
-
-      const summary =
-        getPointSummary(
-          siswaId
-        );
-
-
-      const printArea =
-        document.getElementById(
-          "printArea"
-        );
-
-
-      printArea.innerHTML = `
-
-        <h1>
-          REKAP POIN SISWA LULUS
-        </h1>
-
-        <p>
-          <b>Nama:</b>
-          ${escapeHtml(
-            student.nama
-          )}
-        </p>
-
-        <p>
-          <b>NISN:</b>
-          ${escapeHtml(
-            student.nisn
-          )}
-        </p>
-
-        <p>
-          <b>Kelas terakhir:</b>
-          ${escapeHtml(
-            student.kelas ||
-            "-"
-          )}
-        </p>
-
-        <hr>
-
-        <p>
-          <b>Penghargaan:</b>
-          ${summary.penghargaan}
-        </p>
-
-        <p>
-          <b>Pelanggaran:</b>
-          ${summary.pelanggaran}
-        </p>
-
-        <p>
-          <b>Poin Bersih:</b>
-          ${summary.bersih}
-        </p>
-
-        <br>
-
-        <h3>
-          DETAIL TRANSAKSI POIN
-        </h3>
-
-        <table>
-
-          <thead>
-
-            <tr>
-              <th>Tanggal</th>
-              <th>Jenis</th>
-              <th>Poin</th>
-              <th>Keterangan</th>
-              <th>Dibuat Oleh</th>
-              <th>Peran</th>
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            ${
-              summary.list.length
-                ? summary.list.map(
-                    function (point) {
-
-                      return `
-
-                        <tr>
-
-                          <td>
-                            ${escapeHtml(
-                              point.tanggal
-                            )}
-                          </td>
-
-                          <td>
-                            ${escapeHtml(
-                              point.jenis
-                            )}
-                          </td>
-
-                          <td>
-                            ${escapeHtml(
-                              point.poin
-                            )}
-                          </td>
-
-                          <td>
-                            ${escapeHtml(
-                              point.keterangan ||
-                              "-"
-                            )}
-                          </td>
-
-                          <td>
-                            ${escapeHtml(
-                              point.dibuatOleh ||
-                              point.dibuat_oleh ||
-                              "-"
-                            )}
-                          </td>
-
-                          <td>
-                            ${escapeHtml(
-                              point.peran ||
-                              "-"
-                            )}
-                          </td>
-
-                        </tr>
-
-                      `;
-
-                    }
-                  ).join("")
-                : `
-                    <tr>
-                      <td colspan="6">
-                        Tidak ada transaksi poin.
-                      </td>
-                    </tr>
-                  `
-            }
-
-          </tbody>
-
-        </table>
-
-      `;
-
-
-      window.print();
-
-    }
-
-
-    /* =========================================
-       HAPUS SISWA LULUS
-    ========================================= */
-
-    async function deleteStudent(
-      siswaId
-    ) {
-
-      const student =
-        students.find(
-          function (item) {
-
-            return String(
-              item.id
-            ) === String(
-              siswaId
-            );
-
-          }
-        );
-
-
-      if (!student) {
-
-        alert(
-          "Data siswa tidak ditemukan."
-        );
-
-        return;
-
-      }
-
-
-      const confirmation =
-        confirm(
-
-          "⚠️ HAPUS PERMANEN\n\n" +
-
-          "Nama: " +
-          student.nama +
-          "\n" +
-
-          "NISN: " +
-          student.nisn +
-          "\n\n" +
-
-          "Data yang akan dihapus:\n" +
-
-          "• Data siswa\n" +
-          "• Seluruh poin\n" +
-          "• Seluruh inbox\n" +
-          "• Riwayat kelas\n" +
-          "• Login control\n\n" +
-
-          "Tindakan ini TIDAK DAPAT DIBATALKAN.\n\n" +
-
-          "Lanjutkan?"
-
-        );
-
-
-      if (!confirmation) {
-        return;
-      }
-
-
-      const verification =
-        prompt(
-          'Ketik "LULUS" untuk mengonfirmasi penghapusan:'
-        );
-
-
-      if (
-        verification !==
-        "LULUS"
-      ) {
-
-        alert(
-          "Penghapusan dibatalkan."
-        );
-
-        return;
-
-      }
-
-
-      try {
-
-        const response =
-          await fetch(
-            "/.netlify/functions/admin-lulus",
-            {
-
-              method: "DELETE",
-
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-
-              body:
-                JSON.stringify({
-                  siswaId
-                })
-
-            }
-          );
-
-
-        const result =
-          await response.json();
-
-
-        if (
-          !response.ok ||
-          !result.success
-        ) {
-
-          throw new Error(
-            result.message ||
-            "Gagal menghapus siswa."
-          );
-
-        }
-
-
-        alert(
-          result.message
-        );
-
-
-        await loadData();
-
-
-      } catch (error) {
-
-        console.error(
-          "DELETE LULUS ERROR:",
-          error
-        );
-
-        alert(
-          "Gagal menghapus:\n" +
-          error.message
-        );
-
-      }
-
-    }
-
-
-    /* =========================================
-       START
-    ========================================= */
-
-    loadData();
-
-  </script>
+</script>
 
 </body>
-
 </html>
