@@ -19,7 +19,7 @@ function response(statusCode, body) {
 }
 
 
-exports.handler = async function (event) {
+exports.handler = async function(event) {
 
   /*
    * HANYA DELETE
@@ -45,17 +45,69 @@ exports.handler = async function (event) {
       );
 
 
-    const siswaId =
-      String(
-        body.siswaId || ""
-      ).trim();
+    /*
+     * ==========================================
+     * DUKUNG MULTIPLE ID
+     * ==========================================
+     */
+
+    let siswaIds =
+      Array.isArray(
+        body.siswaIds
+      )
+        ? body.siswaIds
+        : [];
 
 
-    if (!siswaId) {
+    /*
+     * Bersihkan ID
+     */
+
+    siswaIds =
+      [...new Set(
+        siswaIds
+          .map(
+            id =>
+              String(id || "").trim()
+          )
+          .filter(Boolean)
+      )];
+
+
+    if (
+      siswaIds.length === 0
+    ) {
 
       return response(400, {
+
         success: false,
-        message: "ID siswa wajib diisi."
+
+        message:
+          "Tidak ada siswa yang dipilih."
+
+      });
+
+    }
+
+
+    /*
+     * Batasi jumlah untuk
+     * menghindari request tidak wajar.
+     *
+     * Bisa dinaikkan kalau diperlukan.
+     */
+
+    if (
+      siswaIds.length > 500
+    ) {
+
+      return response(400, {
+
+        success: false,
+
+        message:
+          "Maksimal 500 siswa sekali hapus."
+
       });
 
     }
@@ -63,12 +115,12 @@ exports.handler = async function (event) {
 
     /*
      * ==========================================
-     * CARI SISWA
+     * AMBIL SEMUA SISWA
      * ==========================================
      */
 
     const {
-      data: siswa,
+      data: siswaList,
       error: siswaError
     } = await supabase
 
@@ -81,12 +133,10 @@ exports.handler = async function (event) {
         status
       `)
 
-      .eq(
+      .in(
         "id",
-        siswaId
-      )
-
-      .maybeSingle();
+        siswaIds
+      );
 
 
     if (siswaError) {
@@ -94,11 +144,44 @@ exports.handler = async function (event) {
     }
 
 
-    if (!siswa) {
+    /*
+     * ==========================================
+     * CEK SEMUA ID DITEMUKAN
+     * ==========================================
+     */
+
+    const foundIds =
+      new Set(
+        (siswaList || [])
+          .map(
+            siswa =>
+              String(siswa.id)
+          )
+      );
+
+
+    const missingIds =
+      siswaIds.filter(
+        id =>
+          !foundIds.has(
+            String(id)
+          )
+      );
+
+
+    if (
+      missingIds.length > 0
+    ) {
 
       return response(404, {
+
         success: false,
-        message: "Siswa tidak ditemukan."
+
+        message:
+          "Sebagian siswa tidak ditemukan.",
+
+        missingIds
+
       });
 
     }
@@ -106,22 +189,28 @@ exports.handler = async function (event) {
 
     /*
      * ==========================================
-     * PENGAMAN UTAMA
+     * PENGAMAN PALING PENTING
      *
-     * HANYA LULUS
+     * SEMUA harus LULUS.
+     * Kalau ada SATU saja yang bukan Lulus,
+     * seluruh operasi dibatalkan.
      * ==========================================
      */
 
-    const status =
-      String(
-        siswa.status || ""
-      )
-        .trim()
-        .toLowerCase();
+    const nonLulus =
+      siswaList.filter(
+        siswa =>
+          String(
+            siswa.status || ""
+          )
+          .trim()
+          .toLowerCase() !==
+          "lulus"
+      );
 
 
     if (
-      status !== "lulus"
+      nonLulus.length > 0
     ) {
 
       return response(403, {
@@ -130,12 +219,33 @@ exports.handler = async function (event) {
 
         message:
           "Penghapusan ditolak. " +
-          "Fitur ini hanya dapat digunakan " +
-          "untuk siswa berstatus Lulus."
+          "Semua siswa yang dipilih harus berstatus Lulus.",
+
+        siswaDitolak:
+          nonLulus.map(
+            siswa => ({
+              id: siswa.id,
+              nama: siswa.nama,
+              status: siswa.status
+            })
+          )
 
       });
 
     }
+
+
+    /*
+     * ==========================================
+     * AMBIL NISN
+     * ==========================================
+     */
+
+    const nisns =
+      siswaList.map(
+        siswa =>
+          siswa.nisn
+      );
 
 
     /*
@@ -152,9 +262,9 @@ exports.handler = async function (event) {
 
       .delete()
 
-      .eq(
+      .in(
         "nisn",
-        siswa.nisn
+        nisns
       );
 
 
@@ -177,9 +287,9 @@ exports.handler = async function (event) {
 
       .delete()
 
-      .eq(
+      .in(
         "siswa_id",
-        siswaId
+        siswaIds
       );
 
 
@@ -202,9 +312,9 @@ exports.handler = async function (event) {
 
       .delete()
 
-      .eq(
+      .in(
         "siswa_id",
-        siswaId
+        siswaIds
       );
 
 
@@ -227,9 +337,9 @@ exports.handler = async function (event) {
 
       .delete()
 
-      .eq(
+      .in(
         "siswa_id",
-        siswaId
+        siswaIds
       );
 
 
@@ -241,7 +351,7 @@ exports.handler = async function (event) {
     /*
      * ==========================================
      * TERAKHIR:
-     * HAPUS SISWA
+     * HAPUS DATA SISWA
      * ==========================================
      */
 
@@ -253,9 +363,9 @@ exports.handler = async function (event) {
 
       .delete()
 
-      .eq(
+      .in(
         "id",
-        siswaId
+        siswaIds
       );
 
 
@@ -266,23 +376,35 @@ exports.handler = async function (event) {
 
     /*
      * ==========================================
-     * SELESAI
+     * BERHASIL
      * ==========================================
      */
+
+    const names =
+      siswaList.map(
+        siswa =>
+          siswa.nama
+      );
+
 
     return response(200, {
 
       success: true,
 
+      deleted:
+        siswaIds.length,
+
       message:
-        "Data " +
-        siswa.nama +
-        " berhasil dihapus permanen beserta seluruh data terkait."
+        siswaIds.length +
+        " data siswa Lulus berhasil dihapus permanen beserta seluruh data terkait.",
+
+      siswa:
+        names
 
     });
 
 
-  } catch (error) {
+  } catch(error) {
 
     console.error(
       "ADMIN LULUS DELETE ERROR:",
@@ -295,7 +417,7 @@ exports.handler = async function (event) {
       success: false,
 
       message:
-        "Gagal menghapus data siswa lulus.",
+        "Gagal menghapus data siswa Lulus.",
 
       error:
         error.message
