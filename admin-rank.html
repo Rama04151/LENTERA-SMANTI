@@ -12,6 +12,8 @@
   --gold:#fbc02d;
   --muted:#94a3b8;
   --border:#ffffff14;
+  --green:#34d399;
+  --red:#f87171;
 }
 
 *{
@@ -100,6 +102,12 @@ select{
   border:1px solid var(--border);
   background:#0b132b;
   color:#fff;
+  outline:none;
+}
+
+input:focus,
+select:focus{
+  border-color:var(--gold);
 }
 
 button{
@@ -176,15 +184,17 @@ td{
 th{
   color:var(--gold);
   background:#0b132b;
+  position:sticky;
+  top:0;
 }
 
 td.reward{
-  color:#34d399;
+  color:var(--green);
   font-weight:800;
 }
 
 td.violation{
-  color:#f87171;
+  color:var(--red);
   font-weight:800;
 }
 
@@ -193,11 +203,15 @@ td.net{
 }
 
 td.net.positive{
-  color:#34d399;
+  color:var(--green);
+}
+
+td.net.zero{
+  color:#fff;
 }
 
 td.net.negative{
-  color:#f87171;
+  color:var(--red);
 }
 
 .rank{
@@ -222,6 +236,7 @@ td.net.negative{
 }
 
 @media(max-width:800px){
+
   .filters{
     grid-template-columns:1fr 1fr;
   }
@@ -229,9 +244,11 @@ td.net.negative{
   .stats{
     grid-template-columns:1fr 1fr;
   }
+
 }
 
 @media(max-width:520px){
+
   body{
     padding:9px;
   }
@@ -251,6 +268,7 @@ td.net.negative{
   .back{
     font-size:10px;
   }
+
 }
 </style>
 </head>
@@ -259,308 +277,434 @@ td.net.negative{
 
 <div class="wrap">
 
-  <!-- HEADER -->
-  <section class="card">
-    <div class="head">
-      <div class="logo">L</div>
+<!-- =========================================
+     HEADER
+========================================= -->
 
-      <div>
-        <h1>Ranking Poin Siswa</h1>
-        <small>LENTERA SMANTI • ADMIN</small>
-      </div>
+<section class="card">
 
-      <a class="back" href="admin.html">
-        ← Kembali
-      </a>
+  <div class="head">
+
+    <div class="logo">
+      L
     </div>
-  </section>
 
+    <div>
 
-  <!-- FILTER -->
-  <section class="card">
+      <h1>
+        Ranking Poin Siswa
+      </h1>
 
-    <h3 style="color:#fbc02d;margin-top:0">
-      🔎 Filter Ranking
-    </h3>
-
-    <p style="color:#94a3b8;font-size:12px">
-      Ranking dihitung berdasarkan poin bersih:
-      <b style="color:#34d399">Penghargaan - Pelanggaran</b>.
-    </p>
-
-    <div class="filters">
-
-      <!-- SEARCH -->
-      <div class="field">
-        <label>Nama / NISN</label>
-
-        <input
-          id="search"
-          placeholder="Cari siswa..."
-          oninput="apply()"
-        >
-      </div>
-
-
-      <!-- KELAS -->
-      <div class="field">
-        <label>Kelas</label>
-
-        <select
-          id="kelas"
-          onchange="apply()"
-        >
-          <option value="">
-            Semua Kelas
-          </option>
-        </select>
-      </div>
-
-
-      <!-- SORT -->
-      <div class="field">
-        <label>Urutan Ranking</label>
-
-        <select
-          id="mode"
-          onchange="apply()"
-        >
-
-          <option value="net_desc">
-            🏆 Poin bersih terbesar
-          </option>
-
-          <option value="net_asc">
-            📉 Poin bersih terkecil
-          </option>
-
-          <option value="violation_desc">
-            ⚠️ Pelanggaran terbesar
-          </option>
-
-          <option value="violation_asc">
-            ⚠️ Pelanggaran terkecil
-          </option>
-
-          <option value="reward_desc">
-            🏆 Penghargaan terbesar
-          </option>
-
-          <option value="reward_asc">
-            🏆 Penghargaan terkecil
-          </option>
-
-        </select>
-      </div>
-
-
-      <!-- MINIMAL POIN BERSIH -->
-      <div class="field">
-        <label>Minimal Poin Bersih</label>
-
-        <input
-          id="min"
-          type="number"
-          min="0"
-          placeholder="Contoh: 50"
-          oninput="apply()"
-        >
-      </div>
+      <small>
+        LENTERA SMANTI • ADMIN
+      </small>
 
     </div>
 
-
-    <!-- ACTION -->
-    <div class="actions">
-
-      <button
-        class="primary"
-        onclick="apply()"
-      >
-        🔍 Terapkan
-      </button>
-
-      <button
-        class="secondary"
-        onclick="min50()"
-      >
-        50 Poin Bersih Keatas
-      </button>
-
-      <button
-        class="secondary"
-        onclick="resetF()"
-      >
-        ↺ Reset
-      </button>
-
-    </div>
-
-
-    <!-- STATS -->
-    <div class="stats">
-
-      <div class="stat">
-        <small>Hasil</small>
-        <b id="n">0</b>
-      </div>
-
-      <div class="stat">
-        <small>Total Penghargaan</small>
-        <b id="r">0</b>
-      </div>
-
-      <div class="stat">
-        <small>Total Pelanggaran</small>
-        <b id="v">0</b>
-      </div>
-
-      <div class="stat">
-        <small>Total Poin Bersih</small>
-        <b id="net">0</b>
-      </div>
-
-    </div>
-
-
-    <div class="filter-note" id="filterInfo">
-      Menampilkan semua siswa aktif.
-    </div>
-
-  </section>
-
-
-  <!-- TABLE -->
-  <section class="card">
-
-    <h3 style="color:#fbc02d;margin-top:0">
-      📊 Hasil Ranking
-    </h3>
-
-    <p
-      id="info"
-      style="color:#94a3b8;font-size:12px"
+    <a
+      class="back"
+      href="admin.html"
     >
-      Memuat...
-    </p>
+      ← Kembali
+    </a>
 
-    <div class="table">
+  </div>
 
-      <table>
+</section>
 
-        <thead>
 
-          <tr>
-            <th>#</th>
-            <th>Nama</th>
-            <th>NISN</th>
-            <th>Kelas</th>
-            <th>🏆 Penghargaan</th>
-            <th>⚠️ Pelanggaran</th>
-            <th>💎 Poin Bersih</th>
-          </tr>
+<!-- =========================================
+     FILTER
+========================================= -->
 
-        </thead>
+<section class="card">
 
-        <tbody id="body">
+  <h3 style="color:#fbc02d;margin-top:0">
+    🔎 Filter Ranking
+  </h3>
 
-          <tr>
-            <td
-              colspan="7"
-              class="empty"
-            >
-              Memuat data...
-            </td>
-          </tr>
+  <p style="color:#94a3b8;font-size:12px">
+    Ranking dihitung berdasarkan
+    <b style="color:#34d399">
+      Poin Bersih = Penghargaan - Pelanggaran
+    </b>.
+  </p>
 
-        </tbody>
 
-      </table>
+  <div class="filters">
+
+    <!-- NAMA / NISN -->
+
+    <div class="field">
+
+      <label>
+        Nama / NISN
+      </label>
+
+      <input
+        id="search"
+        type="text"
+        placeholder="Cari siswa..."
+        oninput="apply()"
+      >
 
     </div>
 
-  </section>
+
+    <!-- KELAS -->
+
+    <div class="field">
+
+      <label>
+        Kelas
+      </label>
+
+      <select
+        id="kelas"
+        onchange="apply()"
+      >
+
+        <option value="">
+          Semua Kelas
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- URUTAN -->
+
+    <div class="field">
+
+      <label>
+        Urutan Ranking
+      </label>
+
+      <select
+        id="mode"
+        onchange="apply()"
+      >
+
+        <option value="net_desc">
+          🏆 Poin Bersih Terbesar
+        </option>
+
+        <option value="net_asc">
+          📉 Poin Bersih Terkecil
+        </option>
+
+        <option value="violation_desc">
+          ⚠️ Pelanggaran Terbesar
+        </option>
+
+        <option value="violation_asc">
+          ⚠️ Pelanggaran Terkecil
+        </option>
+
+        <option value="reward_desc">
+          🏆 Penghargaan Terbesar
+        </option>
+
+        <option value="reward_asc">
+          🏆 Penghargaan Terkecil
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- MINIMAL POIN BERSIH -->
+
+    <div class="field">
+
+      <label>
+        Minimal Poin Bersih
+      </label>
+
+      <input
+        id="min"
+        type="number"
+        placeholder="Kosong = semua"
+        oninput="apply()"
+      >
+
+    </div>
+
+  </div>
+
+
+  <!-- BUTTON -->
+
+  <div class="actions">
+
+    <button
+      class="primary"
+      onclick="apply()"
+    >
+      🔍 Terapkan
+    </button>
+
+    <button
+      class="secondary"
+      onclick="min50()"
+    >
+      50 Poin Bersih Keatas
+    </button>
+
+    <button
+      class="secondary"
+      onclick="resetF()"
+    >
+      ↺ Reset
+    </button>
+
+  </div>
+
+
+  <!-- STATISTIK -->
+
+  <div class="stats">
+
+    <div class="stat">
+
+      <small>
+        Jumlah Siswa
+      </small>
+
+      <b id="n">
+        0
+      </b>
+
+    </div>
+
+
+    <div class="stat">
+
+      <small>
+        Total Penghargaan
+      </small>
+
+      <b id="r">
+        0
+      </b>
+
+    </div>
+
+
+    <div class="stat">
+
+      <small>
+        Total Pelanggaran
+      </small>
+
+      <b id="v">
+        0
+      </b>
+
+    </div>
+
+
+    <div class="stat">
+
+      <small>
+        Total Poin Bersih
+      </small>
+
+      <b id="net">
+        0
+      </b>
+
+    </div>
+
+  </div>
+
+
+  <!-- KETERANGAN FILTER -->
+
+  <div
+    class="filter-note"
+    id="filterInfo"
+  >
+    Menampilkan seluruh siswa,
+    termasuk siswa dengan poin bersih minus.
+  </div>
+
+</section>
+
+
+<!-- =========================================
+     HASIL RANKING
+========================================= -->
+
+<section class="card">
+
+  <h3 style="color:#fbc02d;margin-top:0">
+    📊 Hasil Ranking
+  </h3>
+
+  <p
+    id="info"
+    style="color:#94a3b8;font-size:12px"
+  >
+    Memuat...
+  </p>
+
+
+  <div class="table">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            #
+          </th>
+
+          <th>
+            Nama
+          </th>
+
+          <th>
+            NISN
+          </th>
+
+          <th>
+            Kelas
+          </th>
+
+          <th>
+            🏆 Penghargaan
+          </th>
+
+          <th>
+            ⚠️ Pelanggaran
+          </th>
+
+          <th>
+            💎 Poin Bersih
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="body">
+
+        <tr>
+
+          <td
+            colspan="7"
+            class="empty"
+          >
+            Memuat data...
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
 
 </div>
 
 
 <script>
 
-/* =========================
-   SESSION ADMIN
-========================= */
+/* =========================================
+   CEK LOGIN ADMIN
+========================================= */
 
-if (
+if(
   !sessionStorage.getItem(
     'lentera_admin_session'
   )
-) {
+){
+
   location.replace(
     'admin-login.html'
   );
+
 }
 
 
-/* =========================
+/* =========================================
    VARIABLE
-========================= */
+========================================= */
 
 let points = [];
+
 let rows = [];
 
 
-/* =========================
+/* =========================================
    ESCAPE HTML
-========================= */
+========================================= */
 
-const esc = x =>
-  String(x ?? '')
+const esc = x => {
+
+  return String(x ?? '')
     .replace(
       /[&<>"']/g,
-      m =>
-        ({
-          '&':'&amp;',
-          '<':'&lt;',
-          '>':'&gt;',
-          '"':'&quot;',
-          "'":'&#039;'
-        }[m])
+      m => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#039;'
+      }[m])
     );
 
+};
 
-/* =========================
+
+/* =========================================
    LOAD DATA
-========================= */
+========================================= */
 
 async function load(){
 
   try{
 
-    const q =
+    const response =
       await fetch(
         '/.netlify/functions/admin-points'
       );
 
-    const d =
-      await q.json();
+
+    const data =
+      await response.json();
+
 
     if(
-      !q.ok ||
-      !d.success
+      !response.ok ||
+      !data.success
     ){
+
       throw new Error(
-        d.message ||
-        'Gagal memuat data'
+        data.message ||
+        'Gagal memuat data poin.'
       );
+
     }
 
 
     points =
-      d.poin || [];
+      Array.isArray(data.poin)
+        ? data.poin
+        : [];
 
 
     /*
-      Gabungkan semua poin
+      Gabungkan seluruh poin
       berdasarkan siswa.
     */
 
@@ -568,12 +712,12 @@ async function load(){
       new Map();
 
 
-    points.forEach(p => {
+    points.forEach(point => {
 
       const id =
-        p.siswaId ||
-        p.nisn ||
-        p.nama;
+        point.siswaId ||
+        point.nisn ||
+        point.nama;
 
 
       if(
@@ -583,10 +727,17 @@ async function load(){
         map.set(
           id,
           {
-            nama:p.nama || '-',
-            nisn:p.nisn || '-',
-            kelas:p.kelas || '-',
+            nama:
+              point.nama || '-',
+
+            nisn:
+              point.nisn || '-',
+
+            kelas:
+              point.kelas || '-',
+
             reward:0,
+
             violation:0
           }
         );
@@ -594,19 +745,19 @@ async function load(){
       }
 
 
-      const x =
+      const student =
         map.get(id);
 
 
       const value =
         Math.abs(
-          Number(p.poin) || 0
+          Number(point.poin) || 0
         );
 
 
       const jenis =
         String(
-          p.jenis || ''
+          point.jenis || ''
         )
         .trim()
         .toLowerCase();
@@ -616,7 +767,7 @@ async function load(){
         jenis === 'penghargaan'
       ){
 
-        x.reward += value;
+        student.reward += value;
 
       }
 
@@ -625,7 +776,7 @@ async function load(){
         jenis === 'pelanggaran'
       ){
 
-        x.violation += value;
+        student.violation += value;
 
       }
 
@@ -633,19 +784,20 @@ async function load(){
 
 
     /*
-      Hitung POIN BERSIH
-      = Penghargaan - Pelanggaran
+      HITUNG POIN BERSIH
+
+      Penghargaan - Pelanggaran
     */
 
     rows =
       [...map.values()]
-      .map(x => ({
+      .map(student => ({
 
-        ...x,
+        ...student,
 
         net:
-          x.reward -
-          x.violation
+          student.reward -
+          student.violation
 
       }));
 
@@ -656,31 +808,41 @@ async function load(){
 
   }
 
-  catch(e){
+
+  catch(error){
+
+    console.error(
+      'ADMIN RANK ERROR:',
+      error
+    );
+
 
     body.innerHTML =
       `
       <tr>
+
         <td
           colspan="7"
           class="empty"
         >
-          ${esc(e.message)}
+          ${esc(error.message)}
         </td>
+
       </tr>
       `;
 
+
     info.textContent =
-      'Gagal memuat data.';
+      'Gagal memuat data ranking.';
 
   }
 
 }
 
 
-/* =========================
-   KELAS
-========================= */
+/* =========================================
+   ISI DROPDOWN KELAS
+========================================= */
 
 function fillClasses(){
 
@@ -688,7 +850,10 @@ function fillClasses(){
     [
       ...new Set(
         rows
-          .map(x => x.kelas)
+          .map(
+            student =>
+              student.kelas
+          )
           .filter(Boolean)
       )
     ]
@@ -704,10 +869,10 @@ function fillClasses(){
 
     classes
       .map(
-        x =>
+        value =>
           `
-          <option value="${esc(x)}">
-            ${esc(x)}
+          <option value="${esc(value)}">
+            ${esc(value)}
           </option>
           `
       )
@@ -716,13 +881,13 @@ function fillClasses(){
 }
 
 
-/* =========================
-   APPLY FILTER
-========================= */
+/* =========================================
+   FILTER + SORTING
+========================================= */
 
 function apply(){
 
-  const q =
+  const query =
     search.value
       .toLowerCase()
       .trim();
@@ -732,102 +897,124 @@ function apply(){
     kelas.value;
 
 
-  const modeValue =
+  const selectedMode =
     mode.value;
 
 
   /*
-    MINIMAL POIN BERSIH
+    Kalau input minimal kosong,
+    SEMUA poin bersih diperbolehkan.
+
+    Artinya:
+    +100 masuk
+    +20 masuk
+    0 masuk
+    -10 masuk
+    -50 masuk
+    -100 masuk
   */
 
-  const minNet =
-    Number(min.value) || 0;
+  const hasMinimum =
+    min.value !== '';
+
+
+  const minimumNet =
+    hasMinimum
+      ? Number(min.value)
+      : null;
 
 
   /*
-    Filter siswa
+    FILTER
   */
 
   let result =
-    rows.filter(x => {
+    rows.filter(student => {
+
 
       const matchSearch =
-        !q ||
+        !query ||
 
         (
-          x.nama +
+          student.nama +
           ' ' +
-          x.nisn +
+          student.nisn +
           ' ' +
-          x.kelas
+          student.kelas
         )
         .toLowerCase()
-        .includes(q);
+        .includes(query);
 
 
       const matchClass =
         !selectedClass ||
-        x.kelas === selectedClass;
+        student.kelas === selectedClass;
 
 
       /*
-        Filter berdasarkan
-        POIN BERSIH
+        Filter minimal poin
+        hanya digunakan jika
+        admin mengisinya.
       */
 
-      const matchNet =
-        x.net >= minNet;
+      const matchMinimum =
+        !hasMinimum ||
+        student.net >= minimumNet;
 
 
       return (
         matchSearch &&
         matchClass &&
-        matchNet
+        matchMinimum
       );
 
     });
 
 
   /*
-    Tentukan kolom sorting
+    TENTUKAN KOLOM SORTING
   */
 
   let field;
 
 
   if(
-    modeValue.startsWith(
+    selectedMode.startsWith(
       'reward'
     )
   ){
 
-    field = 'reward';
+    field =
+      'reward';
 
   }
 
   else if(
-    modeValue.startsWith(
+    selectedMode.startsWith(
       'violation'
     )
   ){
 
-    field = 'violation';
+    field =
+      'violation';
 
   }
 
   else{
 
-    field = 'net';
+    field =
+      'net';
 
   }
 
 
   /*
-    Arah sorting
+    DESC = terbesar ke terkecil
+    ASC  = terkecil ke terbesar
   */
 
   const direction =
-    modeValue.endsWith(
+    selectedMode.endsWith(
       'asc'
     )
       ? 1
@@ -835,7 +1022,7 @@ function apply(){
 
 
   /*
-    Sorting
+    SORTING
   */
 
   result.sort(
@@ -845,7 +1032,8 @@ function apply(){
         (
           a[field] -
           b[field]
-        ) * direction;
+        ) *
+        direction;
 
 
       if(
@@ -867,25 +1055,25 @@ function apply(){
 
   render(
     result,
-    modeValue,
-    minNet
+    selectedMode,
+    minimumNet
   );
 
 }
 
 
-/* =========================
+/* =========================================
    RENDER
-========================= */
+========================================= */
 
 function render(
   data,
-  modeValue,
-  minNet
+  selectedMode,
+  minimumNet
 ){
 
   /*
-    Statistik
+    STATISTIK
   */
 
   n.textContent =
@@ -894,71 +1082,74 @@ function render(
 
   r.textContent =
     data.reduce(
-      (sum,x) =>
-        sum + x.reward,
+      (total,student) =>
+        total +
+        student.reward,
       0
     );
 
 
   v.textContent =
     data.reduce(
-      (sum,x) =>
-        sum + x.violation,
+      (total,student) =>
+        total +
+        student.violation,
       0
     );
 
 
   net.textContent =
     data.reduce(
-      (sum,x) =>
-        sum + x.net,
+      (total,student) =>
+        total +
+        student.net,
       0
     );
 
 
   /*
-    Label mode
+    LABEL SORTING
   */
 
   const labels = {
 
     net_desc:
-      'Poin bersih terbesar',
+      'Poin bersih terbesar → terkecil',
 
     net_asc:
-      'Poin bersih terkecil',
+      'Poin bersih terkecil → terbesar',
 
     violation_desc:
-      'Pelanggaran terbesar',
+      'Pelanggaran terbesar → terkecil',
 
     violation_asc:
-      'Pelanggaran terkecil',
+      'Pelanggaran terkecil → terbesar',
 
     reward_desc:
-      'Penghargaan terbesar',
+      'Penghargaan terbesar → terkecil',
 
     reward_asc:
-      'Penghargaan terkecil'
+      'Penghargaan terkecil → terbesar'
 
   };
 
 
-  /*
-    Info
-  */
-
   info.textContent =
-    labels[modeValue] ||
+    labels[selectedMode] ||
     'Ranking';
 
 
+  /*
+    KETERANGAN FILTER
+  */
+
   if(
-    minNet > 0
+    minimumNet !== null
   ){
 
     filterInfo.textContent =
       'Menampilkan siswa dengan poin bersih minimal ' +
-      minNet +
+      minimumNet +
       ' poin.';
 
   }
@@ -966,13 +1157,13 @@ function render(
   else{
 
     filterInfo.textContent =
-      'Menampilkan semua siswa yang sesuai filter.';
+      'Menampilkan seluruh siswa, termasuk poin bersih minus.';
 
   }
 
 
   /*
-    Table
+    KALAU KOSONG
   */
 
   if(
@@ -982,12 +1173,14 @@ function render(
     body.innerHTML =
       `
       <tr>
+
         <td
           colspan="7"
           class="empty"
         >
           Tidak ada siswa yang sesuai filter.
         </td>
+
       </tr>
       `;
 
@@ -996,54 +1189,95 @@ function render(
   }
 
 
+  /*
+    TABEL
+  */
+
   body.innerHTML =
     data
       .map(
-        (x,i) => {
+        (student,index) => {
 
-          const netClass =
-            x.net >= 0
-              ? 'positive'
-              : 'negative';
+
+          let netClass;
+
+
+          if(
+            student.net > 0
+          ){
+
+            netClass =
+              'positive';
+
+          }
+
+          else if(
+            student.net < 0
+          ){
+
+            netClass =
+              'negative';
+
+          }
+
+          else{
+
+            netClass =
+              'zero';
+
+          }
+
+
+          const sign =
+            student.net > 0
+              ? '+'
+              : '';
 
 
           return `
+
           <tr>
 
             <td class="rank">
-              ${i + 1}
+              ${index + 1}
             </td>
+
 
             <td>
               <b>
-                ${esc(x.nama)}
+                ${esc(student.nama)}
               </b>
             </td>
 
-            <td>
-              ${esc(x.nisn)}
-            </td>
 
             <td>
-              ${esc(x.kelas)}
+              ${esc(student.nisn)}
             </td>
+
+
+            <td>
+              ${esc(student.kelas)}
+            </td>
+
 
             <td class="reward">
-              +${x.reward}
+              +${student.reward}
             </td>
 
+
             <td class="violation">
-              -${x.violation}
+              -${student.violation}
             </td>
+
 
             <td
               class="net ${netClass}"
             >
-              ${x.net > 0 ? '+' : ''}
-              ${x.net}
+              ${sign}${student.net}
             </td>
 
           </tr>
+
           `;
 
         }
@@ -1053,45 +1287,51 @@ function render(
 }
 
 
-/* =========================
-   QUICK FILTER 50
-========================= */
+/* =========================================
+   FILTER CEPAT 50
+========================================= */
 
 function min50(){
 
-  min.value = 50;
+  min.value =
+    '50';
+
 
   mode.value =
     'net_desc';
+
 
   apply();
 
 }
 
 
-/* =========================
+/* =========================================
    RESET
-========================= */
+========================================= */
 
 function resetF(){
 
-  search.value = '';
+  search.value =
+    '';
 
-  kelas.value = '';
+  kelas.value =
+    '';
 
   mode.value =
     'net_desc';
 
-  min.value = '';
+  min.value =
+    '';
 
   apply();
 
 }
 
 
-/* =========================
-   START
-========================= */
+/* =========================================
+   JALANKAN
+========================================= */
 
 load();
 
