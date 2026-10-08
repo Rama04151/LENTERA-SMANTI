@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Data Siswa Lulus - LENTERA SMANTI</title>
+
+  <style>
+    :root {
+      --bg: #0b132b;
+      --card: #1c2541;
+      --gold: #fbc02d;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: #fff;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0 0 7px;
+      color: var(--gold);
+      font-size: 25px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .warning {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      background: rgba(11, 19, 43, 0.55);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 17px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--gold);
+      font-size: 24px;
+      margin-top: 5px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #0b132b;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th,
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      color: var(--gold);
+      font-size: 13px;
+    }
+
+    td {
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 35px;
+    }
+
+    #printArea {
+      display: none;
+    }
+
+    @media (max-width: 700px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* =========================================
+       PRINT
+    ========================================= */
+
+    @media print {
+
+      body {
+        background: #fff;
+        color: #000;
+        padding: 0;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      #printArea {
+        display: block !important;
+        border: none;
+        color: #000;
+        padding: 0;
+      }
+
+      #printArea h1 {
+        color: #000;
+      }
+
+      #printArea p,
+      #printArea td {
+        color: #000;
+      }
+
+      #printArea th {
+        color: #000;
+        border-bottom: 2px solid #000;
+      }
+
+      #printArea td {
+        border-bottom: 1px solid #ccc;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- HEADER -->
+    <div class="card no-print">
+
+      <div class="header">
+
+        <div>
+          <h1>🎓 Data Siswa Lulus</h1>
+
+          <p class="subtitle">
+            Arsip poin dan pengelolaan data siswa yang sudah lulus.
+          </p>
+        </div>
+
+        <button
+          class="btn-secondary"
+          onclick="window.location.href='admin.html'"
+        >
+          ← Kembali
+        </button>
+
+      </div>
+
+      <div class="warning">
+
+        ⚠️ <b>Perhatian:</b><br>
+
+        Halaman ini hanya menampilkan siswa dengan status
+        <b>Lulus</b>.
+
+        <br><br>
+
+        Penghapusan bersifat <b>PERMANEN</b> dan akan menghapus
+        data siswa beserta poin, inbox, riwayat kelas, dan login control.
+
+        <br><br>
+
+        <b>Siswa Aktif tidak dapat dihapus melalui fitur ini.</b>
+
+      </div>
+
+    </div>
+
+
+    <!-- STATISTIK -->
+    <div class="stats no-print">
+
+      <div class="stat">
+        <span>Siswa Lulus</span>
+        <strong id="totalLulus">0</strong>
+      </div>
+
+      <div class="stat">
+        <span>Total Penghargaan</span>
+        <strong id="totalPenghargaan">0</strong>
+      </div>
+
+      <div class="stat">
+        <span>Total Pelanggaran</span>
+        <strong id="totalPelanggaran">0</strong>
+      </div>
+
+    </div>
+
+
+    <!-- DATA -->
+    <div class="card no-print">
+
+      <div id="status">
+        Memuat data...
+      </div>
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>NISN</th>
+              <th>Nama</th>
+              <th>Kelas</th>
+              <th>Penghargaan</th>
+              <th>Pelanggaran</th>
+              <th>Poin Bersih</th>
+              <th>Aksi</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="studentTable">
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <!-- AREA PRINT -->
+    <div
+      id="printArea"
+      class="card"
+    ></div>
+
+  </div>
+
+
+  <script>
+
+    /* =========================================
+       SESSION
+    ========================================= */
+
+    const session =
+      sessionStorage.getItem(
+        "lentera_admin_session"
+      );
+
+    if (!session) {
+      window.location.replace(
+        "admin-login.html"
+      );
+    }
+
+
+    /* =========================================
+       DATA
+    ========================================= */
+
+    let students = [];
+    let points = [];
+
+
+    /* =========================================
+       UTIL
+    ========================================= */
+
+    function escapeHtml(value) {
+
+      return String(
+        value ?? ""
+      ).replace(
+        /[&<>"']/g,
+        function (char) {
+
+          const map = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "\"": "&quot;",
+            "'": "&#039;"
+          };
+
+          return map[char];
+
+        }
+      );
+
+    }
+
+
+    function numberValue(value) {
+
+      return Number(value) || 0;
+
+    }
+
+
+    /* =========================================
+       LOAD DATA
+    ========================================= */
+
+    async function loadData() {
+
+      try {
+
+        const [
+          studentResponse,
+          pointResponse
+        ] = await Promise.all([
+
+          fetch(
+            "/.netlify/functions/admin-students"
+          ),
+
+          fetch(
+            "/.netlify/functions/admin-points"
+          )
+
+        ]);
+
+
+        const studentResult =
+          await studentResponse.json();
+
+        const pointResult =
+          await pointResponse.json();
+
+
+        if (
+          !studentResponse.ok ||
+          !studentResult.success
+        ) {
+
+          throw new Error(
+            studentResult.message ||
+            "Gagal mengambil data siswa."
+          );
+
+        }
+
+
+        if (
+          !pointResponse.ok ||
+          !pointResult.success
+        ) {
+
+          throw new Error(
+            pointResult.message ||
+            "Gagal mengambil data poin."
+          );
+
+        }
+
+
+        /*
+         * PENGAMAN FRONTEND
+         *
+         * Hanya status Lulus.
+         */
+
+        students =
+          (
+            studentResult.siswa || []
+          ).filter(function (student) {
+
+            return (
+              String(
+                student.status || ""
+              )
+                .trim()
+                .toLowerCase() ===
+              "lulus"
+            );
+
+          });
+
+
+        points =
+          pointResult.points ||
+          pointResult.poin ||
+          [];
+
+
+        render();
+
+
+      } catch (error) {
+
+        console.error(
+          "LOAD DATA LULUS ERROR:",
+          error
+        );
+
+        document.getElementById(
+          "status"
+        ).textContent =
+          "Gagal memuat data: " +
+          error.message;
+
+      }
+
+    }
+
+
+    /* =========================================
+       RINGKASAN POIN SISWA
+    ========================================= */
+
+    function getPointSummary(
+      siswaId
+    ) {
+
+      const siswaPoints =
+        points.filter(function (point) {
+
+          return String(
+            point.siswaId ||
+            point.siswa_id ||
+            ""
+          ) === String(
+            siswaId
+          );
+
+        });
+
+
+      let penghargaan = 0;
+      let pelanggaran = 0;
+
+
+      siswaPoints.forEach(
+        function (point) {
+
+          const value =
+            Math.abs(
+              numberValue(
+                point.poin
+              )
+            );
+
+
+          const jenis =
+            String(
+              point.jenis || ""
+            )
+              .trim()
+              .toLowerCase();
+
+
+          if (
+            jenis ===
+            "penghargaan"
+          ) {
+
+            penghargaan +=
+              value;
+
+          } else {
+
+            pelanggaran +=
+              value;
+
+          }
+
+        }
+      );
+
+
+      return {
+
+        list: siswaPoints,
+
+        penghargaan,
+
+        pelanggaran,
+
+        bersih:
+          penghargaan -
+          pelanggaran
+
+      };
+
+    }
+
+
+    /* =========================================
+       RENDER
+    ========================================= */
+
+    function render() {
+
+      const table =
+        document.getElementById(
+          "studentTable"
+        );
+
+
+      document.getElementById(
+        "totalLulus"
+      ).textContent =
+        students.length;
+
+
+      let totalPenghargaan = 0;
+      let totalPelanggaran = 0;
+
+
+      students.forEach(
+        function (student) {
+
+          const summary =
+            getPointSummary(
+              student.id
+            );
+
+          totalPenghargaan +=
+            summary.penghargaan;
+
+          totalPelanggaran +=
+            summary.pelanggaran;
+
+        }
+      );
+
+
+      document.getElementById(
+        "totalPenghargaan"
+      ).textContent =
+        totalPenghargaan;
+
+
+      document.getElementById(
+        "totalPelanggaran"
+      ).textContent =
+        totalPelanggaran;
+
+
+      document.getElementById(
+        "status"
+      ).innerHTML =
+        "Total siswa berstatus <b>Lulus</b>: " +
+        students.length;
+
+
+      if (
+        students.length === 0
+      ) {
+
+        table.innerHTML = `
+          <tr>
+            <td
+              colspan="7"
+              class="empty"
+            >
+              Belum ada siswa yang berstatus Lulus.
+            </td>
+          </tr>
+        `;
+
+        return;
+
+      }
+
+
+      table.innerHTML =
+        students.map(
+          function (student) {
+
+            const summary =
+              getPointSummary(
+                student.id
+              );
+
+
+            return `
+
+              <tr>
+
+                <td>
+                  ${escapeHtml(
+                    student.nisn
+                  )}
+                </td>
+
+                <td>
+                  ${escapeHtml(
+                    student.nama
+                  )}
+                </td>
+
+                <td>
+                  ${escapeHtml(
+                    student.kelas ||
+                    "-"
+                  )}
+                </td>
+
+                <td>
+                  +${summary.penghargaan}
+                </td>
+
+                <td>
+                  -${summary.pelanggaran}
+                </td>
+
+                <td>
+                  ${summary.bersih}
+                </td>
+
+                <td>
+
+                  <div class="actions">
+
+                    <button
+                      class="btn-gold"
+                      onclick="printStudent('${escapeHtml(student.id)}')"
+                    >
+                      🖨️ Cetak
+                    </button>
+
+                    <button
+                      class="btn-danger"
+                      onclick="deleteStudent('${escapeHtml(student.id)}')"
+                    >
+                      🗑️ Hapus
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            `;
+
+          }
+        ).join("");
+
+    }
+
+
+    /* =========================================
+       CETAK POIN SISWA
+    ========================================= */
+
+    function printStudent(
+      siswaId
+    ) {
+
+      const student =
+        students.find(
+          function (item) {
+
+            return String(
+              item.id
+            ) === String(
+              siswaId
+            );
+
+          }
+        );
+
+
+      if (!student) {
+
+        alert(
+          "Data siswa tidak ditemukan."
+        );
+
+        return;
+
+      }
+
+
+      const summary =
+        getPointSummary(
+          siswaId
+        );
+
+
+      const printArea =
+        document.getElementById(
+          "printArea"
+        );
+
+
+      printArea.innerHTML = `
+
+        <h1>
+          REKAP POIN SISWA LULUS
+        </h1>
+
+        <p>
+          <b>Nama:</b>
+          ${escapeHtml(
+            student.nama
+          )}
+        </p>
+
+        <p>
+          <b>NISN:</b>
+          ${escapeHtml(
+            student.nisn
+          )}
+        </p>
+
+        <p>
+          <b>Kelas terakhir:</b>
+          ${escapeHtml(
+            student.kelas ||
+            "-"
+          )}
+        </p>
+
+        <hr>
+
+        <p>
+          <b>Penghargaan:</b>
+          ${summary.penghargaan}
+        </p>
+
+        <p>
+          <b>Pelanggaran:</b>
+          ${summary.pelanggaran}
+        </p>
+
+        <p>
+          <b>Poin Bersih:</b>
+          ${summary.bersih}
+        </p>
+
+        <br>
+
+        <h3>
+          DETAIL TRANSAKSI POIN
+        </h3>
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Tanggal</th>
+              <th>Jenis</th>
+              <th>Poin</th>
+              <th>Keterangan</th>
+              <th>Dibuat Oleh</th>
+              <th>Peran</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${
+              summary.list.length
+                ? summary.list.map(
+                    function (point) {
+
+                      return `
+
+                        <tr>
+
+                          <td>
+                            ${escapeHtml(
+                              point.tanggal
+                            )}
+                          </td>
+
+                          <td>
+                            ${escapeHtml(
+                              point.jenis
+                            )}
+                          </td>
+
+                          <td>
+                            ${escapeHtml(
+                              point.poin
+                            )}
+                          </td>
+
+                          <td>
+                            ${escapeHtml(
+                              point.keterangan ||
+                              "-"
+                            )}
+                          </td>
+
+                          <td>
+                            ${escapeHtml(
+                              point.dibuatOleh ||
+                              point.dibuat_oleh ||
+                              "-"
+                            )}
+                          </td>
+
+                          <td>
+                            ${escapeHtml(
+                              point.peran ||
+                              "-"
+                            )}
+                          </td>
+
+                        </tr>
+
+                      `;
+
+                    }
+                  ).join("")
+                : `
+                    <tr>
+                      <td colspan="6">
+                        Tidak ada transaksi poin.
+                      </td>
+                    </tr>
+                  `
+            }
+
+          </tbody>
+
+        </table>
+
+      `;
+
+
+      window.print();
+
+    }
+
+
+    /* =========================================
+       HAPUS SISWA LULUS
+    ========================================= */
+
+    async function deleteStudent(
+      siswaId
+    ) {
+
+      const student =
+        students.find(
+          function (item) {
+
+            return String(
+              item.id
+            ) === String(
+              siswaId
+            );
+
+          }
+        );
+
+
+      if (!student) {
+
+        alert(
+          "Data siswa tidak ditemukan."
+        );
+
+        return;
+
+      }
+
+
+      const confirmation =
+        confirm(
+
+          "⚠️ HAPUS PERMANEN\n\n" +
+
+          "Nama: " +
+          student.nama +
+          "\n" +
+
+          "NISN: " +
+          student.nisn +
+          "\n\n" +
+
+          "Data yang akan dihapus:\n" +
+
+          "• Data siswa\n" +
+          "• Seluruh poin\n" +
+          "• Seluruh inbox\n" +
+          "• Riwayat kelas\n" +
+          "• Login control\n\n" +
+
+          "Tindakan ini TIDAK DAPAT DIBATALKAN.\n\n" +
+
+          "Lanjutkan?"
+
+        );
+
+
+      if (!confirmation) {
+        return;
+      }
+
+
+      const verification =
+        prompt(
+          'Ketik "LULUS" untuk mengonfirmasi penghapusan:'
+        );
+
+
+      if (
+        verification !==
+        "LULUS"
+      ) {
+
+        alert(
+          "Penghapusan dibatalkan."
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/.netlify/functions/admin-lulus",
+            {
+
+              method: "DELETE",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body:
+                JSON.stringify({
+                  siswaId
+                })
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          throw new Error(
+            result.message ||
+            "Gagal menghapus siswa."
+          );
+
+        }
+
+
+        alert(
+          result.message
+        );
+
+
+        await loadData();
+
+
+      } catch (error) {
+
+        console.error(
+          "DELETE LULUS ERROR:",
+          error
+        );
+
+        alert(
+          "Gagal menghapus:\n" +
+          error.message
+        );
+
+      }
+
+    }
+
+
+    /* =========================================
+       START
+    ========================================= */
+
+    loadData();
+
+  </script>
+
+</body>
+
+</html>
