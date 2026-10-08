@@ -13,15 +13,19 @@
   <style>
     :root {
       --bg-dark: #0b132b;
-      --card-bg: #1c2541;
+      --card-bg: rgba(28, 37, 65, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
       --accent-gold: #fbc02d;
       --accent-gold-hover: #f57f17;
-      --gold-glow: rgba(251, 192, 45, 0.25);
-      --text-main: #ffffff;
+      --gold-glow: rgba(251, 192, 45, 0.2);
+      --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --border-color: rgba(255, 255, 255, 0.08);
-      --input-bg: rgba(11, 19, 43, 0.7);
+      --input-bg: rgba(11, 19, 43, 0.6);
+      --btn-bg: rgba(255, 255, 255, 0.04);
+      --btn-bg-hover: rgba(251, 192, 45, 0.12);
+      --btn-border: rgba(255, 255, 255, 0.1);
       --danger-color: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.12);
     }
 
     * {
@@ -38,24 +42,26 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
+      padding: 24px 16px;
       background-image: 
-        radial-gradient(circle at 10% 20%, rgba(251, 192, 45, 0.06) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(28, 37, 65, 0.6) 0%, transparent 50%);
+        radial-gradient(circle at 15% 15%, rgba(251, 192, 45, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(28, 37, 65, 0.8) 0%, transparent 55%);
+      background-attachment: fixed;
     }
 
     .dashboard-container {
       width: 100%;
-      max-width: 520px;
+      max-width: 620px;
     }
 
     .dashboard-card {
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--card-border);
       border-radius: 24px;
-      padding: 28px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(10px);
+      padding: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
 
     /* Header */
@@ -63,103 +69,120 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--card-border);
     }
 
     .logo-small {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, var(--accent-gold), #d48806);
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #fbc02d, #d48806);
       color: #0b132b;
       font-weight: 800;
-      font-size: 22px;
+      font-size: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 14px;
-      box-shadow: 0 4px 15px var(--gold-glow);
+      border-radius: 16px;
+      box-shadow: 0 6px 20px var(--gold-glow);
+      flex-shrink: 0;
     }
 
-    .dashboard-header h1 {
+    .header-text h1 {
       font-size: 20px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.5px;
       color: var(--text-main);
+      line-height: 1.2;
     }
 
-    .dashboard-header p {
+    .header-text p {
       font-size: 13px;
       color: var(--accent-gold);
       font-weight: 600;
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     /* Welcome Banner */
     .welcome {
-      margin-top: 20px;
+      margin-top: 24px;
       background: linear-gradient(135deg, rgba(251, 192, 45, 0.08), rgba(255, 255, 255, 0.02));
-      border: 1px solid rgba(251, 192, 45, 0.2);
-      padding: 16px 20px;
-      border-radius: 16px;
+      border: 1px solid rgba(251, 192, 45, 0.25);
+      padding: 18px 20px;
+      border-radius: 18px;
     }
 
     .welcome p {
       font-size: 13px;
       color: var(--text-muted);
+      font-weight: 500;
     }
 
     .welcome h2 {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
       color: var(--accent-gold);
-      margin-top: 2px;
+      margin-top: 4px;
     }
 
     /* Stat Cards Summary */
     .points-container {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
       margin-top: 16px;
     }
 
     .point-card {
       display: flex;
       align-items: center;
+      gap: 14px;
       padding: 16px;
-      border-radius: 16px;
-      background: rgba(11, 19, 43, 0.6);
-      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      transition: border-color 0.3s ease;
     }
 
-    .point-card span {
-      font-size: 22px;
-      margin-right: 12px;
+    .point-card:hover {
+      border-color: rgba(251, 192, 45, 0.3);
+    }
+
+    .point-icon {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: rgba(255, 255, 255, 0.05);
-      padding: 8px;
-      border-radius: 10px;
+      border-radius: 12px;
+      font-size: 20px;
+      flex-shrink: 0;
     }
 
-    .point-card p {
-      flex-grow: 1;
+    .point-info p {
       font-size: 12px;
       font-weight: 500;
       color: var(--text-muted);
     }
 
-    .point-card strong {
-      font-size: 18px;
+    .point-info strong {
+      font-size: 20px;
       font-weight: 700;
       color: var(--accent-gold);
+      display: block;
+      margin-top: 2px;
     }
 
     /* Section & Menu Area */
     .history-section {
-      background: rgba(11, 19, 43, 0.4);
-      border-radius: 18px;
-      padding: 20px;
-      border: 1px solid var(--border-color);
-      margin-top: 20px;
+      background: var(--input-bg);
+      border-radius: 20px;
+      padding: 22px;
+      border: 1px solid var(--card-border);
+      margin-top: 24px;
     }
 
     .section-title h3 {
@@ -169,61 +192,101 @@
     }
 
     .section-title p {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-muted);
       margin-top: 2px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     .menu-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* Buttons */
-    .logout-button {
+    .menu-btn {
       width: 100%;
-      padding: 13px 16px;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent-gold), #d48806);
-      color: #0b132b;
-      font-size: 14px;
-      font-weight: 700;
+      padding: 14px 16px;
+      border: 1px solid var(--btn-border);
+      border-radius: 14px;
+      background: var(--btn-bg);
+      color: var(--text-main);
+      font-size: 13.5px;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px var(--gold-glow);
-      text-align: left;
+      transition: all 0.25s ease;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      gap: 10px;
+      text-align: left;
     }
 
-    .logout-button:hover {
-      background: linear-gradient(135deg, #ffd54f, var(--accent-gold));
+    .menu-btn-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-btn .arrow {
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
+
+    .menu-btn:hover {
+      background: var(--btn-bg-hover);
+      border-color: rgba(251, 192, 45, 0.4);
+      color: #ffffff;
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(251, 192, 45, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
-    .logout-button:active {
+    .menu-btn:hover .arrow {
+      color: var(--accent-gold);
+      transform: translateX(3px);
+    }
+
+    .menu-btn:active {
       transform: translateY(0);
     }
 
-    .logout-button.danger {
-      background: rgba(239, 68, 68, 0.15);
+    /* Danger / Logout Button */
+    .logout-button-danger {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: var(--danger-bg);
       color: #f87171;
       border: 1px solid rgba(239, 68, 68, 0.3);
-      box-shadow: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
       justify-content: center;
-      text-align: center;
-      margin-top: 20px;
+      gap: 8px;
+      margin-top: 24px;
     }
 
-    .logout-button.danger:hover {
-      background: rgba(239, 68, 68, 0.3);
+    .logout-button-danger:hover {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: rgba(239, 68, 68, 0.5);
       color: #ffffff;
       transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+    }
+
+    .logout-button-danger:active {
+      transform: translateY(0);
     }
   </style>
 </head>
@@ -234,141 +297,110 @@
 
     <section class="dashboard-card">
 
-      <div class="dashboard-header">
+      <!-- Header -->
+      <header class="dashboard-header">
         <div class="logo-small">L</div>
-
-        <div>
+        <div class="header-text">
           <h1>LENTERA SMANTI</h1>
           <p>Admin Panel</p>
         </div>
-      </div>
+      </header>
 
+      <!-- Welcome Banner -->
       <div class="welcome">
-        <p>Selamat datang,</p>
+        <p>Selamat datang kembali,</p>
         <h2 id="adminUsername">Memuat...</h2>
       </div>
 
+      <!-- Stat Cards -->
       <div class="points-container">
         <div class="point-card">
-          <span>👨‍🎓</span>
-          <div>
+          <div class="point-icon">👨‍🎓</div>
+          <div class="point-info">
             <p>Total Siswa</p>
             <strong id="totalSiswa">0</strong>
           </div>
         </div>
 
         <div class="point-card">
-          <span>🏫</span>
-          <div>
+          <div class="point-icon">🏫</div>
+          <div class="point-info">
             <p>Total Kelas</p>
             <strong id="totalKelas">6</strong>
           </div>
         </div>
       </div>
 
+      <!-- Menu Section -->
       <section class="history-section">
 
         <div class="section-title">
-          <h3>Menu Admin</h3>
-          <p>Kelola data LENTERA SMANTI</p>
+          <h3>Menu Utama Admin</h3>
+          <p>Kelola seluruh operasional LENTERA SMANTI</p>
         </div>
 
         <div class="menu-grid">
-          <button
-            type="button"
-            class="logout-button"
-            onclick="window.location.href='admin-siswa.html'"
-          >
-            👨‍🎓 Data Siswa
+          <button type="button" class="menu-btn" onclick="window.location.href='admin-siswa.html'">
+            <span class="menu-btn-content">👨‍🎓 Data Siswa</span>
+            <span class="arrow">→</span>
           </button>
 
-          <button
-            type="button"
-            class="logout-button"
-            onclick="window.location.href='admin-kelas.html'"
-          >
-            🏫 Data Kelas
+          <button type="button" class="menu-btn" onclick="window.location.href='admin-kelas.html'">
+            <span class="menu-btn-content">🏫 Data Kelas</span>
+            <span class="arrow">→</span>
           </button>
 
-          <button
-            type="button"
-            class="logout-button"
-            onclick="window.location.href='admin-poin.html'"
-          >
-            🏆 Poin Siswa
+          <button type="button" class="menu-btn" onclick="window.location.href='admin-poin.html'">
+            <span class="menu-btn-content">🏆 Poin Siswa</span>
+            <span class="arrow">→</span>
           </button>
 
-          <button
-  type="button"
-  class="logout-button"
-  onclick="window.location.href='admin-rekap.html'"
->
-  📊 Rekap Poin
-</button>
-
-          <button
-  type="button"
-  class="logout-button"
-  onclick="window.location.href='admin-lulus.html'"
->
-  🎓 Data Siswa Lulus
-</button>
-
-<button
-  type="button"
-  class="logout-button"
-  onclick="window.location.href='admin-rank.html'"
->
-  🏅 Ranking Poin Siswa
-</button>
-
-          <button
-            type="button"
-            class="logout-button"
-            onclick="window.location.href='admin-kenaikan.html'"
-          >
-            📈 Kenaikan Kelas
+          <button type="button" class="menu-btn" onclick="window.location.href='admin-rekap.html'">
+            <span class="menu-btn-content">📊 Rekap Poin</span>
+            <span class="arrow">→</span>
           </button>
 
-          <button
-            type="button"
-            class="logout-button"
-            onclick="window.location.href='admin-siswa.html'"
-          >
-            🔄 Pindahkan Siswa
+          <button type="button" class="menu-btn" onclick="window.location.href='admin-lulus.html'">
+            <span class="menu-btn-content">🎓 Data Siswa Lulus</span>
+            <span class="arrow">→</span>
           </button>
 
-          <button 
-            type="button"
-            class="logout-button"
-            onclick="window.location.href='admin-guru.html'">
-  👨‍🏫 Manajemen Akun Guru
-</button>
+          <button type="button" class="menu-btn" onclick="window.location.href='admin-rank.html'">
+            <span class="menu-btn-content">🏅 Ranking Poin</span>
+            <span class="arrow">→</span>
+          </button>
 
-          <button 
-            type="button"
-            class="logout-button"
-            onclick="window.location.href='download.html'">
-  📂 Link Download
-</button>
+          <button type="button" class="menu-btn" onclick="window.location.href='admin-kenaikan.html'">
+            <span class="menu-btn-content">📈 Kenaikan Kelas</span>
+            <span class="arrow">→</span>
+          </button>
 
-          <button
-            type="button"
-            class="logout-button"
-            onclick="window.location.href='admin-inbox.html'"
-          >
-            📨 Inbox Siswa
+          <button type="button" class="menu-btn" onclick="window.location.href='admin-siswa.html'">
+            <span class="menu-btn-content">🔄 Pindahkan Siswa</span>
+            <span class="arrow">→</span>
+          </button>
+
+          <button type="button" class="menu-btn" onclick="window.location.href='admin-guru.html'">
+            <span class="menu-btn-content">👨‍🏫 Akun Guru</span>
+            <span class="arrow">→</span>
+          </button>
+
+          <button type="button" class="menu-btn" onclick="window.location.href='download.html'">
+            <span class="menu-btn-content">📂 Link Download</span>
+            <span class="arrow">→</span>
+          </button>
+
+          <button type="button" class="menu-btn" onclick="window.location.href='admin-inbox.html'">
+            <span class="menu-btn-content">📨 Inbox Siswa</span>
+            <span class="arrow">→</span>
           </button>
         </div>
 
       </section>
 
-      <button
-        type="button"
-        id="logoutAdmin"
-        class="logout-button danger"
-      >
-        🚪 Keluar
+      <!-- Logout Button -->
+      <button type="button" id="logoutAdmin" class="logout-button-danger">
+        🚪 Keluar Akun
       </button>
 
     </section>
@@ -384,10 +416,7 @@
 
     try {
       const admin = JSON.parse(session);
-
-      document.getElementById("adminUsername").textContent =
-        admin.username || "Admin";
-
+      document.getElementById("adminUsername").textContent = admin.username || "Admin";
     } catch (error) {
       sessionStorage.removeItem("lentera_admin_session");
       window.location.replace("admin-login.html");
@@ -401,7 +430,6 @@
     // =========================
     // HITUNG TOTAL SISWA
     // =========================
-
     async function loadTotalSiswa() {
       const totalSiswaElement = document.getElementById("totalSiswa");
 
@@ -417,7 +445,7 @@
 
         // Hanya menghitung siswa aktif
         const totalAktif = siswa.filter(
-          siswa => String(siswa.status || "").trim().toLowerCase() === "aktif"
+          item => String(item.status || "").trim().toLowerCase() === "aktif"
         ).length;
 
         totalSiswaElement.textContent = totalAktif;
