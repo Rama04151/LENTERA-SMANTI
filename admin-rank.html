@@ -1113,10 +1113,17 @@ function apply(){
           jika admin mengisinya.
         */
 
-        const matchMinimum =
-          !hasMinimum ||
-          student.net >=
-          minimumNet;
+        let matchMinimum = true;
+
+if (hasMinimum) {
+  if (selectedMode.startsWith('violation')) {
+    matchMinimum = student.violation >= minimumNet;
+  } else if (selectedMode.startsWith('reward')) {
+    matchMinimum = student.reward >= minimumNet;
+  } else {
+    matchMinimum = student.net >= minimumNet;
+  }
+}
 
 
         return (
