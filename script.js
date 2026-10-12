@@ -1,7 +1,32 @@
 const loginForm = document.getElementById("loginForm");
+const nisnInput = document.getElementById("nisn");
 const passwordInput = document.getElementById("password");
 const togglePassword = document.getElementById("togglePassword");
 const message = document.getElementById("message");
+
+const NISN_STORAGE_KEY = "lentera_nisn_terakhir";
+
+// =========================
+// SIMPAN & MUAT NISN TERAKHIR
+// =========================
+
+// Isi otomatis NISN yang pernah digunakan
+const savedNISN = localStorage.getItem(NISN_STORAGE_KEY);
+
+if (savedNISN) {
+  nisnInput.value = savedNISN;
+}
+
+// Simpan NISN terbaru ketika pengguna mengetik
+nisnInput.addEventListener("input", () => {
+  const nisn = nisnInput.value.trim();
+
+  if (nisn) {
+    localStorage.setItem(NISN_STORAGE_KEY, nisn);
+  } else {
+    localStorage.removeItem(NISN_STORAGE_KEY);
+  }
+});
 
 // =========================
 // TOGGLE PASSWORD
@@ -9,7 +34,6 @@ const message = document.getElementById("message");
 
 if (togglePassword) {
   togglePassword.addEventListener("click", () => {
-
     if (passwordInput.type === "password") {
       passwordInput.type = "text";
       togglePassword.textContent = "🙈";
@@ -17,24 +41,17 @@ if (togglePassword) {
       passwordInput.type = "password";
       togglePassword.textContent = "👁️";
     }
-
   });
 }
-
 
 // =========================
 // LOGIN
 // =========================
 
 loginForm.addEventListener("submit", async (event) => {
-
   event.preventDefault();
 
-  const nisn = document
-    .getElementById("nisn")
-    .value
-    .trim();
-
+  const nisn = nisnInput.value.trim();
   const password = passwordInput.value;
 
   if (!nisn || !password) {
@@ -42,19 +59,19 @@ loginForm.addEventListener("submit", async (event) => {
     return;
   }
 
+  // Simpan NISN sebelum mengirim permintaan login
+  localStorage.setItem(NISN_STORAGE_KEY, nisn);
+
   message.textContent = "Memproses login...";
 
   try {
-
     const response = await fetch(
       "/.netlify/functions/login",
       {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json"
         },
-
         body: JSON.stringify({
           nisn,
           password
@@ -67,7 +84,6 @@ loginForm.addEventListener("submit", async (event) => {
     if (!result.success) {
       message.textContent =
         result.message || "Login gagal.";
-
       return;
     }
 
@@ -87,11 +103,9 @@ loginForm.addEventListener("submit", async (event) => {
     window.location.href = "dashboard.html";
 
   } catch (error) {
-
     console.error(error);
 
     message.textContent =
       "Tidak dapat terhubung ke server.";
   }
-
 });
