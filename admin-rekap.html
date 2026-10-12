@@ -1,1779 +1,816 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Rekap Poin - LENTERA SMANTI</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  >
-
-  <style>
-    :root {
-      --bg-dark: #0b132b;
-      --card-bg: #1c2541;
-      --input-bg: #0f1935;
-      --accent-gold: #fbc02d;
-      --accent-gold-dark: #d48806;
-      --text-main: #ffffff;
-      --text-muted: #94a3b8;
-      --border-color: rgba(255,255,255,.08);
-      --success: #22c55e;
-      --danger: #ef4444;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Plus Jakarta Sans", sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      padding: 20px;
-
-      background-image:
-        radial-gradient(
-          circle at 10% 10%,
-          rgba(251,192,45,.06),
-          transparent 35%
-        ),
-        radial-gradient(
-          circle at 90% 90%,
-          rgba(28,37,65,.7),
-          transparent 45%
-        );
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 22px;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,.35);
-      margin-bottom: 18px;
-    }
-
-    /* ================= HEADER ================= */
-
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .logo {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-
-      background:
-        linear-gradient(
-          135deg,
-          var(--accent-gold),
-          var(--accent-gold-dark)
-        );
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      color: var(--bg-dark);
-      font-size: 22px;
-      font-weight: 800;
-
-      box-shadow:
-        0 4px 15px rgba(251,192,45,.25);
-    }
-
-    .header-title h1 {
-      font-size: 21px;
-      font-weight: 800;
-    }
-
-    .header-title p {
-      margin-top: 3px;
-      font-size: 12px;
-      color: var(--accent-gold);
-      font-weight: 700;
-    }
-
-    .back-button {
-      margin-left: auto;
-      color: var(--accent-gold);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .back-button:hover {
-      text-decoration: underline;
-    }
-
-    /* ================= FILTER ================= */
-
-    .filter-grid {
-      display: grid;
-      grid-template-columns: repeat(2,minmax(0,1fr));
-      gap: 14px;
-      margin-top: 20px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    .field.full {
-      grid-column: 1/-1;
-    }
-
-    .field label {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 700;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 11px;
-      border: 1px solid var(--border-color);
-      background: var(--input-bg);
-      color: #fff;
-      outline: none;
-      font-size: 13px;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: rgba(251,192,45,.65);
-    }
-
-    select option {
-      background: #1c2541;
-      color: #fff;
-    }
-
-    /* ================= BUTTON ================= */
-
-    .button-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    button {
-      border: none;
-      border-radius: 11px;
-      padding: 12px 16px;
-      font-size: 13px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: .2s ease;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-    }
-
-    button:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-primary {
-      background:
-        linear-gradient(
-          135deg,
-          var(--accent-gold),
-          var(--accent-gold-dark)
-        );
-      color: var(--bg-dark);
-    }
-
-    .btn-success {
-      background: #166534;
-      color: #fff;
-    }
-
-    .btn-secondary {
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--border-color);
-      color: #fff;
-    }
-
-    .btn-danger {
-      background: rgba(239,68,68,.15);
-      border: 1px solid rgba(239,68,68,.25);
-      color: #f87171;
-    }
-
-    .status {
-      min-height: 20px;
-      margin-top: 12px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    /* ================= SUMMARY ================= */
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(4,minmax(0,1fr));
-      gap: 12px;
-    }
-
-    .summary-card {
-      background: rgba(11,19,43,.55);
-      border: 1px solid var(--border-color);
-      border-radius: 15px;
-      padding: 16px;
-    }
-
-    .summary-card span {
-      display: block;
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .summary-card strong {
-      display: block;
-      margin-top: 6px;
-      color: var(--accent-gold);
-      font-size: 21px;
-      font-weight: 800;
-    }
-
-    /* ================= SECTION ================= */
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .section-header h2 {
-      color: var(--accent-gold);
-      font-size: 16px;
-      font-weight: 800;
-    }
-
-    .section-header span {
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-
-    /* ================= TABLE ================= */
-
-    .table-wrapper {
-      overflow-x: auto;
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-    }
-
-    table {
-      width: 100%;
-      min-width: 760px;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-
-    th,
-    td {
-      padding: 11px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--border-color);
-      white-space: nowrap;
-    }
-
-    th {
-      background: rgba(11,19,43,.75);
-      color: var(--accent-gold);
-      font-weight: 800;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-
-    td {
-      color: #e5e7eb;
-    }
-
-    tbody tr:hover {
-      background: rgba(255,255,255,.025);
-    }
-
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    .empty {
-      text-align: center;
-      color: var(--text-muted);
-      padding: 22px;
-    }
-
-    /* ================= GRAFIK ================= */
-
-    .chart-card {
-      margin-bottom: 18px;
-    }
-
-    .chart-wrap {
-      width: 100%;
-      overflow-x: auto;
-      padding-top: 8px;
-    }
-
-    .chart-title {
-      color: var(--accent-gold);
-      font-size: 16px;
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-
-    .chart-subtitle {
-      color: var(--text-muted);
-      font-size: 12px;
-      margin-bottom: 16px;
-    }
-
-    .chart-svg {
-      display: block;
-      width: 100%;
-      min-width: 620px;
-      height: 300px;
-    }
-
-    .chart-grid-line {
-      stroke: #d1d5db;
-      stroke-width: 1;
-      stroke-dasharray: 4 4;
-    }
-
-    .chart-axis {
-      stroke: #6b7280;
-      stroke-width: 1;
-    }
-
-   .chart-label {
-  fill: #cbd5e1;
-  font-size: 11px;
-  font-weight: 600;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rekap Poin - LENTERA SMANTI</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0b132b;
+  --card: #1c2541;
+  --input: #0f1935;
+  --gold: #fbc02d;
+  --muted: #94a3b8;
+  --border: rgba(255,255,255,.1);
 }
 
-.chart-value {
-  fill: #ffffff;
-  font-size: 12px;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: #fff;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 18px;
+  box-shadow: 0 15px 35px #0003;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+}
+
+.logo {
+  background: linear-gradient(135deg,var(--gold),#d48806);
+  color: var(--bg);
+  font-size: 22px;
   font-weight: 800;
-  paint-order: stroke;
-  stroke: rgba(11, 19, 43, 0.8);
-  stroke-width: 3px;
-  stroke-linejoin: round;
+  padding: 12px 16px;
+  border-radius: 12px;
 }
 
-    .chart-bar-reward {
-      fill: #16a34a;
-    }
+.header h1 {
+  font-size: 21px;
+}
 
-    .chart-bar-violation {
-      fill: #dc2626;
-    }
+.header p {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 700;
+}
 
-    .chart-legend {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 8px;
-      font-size: 11px;
-      color: #4b5563;
-    }
+.back {
+  margin-left: auto;
+  color: var(--gold);
+  text-decoration: none;
+}
 
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
+.filters {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
 
-    .legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 3px;
-    }
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
 
-    .legend-reward {
-      background: #16a34a;
-    }
+.field label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
 
-    .legend-violation {
-      background: #dc2626;
-    }
+input,select {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--input);
+  color: white;
+  width: 100%;
+}
 
-    /* ================= HIDDEN ================= */
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
 
-    .hidden {
-      display: none !important;
-    }
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
 
-    /* ================= MOBILE ================= */
+button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
 
-    @media(max-width:800px) {
+.primary {
+  background: linear-gradient(135deg,var(--gold),#d48806);
+  color: var(--bg);
+}
 
-      body {
-        padding: 10px;
-      }
+.secondary {
+  background: #ffffff12;
+  color: white;
+  border: 1px solid var(--border);
+}
 
-      .card {
-        padding: 16px;
-        border-radius: 18px;
-      }
+.success {
+  background: #166534;
+  color: white;
+}
 
-      .filter-grid {
-        grid-template-columns: 1fr;
-      }
+.status {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 12px;
+  min-height: 18px;
+}
 
-      .field.full {
-        grid-column: auto;
-      }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 12px;
+}
 
-      .summary-grid {
-        grid-template-columns: repeat(2,minmax(0,1fr));
-      }
+.metric {
+  background: #0b132b88;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 15px;
+}
 
-      .header-title h1 {
-        font-size: 18px;
-      }
+.metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
 
-      .back-button {
-        font-size: 11px;
-      }
+.metric strong {
+  display: block;
+  color: var(--gold);
+  font-size: 21px;
+  margin-top: 6px;
+}
 
-      .button-row button {
-        flex: 1;
-        min-width: 120px;
-      }
-    }
+.section {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
 
-    @media(max-width:450px) {
+.section h2 {
+  font-size: 16px;
+  color: var(--gold);
+}
 
-      .summary-card strong {
-        font-size: 18px;
-      }
+.section span {
+  font-size: 12px;
+  color: var(--muted);
+}
 
-      .logo {
-        width: 42px;
-        height: 42px;
-        font-size: 19px;
-      }
+.tablewrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
 
-      .header-title h1 {
-        font-size: 16px;
-      }
-    }
+table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
 
-    /* ================= PRINT ================= */
+th,td {
+  text-align: left;
+  padding: 10px 11px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
 
-    @media print {
+th {
+  background: #0b132bcc;
+  color: var(--gold);
+}
 
+td {
+  color: #e5e7eb;
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 22px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.chartwrap {
+  overflow-x: auto;
+}
+
+.chartsvg {
+  width: 100%;
+  min-width: 600px;
+  height: 280px;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.green {
+  background: #16a34a;
+}
+
+.red {
+  background: #dc2626;
+}
+
+@media(max-width:750px) {
+  body {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  .header h1 {
+    font-size: 16px;
+  }
+
+  .back {
+    font-size: 11px;
+  }
+
+  .buttons button {
+    flex: 1;
+  }
+}
+
+@media print {
   @page {
     size: A4 landscape;
     margin: 10mm;
   }
 
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
   body {
-    background: #fff;
-    color: #000;
+    background: white !important;
+    color: black;
     padding: 0;
   }
 
-  .container {
-    width: 100%;
-    max-width: none;
-  }
-
   .card {
+    background: white !important;
+    color: black;
     box-shadow: none;
-    background: #fff;
-    color: #000;
-    border: 1px solid #ccc;
+    border: 1px solid #bbb;
+    break-inside: auto;
   }
 
   .header,
-  .filter-grid,
-  .button-row,
+  .filters,
+  .buttons,
   .status,
-  .back-button {
+  .back {
     display: none !important;
   }
 
-  .summary-card {
-    background: #fff;
-    color: #000;
-    border: 1px solid #ccc;
+  .metric {
+    background: white;
+    border: 1px solid #bbb;
   }
 
-  .summary-card span,
-  .summary-card strong {
-    color: #000;
+  .metric span,
+  .metric strong,
+  td {
+    color: black;
   }
 
   th {
-    background: #eee;
-    color: #000;
+    background: #eee !important;
+    color: black;
+    position: static;
   }
 
-  td {
-    color: #000;
+  .tablewrap {
+    overflow: visible !important;
   }
-
-  /* ================= TABEL PRINT ================= */
 
   table {
-    width: 100%;
     min-width: 0 !important;
-    table-layout: fixed;
-    border-collapse: collapse;
-  }
-
-  th,
-  td {
-    white-space: normal !important;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    vertical-align: top;
-  }
-
-  .table-wrapper {
-    overflow: visible !important;
     width: 100%;
+    font-size: 9px;
   }
 
-  /* Kolom keterangan dibuat lebih lebar */
-  #detailTableWrapper th:nth-child(7),
-  #detailTableWrapper td:nth-child(7) {
-    width: 32%;
-    white-space: normal !important;
+  th,td {
+    white-space: normal;
     overflow-wrap: anywhere;
-    word-break: break-word;
+    border: 1px solid #ccc;
   }
 
-  /* Kolom kecil */
-  #detailTableWrapper th:nth-child(1),
-  #detailTableWrapper td:nth-child(1) {
-    width: 8%;
-  }
-
-  #detailTableWrapper th:nth-child(2),
-  #detailTableWrapper td:nth-child(2) {
-    width: 10%;
-  }
-
-  #detailTableWrapper th:nth-child(3),
-  #detailTableWrapper td:nth-child(3) {
-    width: 13%;
-  }
-
-  #detailTableWrapper th:nth-child(4),
-  #detailTableWrapper td:nth-child(4) {
-    width: 7%;
-  }
-
-  #detailTableWrapper th:nth-child(5),
-  #detailTableWrapper td:nth-child(5) {
-    width: 8%;
-  }
-
-  #detailTableWrapper th:nth-child(6),
-  #detailTableWrapper td:nth-child(6) {
-    width: 5%;
-  }
-
-  #detailTableWrapper th:nth-child(8),
-  #detailTableWrapper td:nth-child(8) {
-    width: 10%;
-  }
-
-  #detailTableWrapper th:nth-child(9),
-  #detailTableWrapper td:nth-child(9) {
-    width: 7%;
-  }
-
-  /* ================= GRAFIK ================= */
-
-  .chart-card {
-    display: block !important;
-    break-inside: avoid;
-    page-break-inside: avoid;
-    border: 1px solid #999;
-    background: #fff;
-    box-shadow: none;
-  }
-
-  .chart-wrap {
-    overflow: visible !important;
-  }
-
-  .chart-svg {
-    width: 100%;
+  .chartsvg {
     min-width: 0;
-    height: 260px;
+    height: 220px;
+  }
+
+  .chartwrap {
     overflow: visible;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    forced-color-adjust: none;
   }
 
-  .chart-grid-line {
-    stroke: #d1d1d1;
-  }
-
-  .chart-axis {
-    stroke: #555;
-  }
-
-  /* TETAP BERWARNA SAAT PRINT */
-
-  .chart-label {
+  .chartlabel,
+  .chartvalue {
     fill: #111;
   }
 
-  .chart-value {
-    fill: #111;
-    font-weight: 800;
-  }
-
-  .chart-bar-reward {
+  .barreward {
     fill: #16a34a !important;
   }
 
-  .chart-bar-violation {
+  .barviolation {
     fill: #dc2626 !important;
   }
 
-  .chart-legend {
-    color: #111;
-  }
-
-  .legend-reward {
-    background: #16a34a !important;
-  }
-
-  .legend-violation {
-    background: #dc2626 !important;
+  #classStudentCard {
+    display: block !important;
   }
 }
-  </style>
+</style>
 </head>
 
 <body>
 
 <main class="container">
 
-  <!-- ================= FILTER ================= -->
-
+  <!-- FILTER -->
   <section class="card">
 
     <div class="header">
+      <div class="logo">L</div>
 
-      <div class="logo">
-        L
-      </div>
-
-      <div class="header-title">
+      <div>
         <h1>Rekap Poin Siswa</h1>
         <p>LENTERA SMANTI • ADMIN</p>
       </div>
 
-      <a
-        href="admin.html"
-        class="back-button"
-      >
-        ← Kembali
-      </a>
-
+      <a class="back" href="admin.html">← Kembali</a>
     </div>
 
-    <div class="filter-grid">
+    <div class="filters">
 
       <div class="field">
-        <label for="tanggalMulai">
-          Tanggal Mulai
-        </label>
-
-        <input
-          type="date"
-          id="tanggalMulai"
-        >
+        <label for="mulai">Tanggal Mulai</label>
+        <input type="date" id="mulai">
       </div>
 
       <div class="field">
-        <label for="tanggalAkhir">
-          Tanggal Akhir
-        </label>
-
-        <input
-          type="date"
-          id="tanggalAkhir"
-        >
+        <label for="akhir">Tanggal Akhir</label>
+        <input type="date" id="akhir">
       </div>
 
       <div class="field">
-        <label for="tipeRekap">
-          Jenis Rekap
-        </label>
+        <label for="tipe">Jenis Rekap</label>
 
-        <select id="tipeRekap">
-
-          <option value="siswa">
-            Per Siswa
-          </option>
-
-          <option value="kelas">
-            Per Kelas
-          </option>
-
-          <option value="sekolah">
-            Satu Sekolah
-          </option>
-
+        <select id="tipe">
+          <option value="siswa">Per Siswa</option>
+          <option value="kelas">Per Kelas</option>
+          <option value="sekolah">Satu Sekolah</option>
         </select>
       </div>
 
-      <div
-        class="field hidden"
-        id="siswaField"
-      >
-
-        <label for="siswaSelect">
-          Pilih Siswa
-        </label>
-
-        <select id="siswaSelect">
-          <option value="">
-            Memuat siswa...
-          </option>
+      <div class="field hidden" id="siswaField">
+        <label for="siswa">Pilih Siswa</label>
+        <select id="siswa">
+          <option value="">Pilih siswa</option>
         </select>
-
       </div>
 
-      <div
-        class="field hidden"
-        id="kelasField"
-      >
-
-        <label for="kelasSelect">
-          Pilih Kelas
-        </label>
-
-        <select id="kelasSelect">
-          <option value="">
-            Memuat kelas...
-          </option>
+      <div class="field hidden" id="kelasField">
+        <label for="kelas">Pilih Kelas</label>
+        <select id="kelas">
+          <option value="">Pilih kelas</option>
         </select>
-
       </div>
 
     </div>
 
-    <div class="button-row">
-
-      <button
-        type="button"
-        class="btn-primary"
-        id="tampilkanBtn"
-      >
-        📊 Tampilkan Rekap
-      </button>
-
-      <button
-        type="button"
-        class="btn-success hidden"
-        id="exportXlsBtn"
-      >
-        📗 Export XLS
-      </button>
-
-      <button
-        type="button"
-        class="btn-secondary hidden"
-        id="exportCsvBtn"
-      >
-        📄 Export CSV
-      </button>
-
-      <button
-        type="button"
-        class="btn-secondary"
-        id="cetakBtn"
-      >
-        🖨️ Cetak
-      </button>
-
+    <div class="buttons">
+      <button class="primary" id="show">📊 Tampilkan Rekap</button>
+      <button class="success hidden" id="xls">📗 Export XLS</button>
+      <button class="secondary hidden" id="csv">📄 Export CSV</button>
+      <button class="secondary" id="print">🖨️ Cetak</button>
     </div>
 
-    <div
-      class="status"
-      id="status"
-    ></div>
+    <div class="status" id="status"></div>
 
   </section>
 
+  <!-- RINGKASAN -->
+  <section class="card hidden" id="summaryCard">
 
-  <!-- ================= RINGKASAN ================= -->
-
-  <section
-    class="card hidden"
-    id="ringkasanCard"
-  >
-
-    <div class="section-header">
-
-      <h2>
-        Ringkasan Rekap
-      </h2>
-
-      <span id="periodeText">
-        -
-      </span>
-
+    <div class="section">
+      <h2>Ringkasan Rekap</h2>
+      <span id="period"></span>
     </div>
 
-    <div class="summary-grid">
+    <div class="grid">
 
-      <div class="summary-card">
+      <div class="metric">
         <span>Jumlah Siswa</span>
-
-        <strong id="jumlahSiswa">
-          0
-        </strong>
+        <strong id="nSiswa">0</strong>
       </div>
 
-      <div class="summary-card">
+      <div class="metric">
         <span>Total Penghargaan</span>
-
-        <strong id="totalPenghargaan">
-          0
-        </strong>
+        <strong id="nReward">0</strong>
       </div>
 
-      <div class="summary-card">
+      <div class="metric">
         <span>Total Pelanggaran</span>
-
-        <strong id="totalPelanggaran">
-          0
-        </strong>
+        <strong id="nViolation">0</strong>
       </div>
 
-      <div class="summary-card">
+      <div class="metric">
         <span>Poin Bersih</span>
-
-        <strong id="totalBersih">
-          0
-        </strong>
+        <strong id="nNet">0</strong>
       </div>
 
     </div>
-
   </section>
 
+  <!-- GRAFIK -->
+  <section class="card hidden" id="chartCard">
 
-  <!-- ================= GRAFIK ================= -->
-
-  <section
-    class="card chart-card hidden"
-    id="chartCard"
-  >
-
-    <div class="section-header">
-
-      <div>
-
-        <h2
-          class="chart-title"
-          id="chartTitle"
-        >
-          Grafik Rekap Poin
-        </h2>
-
-        <div
-          class="chart-subtitle"
-          id="chartSubtitle"
-        >
-          Perbandingan penghargaan dan pelanggaran.
-        </div>
-
-      </div>
-
+    <div class="section">
+      <h2 id="chartTitle">Grafik Poin</h2>
     </div>
 
-    <div
-      class="chart-wrap"
-      id="chartWrap"
-    ></div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px"
+       id="chartSubtitle">
+      Penghargaan dan pelanggaran
+    </p>
 
-    <div class="chart-legend">
+    <div class="chartwrap" id="chart"></div>
 
-      <span class="legend-item">
-        <span class="legend-dot legend-reward"></span>
-        Penghargaan
-      </span>
-
-      <span class="legend-item">
-        <span class="legend-dot legend-violation"></span>
-        Pelanggaran
-      </span>
-
+    <div class="legend">
+      <span><i class="dot green"></i>Penghargaan</span>
+      <span><i class="dot red"></i>Pelanggaran</span>
     </div>
 
   </section>
 
+  <!-- REKAP UTAMA -->
+  <section class="card hidden" id="mainCard">
 
-  <!-- ================= REKAP UTAMA ================= -->
-
-  <section
-    class="card hidden"
-    id="rekapCard"
-  >
-
-    <div class="section-header">
-
-      <h2 id="judulRekap">
-        Rekap
-      </h2>
-
-      <span id="jumlahData">
-        0 data
-      </span>
-
+    <div class="section">
+      <h2 id="mainTitle">Rekap</h2>
+      <span id="mainCount"></span>
     </div>
 
-    <div
-      class="table-wrapper"
-      id="rekapTableWrapper"
-    ></div>
+    <div class="tablewrap" id="mainTable"></div>
 
   </section>
 
+  <!-- REKAP SETIAP SISWA DALAM KELAS -->
+  <section class="card hidden" id="classStudentCard">
 
-  <!-- ================= DETAIL ================= -->
-
-  <section
-    class="card hidden"
-    id="detailCard"
-  >
-
-    <div class="section-header">
-
-      <h2>
-        Detail Transaksi Poin
-      </h2>
-
-      <span id="jumlahTransaksi">
-        0 transaksi
-      </span>
-
+    <div class="section">
+      <h2>Rekap Poin Setiap Siswa</h2>
+      <span id="classStudentCount"></span>
     </div>
 
-    <div
-      class="table-wrapper"
-      id="detailTableWrapper"
-    ></div>
+    <p id="classPeriod"
+       style="font-size:12px;color:var(--muted);margin-bottom:12px">
+    </p>
+
+    <div class="tablewrap" id="classStudentTable"></div>
+
+  </section>
+
+  <!-- DETAIL TRANSAKSI -->
+  <section class="card hidden" id="detailCard">
+
+    <div class="section">
+      <h2>Detail Transaksi Poin</h2>
+      <span id="detailCount"></span>
+    </div>
+
+    <div class="tablewrap" id="detailTable"></div>
 
   </section>
 
 </main>
 
-
 <script>
+"use strict";
 
-/* =========================================================
-   SESSION ADMIN
-========================================================= */
-
-const adminSession =
-  sessionStorage.getItem(
-    "lentera_admin_session"
-  );
-
-if (!adminSession) {
-
-  window.location.replace(
-    "admin-login.html"
-  );
-
+if (!sessionStorage.getItem("lentera_admin_session")) {
+  location.replace("admin-login.html");
 }
 
+const $ = id => document.getElementById(id);
 
-/* =========================================================
-   ELEMENT
-========================================================= */
+let students = [];
+let classes = [];
+let reportData = null;
+let classRows = [];
 
-const tanggalMulai =
-  document.getElementById(
-    "tanggalMulai"
-  );
+function today() {
+  const d = new Date();
 
-const tanggalAkhir =
-  document.getElementById(
-    "tanggalAkhir"
-  );
-
-const tipeRekap =
-  document.getElementById(
-    "tipeRekap"
-  );
-
-const siswaField =
-  document.getElementById(
-    "siswaField"
-  );
-
-const kelasField =
-  document.getElementById(
-    "kelasField"
-  );
-
-const siswaSelect =
-  document.getElementById(
-    "siswaSelect"
-  );
-
-const kelasSelect =
-  document.getElementById(
-    "kelasSelect"
-  );
-
-const tampilkanBtn =
-  document.getElementById(
-    "tampilkanBtn"
-  );
-
-const exportXlsBtn =
-  document.getElementById(
-    "exportXlsBtn"
-  );
-
-const exportCsvBtn =
-  document.getElementById(
-    "exportCsvBtn"
-  );
-
-const cetakBtn =
-  document.getElementById(
-    "cetakBtn"
-  );
-
-const statusElement =
-  document.getElementById(
-    "status"
-  );
-
-const chartCard =
-  document.getElementById(
-    "chartCard"
-  );
-
-const chartWrap =
-  document.getElementById(
-    "chartWrap"
-  );
-
-const chartTitle =
-  document.getElementById(
-    "chartTitle"
-  );
-
-const chartSubtitle =
-  document.getElementById(
-    "chartSubtitle"
-  );
-
-
-/* =========================================================
-   DATA
-========================================================= */
-
-let daftarSiswa = [];
-let daftarKelas = [];
-let latestReport = null;
-
-
-/* =========================================================
-   TANGGAL
-========================================================= */
-
-function getToday() {
-
-  const date = new Date();
-
-  const year =
-    date.getFullYear();
-
-  const month =
-    String(
-      date.getMonth() + 1
-    ).padStart(2,"0");
-
-  const day =
-    String(
-      date.getDate()
-    ).padStart(2,"0");
-
-  return `${year}-${month}-${day}`;
-
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
+$("mulai").value = today().slice(0,8) + "01";
+$("akhir").value = today();
 
-function getFirstDayOfMonth() {
+const esc = value =>
+  String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
 
-  const date = new Date();
+const num = value => Number(value || 0);
 
-  const year =
-    date.getFullYear();
+const norm = value =>
+  String(value ?? "").trim().toLowerCase();
 
-  const month =
-    String(
-      date.getMonth() + 1
-    ).padStart(2,"0");
+function dateFmt(value) {
+  if (!value) return "-";
 
-  return `${year}-${month}-01`;
+  const parts = String(value).slice(0,10).split("-");
 
+  return parts.length === 3
+    ? `${parts[2]}-${parts[1]}-${parts[0]}`
+    : value;
 }
 
+/* ================= LOAD DATA MASTER ================= */
 
-tanggalMulai.value =
-  getFirstDayOfMonth();
-
-tanggalAkhir.value =
-  getToday();
-
-
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHtml(value) {
-
-  return String(
-    value ?? ""
-  ).replace(
-    /[&<>"']/g,
-    function(char) {
-
-      const map = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      };
-
-      return map[char];
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   ESCAPE XML
-========================================================= */
-
-function escapeXml(value) {
-
-  return String(
-    value ?? ""
-  )
-  .replace(/&/g,"&amp;")
-  .replace(/</g,"&lt;")
-  .replace(/>/g,"&gt;")
-  .replace(/"/g,"&quot;")
-  .replace(/'/g,"&apos;");
-
-}
-
-
-/* =========================================================
-   NUMBER
-========================================================= */
-
-function numberValue(value) {
-
-  return Number(
-    value || 0
-  );
-
-}
-
-
-/* =========================================================
-   FORMAT TANGGAL
-========================================================= */
-
-function formatTanggal(tanggal) {
-
-  if (!tanggal) {
-    return "-";
-  }
-
-  const parts =
-    String(tanggal).split("-");
-
-  if (parts.length !== 3) {
-    return tanggal;
-  }
-
-  return (
-    parts[2] +
-    "-" +
-    parts[1] +
-    "-" +
-    parts[0]
-  );
-
-}
-
-
-/* =========================================================
-   LOAD DATA MASTER
-========================================================= */
-
-async function loadDataMaster() {
-
+async function loadMaster() {
   try {
+    $("status").textContent = "Memuat siswa dan kelas...";
 
-    statusElement.textContent =
-      "Memuat data siswa dan kelas...";
+    const [studentResponse, classResponse] =
+      await Promise.all([
+        fetch("/.netlify/functions/admin-students"),
+        fetch("/.netlify/functions/admin-classes")
+      ]);
 
-    const [
-      siswaResponse,
-      kelasResponse
-    ] = await Promise.all([
+    const [studentResult, classResult] =
+      await Promise.all([
+        studentResponse.json(),
+        classResponse.json()
+      ]);
 
-      fetch(
-        "/.netlify/functions/admin-students"
-      ),
-
-      fetch(
-        "/.netlify/functions/admin-classes"
-      )
-
-    ]);
-
-
-    const siswaResult =
-      await siswaResponse.json();
-
-    const kelasResult =
-      await kelasResponse.json();
-
-
-    if (
-      !siswaResponse.ok ||
-      !siswaResult.success
-    ) {
-
-      throw new Error(
-        siswaResult.message ||
-        "Gagal mengambil data siswa."
-      );
-
+    if (!studentResponse.ok || !studentResult.success) {
+      throw Error(studentResult.message || "Gagal memuat siswa.");
     }
 
-
-    if (
-      !kelasResponse.ok ||
-      !kelasResult.success
-    ) {
-
-      throw new Error(
-        kelasResult.message ||
-        "Gagal mengambil data kelas."
-      );
-
+    if (!classResponse.ok || !classResult.success) {
+      throw Error(classResult.message || "Gagal memuat kelas.");
     }
 
-
-    daftarSiswa =
-      Array.isArray(
-        siswaResult.siswa
-      )
-      ? siswaResult.siswa
+    students = Array.isArray(studentResult.siswa)
+      ? studentResult.siswa
       : [];
 
-
-    daftarKelas =
-      Array.isArray(
-        kelasResult.kelas
-      )
-      ? kelasResult.kelas
+    classes = Array.isArray(classResult.kelas)
+      ? classResult.kelas
       : [];
 
+    $("siswa").innerHTML =
+      '<option value="">Pilih siswa</option>';
 
-    renderSiswaSelect();
-    renderKelasSelect();
+    students.forEach(student => {
+      $("siswa").add(new Option(
+        `${student.nama || "-"} — ${student.nisn || "-"} (${student.kelas || student.nama_kelas || "-"})`,
+        student.id || ""
+      ));
+    });
 
+    $("kelas").innerHTML =
+      '<option value="">Pilih kelas</option>';
 
-    statusElement.textContent =
-      "Data siap digunakan.";
+    classes.forEach(item => {
+      $("kelas").add(new Option(
+        item.nama_kelas || item.nama || item.id,
+        item.id
+      ));
+    });
 
+    $("status").textContent = "Data siap.";
+
+  } catch (error) {
+    console.error(error);
+    $("status").textContent =
+      error.message || "Gagal memuat data master.";
   }
-  catch(error) {
-
-    console.error(
-      "LOAD MASTER ERROR:",
-      error
-    );
-
-    statusElement.textContent =
-      error.message ||
-      "Gagal memuat data.";
-
-  }
-
 }
 
-
-/* =========================================================
-   SELECT SISWA
-========================================================= */
-
-function renderSiswaSelect() {
-
-  siswaSelect.innerHTML =
-    '<option value="">-- Pilih Siswa --</option>';
-
-  daftarSiswa.forEach(
-    function(siswa) {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-      option.value =
-        siswa.id || "";
-
-      const nama =
-        siswa.nama || "-";
-
-      const nisn =
-        siswa.nisn || "-";
-
-      const kelas =
-        siswa.kelas ||
-        siswa.nama_kelas ||
-        "-";
-
-      option.textContent =
-        `${nama} — ${nisn} (${kelas})`;
-
-      siswaSelect.appendChild(
-        option
-      );
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   SELECT KELAS
-========================================================= */
-
-function renderKelasSelect() {
-
-  kelasSelect.innerHTML =
-    '<option value="">-- Pilih Kelas --</option>';
-
-  daftarKelas.forEach(
-    function(kelas) {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-      option.value =
-        kelas.id || "";
-
-      option.textContent =
-        kelas.nama_kelas ||
-        kelas.nama ||
-        kelas.id ||
-        "-";
-
-      kelasSelect.appendChild(
-        option
-      );
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   FILTER
-========================================================= */
+/* ================= FILTER ================= */
 
 function updateFilter() {
-
-  siswaField.classList.toggle(
+  $("siswaField").classList.toggle(
     "hidden",
-    tipeRekap.value !== "siswa"
+    $("tipe").value !== "siswa"
   );
 
-  kelasField.classList.toggle(
+  $("kelasField").classList.toggle(
     "hidden",
-    tipeRekap.value !== "kelas"
+    $("tipe").value !== "kelas"
   );
-
 }
 
-tipeRekap.addEventListener(
-  "change",
-  updateFilter
-);
-
+$("tipe").addEventListener("change", updateFilter);
 updateFilter();
 
+/* ================= AMBIL REKAP ================= */
 
-/* =========================================================
-   TAMPILKAN REKAP
-========================================================= */
-
-async function tampilkanRekap() {
-
-  const mulai =
-    tanggalMulai.value;
-
-  const akhir =
-    tanggalAkhir.value;
-
-  const tipe =
-    tipeRekap.value;
-
+async function showReport() {
+  const mulai = $("mulai").value;
+  const akhir = $("akhir").value;
+  const tipe = $("tipe").value;
 
   if (!mulai || !akhir) {
-
-    alert(
-      "Tanggal mulai dan tanggal akhir wajib diisi."
-    );
-
+    alert("Tanggal mulai dan akhir wajib diisi.");
     return;
-
   }
-
 
   if (mulai > akhir) {
-
-    alert(
-      "Tanggal mulai tidak boleh lebih besar dari tanggal akhir."
-    );
-
+    alert("Tanggal mulai tidak boleh melebihi tanggal akhir.");
     return;
-
   }
 
-
-  if (
-    tipe === "siswa" &&
-    !siswaSelect.value
-  ) {
-
-    alert(
-      "Silakan pilih siswa terlebih dahulu."
-    );
-
+  if (tipe === "siswa" && !$("siswa").value) {
+    alert("Pilih siswa terlebih dahulu.");
     return;
-
   }
 
-
-  if (
-    tipe === "kelas" &&
-    !kelasSelect.value
-  ) {
-
-    alert(
-      "Silakan pilih kelas terlebih dahulu."
-    );
-
+  if (tipe === "kelas" && !$("kelas").value) {
+    alert("Pilih kelas terlebih dahulu.");
     return;
-
   }
 
-
-  tampilkanBtn.disabled = true;
-
-  tampilkanBtn.textContent =
-    "⏳ Memuat...";
-
-  statusElement.textContent =
-    "Mengambil data rekap...";
-
+  $("show").disabled = true;
+  $("show").textContent = "Memuat...";
+  $("status").textContent = "Mengambil rekap...";
 
   try {
-
-    const params =
-      new URLSearchParams();
-
-    params.set(
-      "mulai",
-      mulai
-    );
-
-    params.set(
-      "akhir",
-      akhir
-    );
-
-    params.set(
-      "tipe",
+    const params = new URLSearchParams({
+      mulai,
+      akhir,
       tipe
-    );
-
+    });
 
     if (tipe === "siswa") {
-
-      params.set(
-        "siswaId",
-        siswaSelect.value
-      );
-
+      params.set("siswaId", $("siswa").value);
     }
-
 
     if (tipe === "kelas") {
-
-      params.set(
-        "kelasId",
-        kelasSelect.value
-      );
-
+      params.set("kelasId", $("kelas").value);
     }
 
+    const response = await fetch(
+      "/.netlify/functions/admin-report?" + params
+    );
 
-    const response =
-      await fetch(
-        "/.netlify/functions/admin-report?" +
-        params.toString()
-      );
+    const result = await response.json();
 
-
-    const result =
-      await response.json();
-
-
-    if (
-      !response.ok ||
-      !result.success
-    ) {
-
-      throw new Error(
-        result.message ||
-        "Gagal mengambil rekap."
-      );
-
+    if (!response.ok || !result.success) {
+      throw Error(result.message || "Gagal mengambil rekap.");
     }
 
+    reportData = result;
+    classRows = [];
 
-    latestReport =
-      result;
+    renderReport(result);
 
+    $("xls").classList.remove("hidden");
+    $("csv").classList.remove("hidden");
 
-    renderReport(
-      result
-    );
+    $("status").textContent = "Rekap berhasil dibuat.";
 
+  } catch (error) {
+    console.error(error);
 
-    exportXlsBtn.classList.remove(
-      "hidden"
-    );
+    reportData = null;
 
-    exportCsvBtn.classList.remove(
-      "hidden"
-    );
+    $("status").textContent =
+      error.message || "Gagal membuat rekap.";
 
+    alert(error.message || "Gagal membuat rekap.");
 
-    statusElement.textContent =
-      "Rekap berhasil dibuat.";
-
+  } finally {
+    $("show").disabled = false;
+    $("show").textContent = "📊 Tampilkan Rekap";
   }
-  catch(error) {
-
-    console.error(
-      "REKAP ERROR:",
-      error
-    );
-
-    latestReport = null;
-
-    exportXlsBtn.classList.add(
-      "hidden"
-    );
-
-    exportCsvBtn.classList.add(
-      "hidden"
-    );
-
-    statusElement.textContent =
-      error.message ||
-      "Gagal membuat rekap.";
-
-    alert(
-      error.message ||
-      "Gagal membuat rekap."
-    );
-
-  }
-  finally {
-
-    tampilkanBtn.disabled =
-      false;
-
-    tampilkanBtn.textContent =
-      "📊 Tampilkan Rekap";
-
-  }
-
 }
 
-
-/* =========================================================
-   RENDER REPORT
-========================================================= */
+/* ================= RENDER LAPORAN ================= */
 
 function renderReport(report) {
+  $("summaryCard").classList.remove("hidden");
+  $("mainCard").classList.remove("hidden");
+  $("detailCard").classList.remove("hidden");
 
-  document
-    .getElementById("ringkasanCard")
-    .classList.remove("hidden");
+  $("period").textContent =
+    `${dateFmt(report.periode?.mulai)} s/d ${dateFmt(report.periode?.akhir)}`;
 
-  document
-    .getElementById("rekapCard")
-    .classList.remove("hidden");
+  $("nSiswa").textContent =
+    num(report.ringkasan?.jumlahSiswa);
 
-  document
-    .getElementById("detailCard")
-    .classList.remove("hidden");
+  $("nReward").textContent =
+    num(report.ringkasan?.totalPenghargaan);
 
+  $("nViolation").textContent =
+    num(report.ringkasan?.totalPelanggaran);
 
-  document
-    .getElementById("periodeText")
-    .textContent =
-    `${formatTanggal(report.periode.mulai)} s/d ${formatTanggal(report.periode.akhir)}`;
-
-
-  document
-    .getElementById("jumlahSiswa")
-    .textContent =
-    numberValue(
-      report.ringkasan.jumlahSiswa
-    );
-
-
-  document
-    .getElementById("totalPenghargaan")
-    .textContent =
-    numberValue(
-      report.ringkasan.totalPenghargaan
-    );
-
-
-  document
-    .getElementById("totalPelanggaran")
-    .textContent =
-    numberValue(
-      report.ringkasan.totalPelanggaran
-    );
-
-
-  document
-    .getElementById("totalBersih")
-    .textContent =
-    numberValue(
-      report.ringkasan.totalBersih
-    );
-
+  $("nNet").textContent =
+    num(report.ringkasan?.totalBersih);
 
   if (report.tipe === "kelas") {
-
-    renderRekapKelas(report);
-
-  }
-  else {
-
-    renderRekapSiswa(report);
-
+    renderClasses(report);
+    renderClassStudents(report);
+  } else {
+    $("classStudentCard").classList.add("hidden");
+    renderStudents(report);
   }
 
-
-  renderDetailTransaksi(report);
-
+  renderDetails(report);
   renderChart(report);
-
 }
 
+/* ================= REKAP SISWA / SEKOLAH ================= */
 
-/* =========================================================
-   REKAP SISWA
-========================================================= */
+function renderStudents(report) {
+  const data = Array.isArray(report.siswa)
+    ? report.siswa
+    : [];
 
-function renderRekapSiswa(report) {
-
-  document
-    .getElementById("judulRekap")
-    .textContent =
+  $("mainTitle").textContent =
     report.tipe === "siswa"
       ? "Rekap Per Siswa"
       : "Rekap Satu Sekolah";
 
-
-  document
-    .getElementById("jumlahData")
-    .textContent =
-    `${report.siswa.length} siswa`;
-
+  $("mainCount").textContent = `${data.length} siswa`;
 
   let html = `
     <table>
-
       <thead>
-
         <tr>
           <th>No</th>
           <th>NISN</th>
@@ -1784,116 +821,49 @@ function renderRekapSiswa(report) {
           <th>Poin Bersih</th>
           <th>Transaksi</th>
         </tr>
-
       </thead>
-
       <tbody>
   `;
 
-
-  if (
-    !report.siswa ||
-    report.siswa.length === 0
-  ) {
-
+  if (!data.length) {
     html += `
       <tr>
-        <td
-          colspan="8"
-          class="empty"
-        >
-          Tidak ada data siswa.
-        </td>
+        <td colspan="8" class="empty">Tidak ada data siswa.</td>
       </tr>
     `;
-
-  }
-  else {
-
-    report.siswa.forEach(
-      function(siswa,index) {
-
-        html += `
-          <tr>
-
-            <td>
-              ${index + 1}
-            </td>
-
-            <td>
-              ${escapeHtml(siswa.nisn)}
-            </td>
-
-            <td>
-              ${escapeHtml(siswa.nama)}
-            </td>
-
-            <td>
-              ${escapeHtml(siswa.kelas)}
-            </td>
-
-            <td>
-              ${numberValue(siswa.penghargaan)}
-            </td>
-
-            <td>
-              ${numberValue(siswa.pelanggaran)}
-            </td>
-
-            <td>
-              ${numberValue(siswa.total)}
-            </td>
-
-            <td>
-              ${numberValue(siswa.transaksi)}
-            </td>
-
-          </tr>
-        `;
-
-      }
-    );
-
   }
 
+  data.forEach((item, index) => {
+    html += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${esc(item.nisn)}</td>
+        <td>${esc(item.nama)}</td>
+        <td>${esc(item.kelas)}</td>
+        <td>${num(item.penghargaan)}</td>
+        <td>${num(item.pelanggaran)}</td>
+        <td>${num(item.total)}</td>
+        <td>${num(item.transaksi)}</td>
+      </tr>
+    `;
+  });
 
-  html += `
-      </tbody>
-    </table>
-  `;
-
-
-  document
-    .getElementById("rekapTableWrapper")
-    .innerHTML =
-    html;
-
+  $("mainTable").innerHTML = html + "</tbody></table>";
 }
 
+/* ================= REKAP KELAS ================= */
 
-/* =========================================================
-   REKAP KELAS
-========================================================= */
+function renderClasses(report) {
+  const data = Array.isArray(report.kelas)
+    ? report.kelas
+    : [];
 
-function renderRekapKelas(report) {
-
-  document
-    .getElementById("judulRekap")
-    .textContent =
-    "Rekap Per Kelas";
-
-
-  document
-    .getElementById("jumlahData")
-    .textContent =
-    `${report.kelas.length} kelas`;
-
+  $("mainTitle").textContent = "Rekap Per Kelas";
+  $("mainCount").textContent = `${data.length} kelas`;
 
   let html = `
     <table>
-
       <thead>
-
         <tr>
           <th>No</th>
           <th>Kelas</th>
@@ -1903,112 +873,208 @@ function renderRekapKelas(report) {
           <th>Poin Bersih</th>
           <th>Transaksi</th>
         </tr>
-
       </thead>
-
       <tbody>
   `;
 
-
-  if (
-    !report.kelas ||
-    report.kelas.length === 0
-  ) {
-
+  if (!data.length) {
     html += `
       <tr>
-
-        <td
-          colspan="7"
-          class="empty"
-        >
-          Tidak ada data kelas.
-        </td>
-
+        <td colspan="7" class="empty">Tidak ada data kelas.</td>
       </tr>
     `;
-
-  }
-  else {
-
-    report.kelas.forEach(
-      function(kelas,index) {
-
-        html += `
-          <tr>
-
-            <td>
-              ${index + 1}
-            </td>
-
-            <td>
-              ${escapeHtml(kelas.kelas)}
-            </td>
-
-            <td>
-              ${numberValue(kelas.jumlahSiswa)}
-            </td>
-
-            <td>
-              ${numberValue(kelas.penghargaan)}
-            </td>
-
-            <td>
-              ${numberValue(kelas.pelanggaran)}
-            </td>
-
-            <td>
-              ${numberValue(kelas.total)}
-            </td>
-
-            <td>
-              ${numberValue(kelas.transaksi)}
-            </td>
-
-          </tr>
-        `;
-
-      }
-    );
-
   }
 
+  data.forEach((item, index) => {
+    html += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${esc(item.kelas)}</td>
+        <td>${num(item.jumlahSiswa)}</td>
+        <td>${num(item.penghargaan)}</td>
+        <td>${num(item.pelanggaran)}</td>
+        <td>${num(item.total)}</td>
+        <td>${num(item.transaksi)}</td>
+      </tr>
+    `;
+  });
 
-  html += `
-      </tbody>
-    </table>
-  `;
-
-
-  document
-    .getElementById("rekapTableWrapper")
-    .innerHTML =
-    html;
-
+  $("mainTable").innerHTML = html + "</tbody></table>";
 }
 
+/* ================= REKAP POIN SETIAP SISWA DALAM KELAS ================= */
 
-/* =========================================================
-   DETAIL TRANSAKSI
-========================================================= */
+function renderClassStudents(report) {
+  const selectedClassId = String($("kelas").value);
 
-function renderDetailTransaksi(report) {
+  const selectedClass = classes.find(
+    item => String(item.id) === selectedClassId
+  );
 
-  const transaksi =
-    report.transaksi || [];
+  const className =
+    selectedClass?.nama_kelas ||
+    selectedClass?.nama ||
+    "-";
 
+  $("classStudentCard").classList.remove("hidden");
 
-  document
-    .getElementById("jumlahTransaksi")
-    .textContent =
-    `${transaksi.length} transaksi`;
+  $("classPeriod").textContent =
+    `Kelas ${className} • ${dateFmt(report.periode?.mulai)} s/d ${dateFmt(report.periode?.akhir)}`;
 
+  /*
+   * Daftar siswa aktif yang termasuk dalam kelas terpilih.
+   * Data siswa diharapkan memiliki kelas_id.
+   */
+  const classStudents = students.filter(student => {
+    const status = norm(student.status || "Aktif");
+
+    const studentClassId = String(
+      student.kelas_id ?? student.kelasId ?? ""
+    );
+
+    const studentClassName = String(
+      student.kelas || student.nama_kelas || ""
+    );
+
+    const sameClass =
+      studentClassId === selectedClassId ||
+      (
+        !studentClassId &&
+        norm(studentClassName) === norm(className)
+      );
+
+    return status === "aktif" && sameClass;
+  });
+
+  const map = new Map();
+
+  classStudents.forEach(student => {
+    const nisn = String(student.nisn || "");
+
+    map.set(nisn, {
+      nisn: student.nisn || "-",
+      nama: student.nama || "-",
+      kelas: className,
+      penghargaan: 0,
+      pelanggaran: 0,
+      total: 0,
+      transaksi: 0
+    });
+  });
+
+  /*
+   * Hitung transaksi sesuai rentang tanggal laporan.
+   */
+  (report.transaksi || []).forEach(transaction => {
+    const row = map.get(String(transaction.nisn || ""));
+
+    if (!row) return;
+
+    const type = norm(transaction.jenis);
+    const points = Math.abs(num(transaction.poin));
+
+    if (type === "penghargaan") {
+      row.penghargaan += points;
+      row.total += points;
+    } else if (type === "pelanggaran") {
+      row.pelanggaran += points;
+      row.total -= points;
+    } else {
+      return;
+    }
+
+    row.transaksi++;
+  });
+
+  classRows = [...map.values()].sort((a, b) =>
+    b.total - a.total ||
+    a.nama.localeCompare(b.nama, "id")
+  );
+
+  $("classStudentCount").textContent =
+    `${classRows.length} siswa`;
+
+  let totalReward = 0;
+  let totalViolation = 0;
+  let totalNet = 0;
+  let totalTransactions = 0;
 
   let html = `
     <table>
-
       <thead>
+        <tr>
+          <th>No</th>
+          <th>NISN</th>
+          <th>Nama Siswa</th>
+          <th>Kelas</th>
+          <th>Penghargaan</th>
+          <th>Pelanggaran</th>
+          <th>Poin Bersih</th>
+          <th>Transaksi</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
 
+  if (!classRows.length) {
+    html += `
+      <tr>
+        <td colspan="8" class="empty">
+          Tidak ditemukan siswa aktif. Periksa data kelas pada admin-students.
+        </td>
+      </tr>
+    `;
+  }
+
+  classRows.forEach((student, index) => {
+    totalReward += student.penghargaan;
+    totalViolation += student.pelanggaran;
+    totalNet += student.total;
+    totalTransactions += student.transaksi;
+
+    html += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${esc(student.nisn)}</td>
+        <td>${esc(student.nama)}</td>
+        <td>${esc(student.kelas)}</td>
+        <td>${student.penghargaan}</td>
+        <td>${student.pelanggaran}</td>
+        <td><strong>${student.total}</strong></td>
+        <td>${student.transaksi}</td>
+      </tr>
+    `;
+  });
+
+  if (classRows.length) {
+    html += `
+      <tr style="font-weight:800;background:rgba(251,192,45,.08)">
+        <td colspan="4">TOTAL KELAS ${esc(className)}</td>
+        <td>${totalReward}</td>
+        <td>${totalViolation}</td>
+        <td>${totalNet}</td>
+        <td>${totalTransactions}</td>
+      </tr>
+    `;
+  }
+
+  $("classStudentTable").innerHTML =
+    html + "</tbody></table>";
+}
+
+/* ================= DETAIL TRANSAKSI ================= */
+
+function renderDetails(report) {
+  const data = Array.isArray(report.transaksi)
+    ? report.transaksi
+    : [];
+
+  $("detailCount").textContent =
+    `${data.length} transaksi`;
+
+  let html = `
+    <table>
+      <thead>
         <tr>
           <th>Tanggal</th>
           <th>NISN</th>
@@ -2020,1471 +1086,471 @@ function renderDetailTransaksi(report) {
           <th>Dibuat Oleh</th>
           <th>Peran</th>
         </tr>
-
       </thead>
-
       <tbody>
   `;
 
-
-  if (transaksi.length === 0) {
-
+  if (!data.length) {
     html += `
       <tr>
-
-        <td
-          colspan="9"
-          class="empty"
-        >
-          Tidak ada transaksi
-          pada periode tersebut.
+        <td colspan="9" class="empty">
+          Tidak ada transaksi pada periode tersebut.
         </td>
-
       </tr>
     `;
-
-  }
-  else {
-
-    transaksi.forEach(
-      function(item) {
-
-        html += `
-          <tr>
-
-            <td>
-              ${formatTanggal(item.tanggal)}
-            </td>
-
-            <td>
-              ${escapeHtml(item.nisn)}
-            </td>
-
-            <td>
-              ${escapeHtml(item.nama)}
-            </td>
-
-            <td>
-              ${escapeHtml(item.kelas)}
-            </td>
-
-            <td>
-              ${escapeHtml(item.jenis)}
-            </td>
-
-            <td>
-              ${numberValue(item.poin)}
-            </td>
-
-            <td>
-              ${escapeHtml(item.keterangan)}
-            </td>
-
-            <td>
-              ${escapeHtml(item.dibuatOleh || "-")}
-            </td>
-
-            <td>
-              ${escapeHtml(item.peran || "-")}
-            </td>
-
-          </tr>
-        `;
-
-      }
-    );
-
   }
 
+  data.forEach(item => {
+    html += `
+      <tr>
+        <td>${dateFmt(item.tanggal)}</td>
+        <td>${esc(item.nisn)}</td>
+        <td>${esc(item.nama)}</td>
+        <td>${esc(item.kelas)}</td>
+        <td>${esc(item.jenis)}</td>
+        <td>${num(item.poin)}</td>
+        <td>${esc(item.keterangan)}</td>
+        <td>${esc(item.dibuatOleh || "-")}</td>
+        <td>${esc(item.peran || "-")}</td>
+      </tr>
+    `;
+  });
 
-  html += `
-      </tbody>
-    </table>
-  `;
-
-
-  document
-    .getElementById("detailTableWrapper")
-    .innerHTML =
-    html;
-
+  $("detailTable").innerHTML = html + "</tbody></table>";
 }
 
-
-/* =========================================================
-   GRAFIK REKAP
-   SVG digunakan supaya grafik ikut tercetak.
-========================================================= */
+/* ================= GRAFIK ================= */
 
 function renderChart(report) {
+  $("chartCard").classList.remove("hidden");
 
-  chartCard.classList.remove(
-    "hidden"
-  );
+  const data = (
+    report.tipe === "siswa"
+      ? report.siswa || []
+      : report.kelas || []
+  ).map(item => ({
+    label: report.tipe === "siswa"
+      ? item.nama
+      : item.kelas,
+    reward: num(item.penghargaan),
+    violation: num(item.pelanggaran)
+  }));
 
+  $("chartTitle").textContent =
+    report.tipe === "siswa"
+      ? "Grafik Poin Siswa"
+      : report.tipe === "kelas"
+        ? "Grafik Poin Per Kelas"
+        : "Grafik Poin Satu Sekolah";
 
-  let rows = [];
-
-
-  /* ---------- PER KELAS ---------- */
-
-  if (report.tipe === "kelas") {
-
-    rows =
-      (report.kelas || [])
-      .map(function(item) {
-
-        return {
-          label:
-            item.kelas || "-",
-
-          penghargaan:
-            numberValue(
-              item.penghargaan
-            ),
-
-          pelanggaran:
-            numberValue(
-              item.pelanggaran
-            )
-        };
-
-      });
-
-
-    chartTitle.textContent =
-      "Grafik Poin Per Kelas";
-
-    chartSubtitle.textContent =
-      "Perbandingan penghargaan dan pelanggaran setiap kelas.";
-
-  }
-
-
-  /* ---------- PER SISWA ---------- */
-
-  else if (report.tipe === "siswa") {
-
-    rows =
-      (report.siswa || [])
-      .map(function(item) {
-
-        return {
-          label:
-            item.nama || "-",
-
-          penghargaan:
-            numberValue(
-              item.penghargaan
-            ),
-
-          pelanggaran:
-            numberValue(
-              item.pelanggaran
-            )
-        };
-
-      });
-
-
-    chartTitle.textContent =
-      "Grafik Poin Siswa";
-
-    chartSubtitle.textContent =
-      "Perbandingan penghargaan dan pelanggaran siswa yang dipilih.";
-
-  }
-
-
-  /* ---------- SATU SEKOLAH ---------- */
-
-  else {
-
-    rows =
-      (report.kelas || [])
-      .map(function(item) {
-
-        return {
-          label:
-            item.kelas || "-",
-
-          penghargaan:
-            numberValue(
-              item.penghargaan
-            ),
-
-          pelanggaran:
-            numberValue(
-              item.pelanggaran
-            )
-        };
-
-      });
-
-
-    chartTitle.textContent =
-      "Grafik Poin Satu Sekolah";
-
-    chartSubtitle.textContent =
-      "Perbandingan penghargaan dan pelanggaran setiap kelas.";
-
-  }
-
-
-  /* ---------- TIDAK ADA DATA ---------- */
-
-  if (!rows.length) {
-
-    chartWrap.innerHTML =
-      `
-        <div class="empty">
-          Tidak ada data untuk ditampilkan pada grafik.
-        </div>
-      `;
-
+  if (!data.length) {
+    $("chart").innerHTML =
+      '<p class="empty">Tidak ada data grafik.</p>';
     return;
-
   }
 
-
-  /* ---------- NILAI MAKSIMUM ---------- */
-
-  const maxValue =
-    Math.max(
-      1,
-      ...rows.map(function(item) {
-
-        return Math.max(
-          item.penghargaan,
-          item.pelanggaran
-        );
-
-      })
-    );
-
-
-  /* ---------- UKURAN ---------- */
-
-  const width = 1000;
-  const height = 320;
-
-  const left = 60;
-  const right = 25;
-  const top = 25;
-  const bottom = 65;
-
-  const chartHeight =
-    height -
-    top -
-    bottom;
-
-  const chartWidth =
-    width -
-    left -
-    right;
-
-  const groupWidth =
-    chartWidth /
-    rows.length;
-
-  const barWidth =
-    Math.max(
-      6,
-      Math.min(
-        24,
-        groupWidth * .25
-      )
-    );
-
-  const gap =
-    Math.max(
-      3,
-      groupWidth * .06
-    );
-
-
-  /* ---------- SVG ---------- */
-
-  let svg = "";
-
-  svg +=
-    `<svg
-      class="chart-svg"
-      viewBox="0 0 ${width} ${height}"
-      role="img"
-      aria-label="Grafik rekap poin"
-    >`;
-
-
-  /* ---------- GRID ---------- */
-
-  for (
-    let i = 0;
-    i <= 4;
-    i++
-  ) {
-
-    const percentage =
-      i / 4;
-
-    const value =
-      Math.round(
-        maxValue *
-        percentage
-      );
-
-    const y =
-      top +
-      chartHeight -
-      (
-        chartHeight *
-        percentage
-      );
-
-
-    svg +=
-      `<line
-        class="chart-grid-line"
-        x1="${left}"
-        y1="${y}"
-        x2="${width - right}"
-        y2="${y}"
-      ></line>`;
-
-
-    svg +=
-      `<text
-        class="chart-label"
-        x="${left - 8}"
-        y="${y + 4}"
-        text-anchor="end"
-      >
-        ${escapeHtml(value)}
-      </text>`;
-
-  }
-
-
-  /* ---------- SUMBU ---------- */
-
-  svg +=
-    `<line
-      class="chart-axis"
-      x1="${left}"
-      y1="${top + chartHeight}"
-      x2="${width - right}"
-      y2="${top + chartHeight}"
-    ></line>`;
-
-
-  /* ---------- BAR ---------- */
-
-  rows.forEach(
-    function(item,index) {
-
-      const center =
-        left +
-        (
-          groupWidth *
-          index
-        ) +
-        (
-          groupWidth / 2
-        );
-
-
-      const rewardHeight =
-        (
-          item.penghargaan /
-          maxValue
-        ) *
-        chartHeight;
-
-
-      const violationHeight =
-        (
-          item.pelanggaran /
-          maxValue
-        ) *
-        chartHeight;
-
-
-      const rewardX =
-        center -
-        barWidth -
-        (gap / 2);
-
-
-      const violationX =
-        center +
-        (gap / 2);
-
-
-      const rewardY =
-        top +
-        chartHeight -
-        rewardHeight;
-
-
-      const violationY =
-        top +
-        chartHeight -
-        violationHeight;
-
-
-      /* PENGHARGAAN */
-
-      svg +=
-        `<rect
-          class="chart-bar-reward"
-          x="${rewardX}"
-          y="${rewardY}"
-          width="${barWidth}"
-          height="${Math.max(
-            0,
-            rewardHeight
-          )}"
-          rx="3"
-        ></rect>`;
-
-
-      /* PELANGGARAN */
-
-      svg +=
-        `<rect
-          class="chart-bar-violation"
-          x="${violationX}"
-          y="${violationY}"
-          width="${barWidth}"
-          height="${Math.max(
-            0,
-            violationHeight
-          )}"
-          rx="3"
-        ></rect>`;
-
-
-      /* NILAI PENGHARGAAN */
-
-      if (
-        item.penghargaan > 0
-      ) {
-
-        svg +=
-          `<text
-            class="chart-value"
-            x="${rewardX + barWidth / 2}"
-            y="${Math.max(
-              14,
-              rewardY - 6
-            )}"
-            text-anchor="middle"
-          >
-            ${item.penghargaan}
-          </text>`;
-
-      }
-
-
-      /* NILAI PELANGGARAN */
-
-      if (
-        item.pelanggaran > 0
-      ) {
-
-        svg +=
-          `<text
-            class="chart-value"
-            x="${violationX + barWidth / 2}"
-            y="${Math.max(
-              14,
-              violationY - 6
-            )}"
-            text-anchor="middle"
-          >
-            ${item.pelanggaran}
-          </text>`;
-
-      }
-
-
-      /* LABEL */
-
-      let label =
-        String(
-          item.label || "-"
-        );
-
-
-      if (
-        label.length > 16
-      ) {
-
-        label =
-          label.substring(
-            0,
-            15
-          ) +
-          "…";
-
-      }
-
-
-      svg +=
-        `<text
-          class="chart-label"
-          x="${center}"
-          y="${height - 30}"
-          text-anchor="middle"
-        >
-          ${escapeHtml(label)}
-        </text>`;
-
-    }
+  const max = Math.max(
+    1,
+    ...data.map(item =>
+      Math.max(item.reward, item.violation)
+    )
   );
 
+  const W = 1000;
+  const H = 300;
+  const L = 55;
+  const R = 20;
+  const T = 20;
+  const B = 55;
 
-  svg += "</svg>";
+  const chartHeight = H - T - B;
+  const chartWidth = W - L - R;
+  const groupWidth = chartWidth / data.length;
 
+  const barWidth = Math.max(
+    6,
+    Math.min(24, groupWidth * .24)
+  );
 
-  chartWrap.innerHTML =
-    svg;
+  const gap = Math.max(3, groupWidth * .06);
 
+  let svg = `
+    <svg class="chartsvg" viewBox="0 0 ${W} ${H}">
+  `;
+
+  for (let i = 0; i <= 4; i++) {
+    const percentage = i / 4;
+    const y = T + chartHeight - chartHeight * percentage;
+
+    svg += `
+      <line
+        x1="${L}" y1="${y}"
+        x2="${W-R}" y2="${y}"
+        stroke="#ccc"
+        stroke-dasharray="4 4"
+      ></line>
+
+      <text
+        class="chartlabel"
+        x="${L-8}"
+        y="${y+4}"
+        fill="#cbd5e1"
+        font-size="11"
+        text-anchor="end"
+      >${Math.round(max * percentage)}</text>
+    `;
+  }
+
+  data.forEach((item, index) => {
+    const center =
+      L + groupWidth * index + groupWidth / 2;
+
+    const rewardHeight =
+      item.reward / max * chartHeight;
+
+    const violationHeight =
+      item.violation / max * chartHeight;
+
+    const rewardX = center - barWidth - gap / 2;
+    const violationX = center + gap / 2;
+
+    const rewardY =
+      T + chartHeight - rewardHeight;
+
+    const violationY =
+      T + chartHeight - violationHeight;
+
+    svg += `
+      <rect
+        class="barreward"
+        x="${rewardX}"
+        y="${rewardY}"
+        width="${barWidth}"
+        height="${rewardHeight}"
+        fill="#16a34a"
+        rx="3"
+      ></rect>
+
+      <rect
+        class="barviolation"
+        x="${violationX}"
+        y="${violationY}"
+        width="${barWidth}"
+        height="${violationHeight}"
+        fill="#dc2626"
+        rx="3"
+      ></rect>
+    `;
+
+    if (item.reward) {
+      svg += `
+        <text
+          class="chartvalue"
+          x="${rewardX + barWidth/2}"
+          y="${Math.max(12,rewardY-5)}"
+          fill="#fff"
+          font-size="11"
+          text-anchor="middle"
+        >${item.reward}</text>
+      `;
+    }
+
+    if (item.violation) {
+      svg += `
+        <text
+          class="chartvalue"
+          x="${violationX + barWidth/2}"
+          y="${Math.max(12,violationY-5)}"
+          fill="#fff"
+          font-size="11"
+          text-anchor="middle"
+        >${item.violation}</text>
+      `;
+    }
+
+    let label = String(item.label || "-");
+
+    if (label.length > 14) {
+      label = label.slice(0,13) + "…";
+    }
+
+    svg += `
+      <text
+        class="chartlabel"
+        x="${center}"
+        y="${H-24}"
+        fill="#cbd5e1"
+        font-size="11"
+        text-anchor="middle"
+      >${esc(label)}</text>
+    `;
+  });
+
+  $("chart").innerHTML = svg + "</svg>";
 }
 
+/* ================= NAMA FILE ================= */
 
-/* =========================================================
-   TARGET EXPORT
-========================================================= */
+function targetName() {
+  if (!reportData) return "rekap";
 
-function getTargetName() {
-
-  if (!latestReport) {
-    return "rekap";
+  if (reportData.tipe === "siswa") {
+    return students.find(
+      item => String(item.id) === String($("siswa").value)
+    )?.nama || "siswa";
   }
 
+  if (reportData.tipe === "kelas") {
+    const selected = classes.find(
+      item => String(item.id) === String($("kelas").value)
+    );
 
-  if (
-    latestReport.tipe ===
-    "siswa"
-  ) {
-
-    const siswa =
-      daftarSiswa.find(
-        function(item) {
-
-          return String(item.id) ===
-            String(siswaSelect.value);
-
-        }
-      );
-
-
-    return siswa
-      ? siswa.nama
-      : "siswa";
-
+    return selected?.nama_kelas ||
+      selected?.nama ||
+      "kelas";
   }
-
-
-  if (
-    latestReport.tipe ===
-    "kelas"
-  ) {
-
-    const kelas =
-      daftarKelas.find(
-        function(item) {
-
-          return String(item.id) ===
-            String(kelasSelect.value);
-
-        }
-      );
-
-
-    return kelas
-      ? (
-          kelas.nama_kelas ||
-          kelas.nama ||
-          "kelas"
-        )
-      : "kelas";
-
-  }
-
 
   return "sekolah";
-
 }
 
-
-/* =========================================================
-   SANITIZE FILE NAME
-========================================================= */
-
-function sanitizeFileName(value) {
-
-  return String(
-    value || ""
-  )
-  .trim()
-  .replace(
-    /[^a-zA-Z0-9_-]+/g,
-    "-"
-  )
-  .replace(
-    /^-+|-+$/g,
-    ""
-  )
-  .toLowerCase() ||
-  "rekap";
-
+function safeName(value) {
+  return String(value || "rekap")
+    .trim()
+    .replace(/[^a-z0-9_-]+/gi,"-")
+    .replace(/^-+|-+$/g,"")
+    .toLowerCase() || "rekap";
 }
 
-
-/* =========================================================
-   DOWNLOAD
-========================================================= */
-
-function downloadBlob(
-  blob,
-  filename
-) {
-
-  const url =
-    URL.createObjectURL(blob);
-
-
-  const link =
-    document.createElement("a");
-
+function download(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
 
   link.href = url;
+  link.download = filename;
 
-  link.download =
-    filename;
-
-
-  document.body.appendChild(
-    link
-  );
-
-
+  document.body.appendChild(link);
   link.click();
-
-
   link.remove();
 
-
-  setTimeout(
-    function() {
-
-      URL.revokeObjectURL(
-        url
-      );
-
-    },
-    1000
-  );
-
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+/* ================= DATA EKSPOR CSV/XLS ================= */
 
-/* =========================================================
-   CSV
-========================================================= */
+function exportRows() {
+  const report = reportData;
 
-function csvCell(value) {
+  const rows = [
+    ["REKAP POIN LENTERA SMANTI"],
+    ["Tanggal Mulai", report.periode?.mulai],
+    ["Tanggal Akhir", report.periode?.akhir],
+    ["Jenis Rekap", report.tipe],
+    ["Target", targetName()],
+    [],
+    ["RINGKASAN"],
+    ["Jumlah Siswa", report.ringkasan?.jumlahSiswa],
+    ["Total Penghargaan", report.ringkasan?.totalPenghargaan],
+    ["Total Pelanggaran", report.ringkasan?.totalPelanggaran],
+    ["Poin Bersih", report.ringkasan?.totalBersih],
+    ["Total Transaksi", report.ringkasan?.totalTransaksi],
+    []
+  ];
 
-  const text =
-    String(
-      value ?? ""
+  if (report.tipe === "kelas") {
+    rows.push(
+      ["REKAP PER KELAS"],
+      [
+        "Kelas",
+        "Jumlah Siswa",
+        "Penghargaan",
+        "Pelanggaran",
+        "Poin Bersih",
+        "Transaksi"
+      ]
     );
 
-  return (
-    '"' +
-    text.replace(
-      /"/g,
-      '""'
-    ) +
-    '"'
-  );
-
-}
-
-
-function csvRow(values) {
-
-  return values
-    .map(csvCell)
-    .join(",");
-
-}
-
-
-/* =========================================================
-   BUILD CSV
-========================================================= */
-
-function buildCSV() {
-
-  const report =
-    latestReport;
-
-  const rows = [];
-
-
-  rows.push([
-    "REKAP POIN LENTERA SMANTI"
-  ]);
-
-
-  rows.push([
-    "Periode Mulai",
-    report.periode.mulai
-  ]);
-
-
-  rows.push([
-    "Periode Akhir",
-    report.periode.akhir
-  ]);
-
-
-  rows.push([
-    "Jenis Rekap",
-    report.tipe === "siswa"
-      ? "Per Siswa"
-      : report.tipe === "kelas"
-        ? "Per Kelas"
-        : "Satu Sekolah"
-  ]);
-
-
-  rows.push([
-    "Target",
-    getTargetName()
-  ]);
-
-
-  rows.push([]);
-
-
-  rows.push([
-    "RINGKASAN"
-  ]);
-
-
-  rows.push([
-    "Jumlah Siswa",
-    report.ringkasan.jumlahSiswa
-  ]);
-
-
-  rows.push([
-    "Total Penghargaan",
-    report.ringkasan.totalPenghargaan
-  ]);
-
-
-  rows.push([
-    "Total Pelanggaran",
-    report.ringkasan.totalPelanggaran
-  ]);
-
-
-  rows.push([
-    "Poin Bersih",
-    report.ringkasan.totalBersih
-  ]);
-
-
-  rows.push([
-    "Total Transaksi",
-    report.ringkasan.totalTransaksi
-  ]);
-
-
-  rows.push([]);
-
-
-  if (
-    report.tipe ===
-    "kelas"
-  ) {
-
-    rows.push([
-      "REKAP PER KELAS"
-    ]);
-
-
-    rows.push([
-      "Kelas",
-      "Jumlah Siswa",
-      "Penghargaan",
-      "Pelanggaran",
-      "Poin Bersih",
-      "Transaksi"
-    ]);
-
-
-    (
-      report.kelas || []
-    ).forEach(
-      function(item) {
-
-        rows.push([
-          item.kelas,
-          item.jumlahSiswa,
-          item.penghargaan,
-          item.pelanggaran,
-          item.total,
-          item.transaksi
-        ]);
-
-      }
-    );
-
-  }
-  else {
-
-    rows.push([
-      report.tipe === "siswa"
-        ? "REKAP PER SISWA"
-        : "REKAP SATU SEKOLAH"
-    ]);
-
-
-    rows.push([
-      "NISN",
-      "Nama",
-      "Kelas",
-      "Penghargaan",
-      "Pelanggaran",
-      "Poin Bersih",
-      "Transaksi"
-    ]);
-
-
-    (
-      report.siswa || []
-    ).forEach(
-      function(item) {
-
-        rows.push([
-          item.nisn,
-          item.nama,
-          item.kelas,
-          item.penghargaan,
-          item.pelanggaran,
-          item.total,
-          item.transaksi
-        ]);
-
-      }
-    );
-
-  }
-
-
-  rows.push([]);
-
-
-  rows.push([
-    "DETAIL TRANSAKSI"
-  ]);
-
-
-  rows.push([
-    "Tanggal",
-    "NISN",
-    "Nama",
-    "Kelas",
-    "Jenis",
-    "Poin",
-    "Keterangan",
-    "Dibuat Oleh",
-    "Peran"
-  ]);
-
-
-  (
-    report.transaksi || []
-  ).forEach(
-    function(item) {
-
+    (report.kelas || []).forEach(item => {
       rows.push([
-        item.tanggal,
+        item.kelas,
+        item.jumlahSiswa,
+        item.penghargaan,
+        item.pelanggaran,
+        item.total,
+        item.transaksi
+      ]);
+    });
+
+    rows.push(
+      [],
+      ["REKAP POIN SETIAP SISWA"],
+      [
+        "NISN",
+        "Nama",
+        "Kelas",
+        "Penghargaan",
+        "Pelanggaran",
+        "Poin Bersih",
+        "Transaksi"
+      ]
+    );
+
+    classRows.forEach(item => {
+      rows.push([
         item.nisn,
         item.nama,
         item.kelas,
-        item.jenis,
-        item.poin,
-        item.keterangan,
-        item.dibuatOleh,
-        item.peran
+        item.penghargaan,
+        item.pelanggaran,
+        item.total,
+        item.transaksi
       ]);
+    });
 
-    }
-  );
-
-
-  return (
-    "\uFEFF" +
-    rows
-      .map(csvRow)
-      .join("\r\n")
-  );
-
-}
-
-
-/* =========================================================
-   EXPORT CSV
-========================================================= */
-
-function exportCSV() {
-
-  if (!latestReport) {
-
-    alert(
-      "Tampilkan rekap terlebih dahulu."
+  } else {
+    rows.push(
+      ["REKAP SISWA"],
+      [
+        "NISN",
+        "Nama",
+        "Kelas",
+        "Penghargaan",
+        "Pelanggaran",
+        "Poin Bersih",
+        "Transaksi"
+      ]
     );
 
-    return;
-
+    (report.siswa || []).forEach(item => {
+      rows.push([
+        item.nisn,
+        item.nama,
+        item.kelas,
+        item.penghargaan,
+        item.pelanggaran,
+        item.total,
+        item.transaksi
+      ]);
+    });
   }
 
-
-  const target =
-    sanitizeFileName(
-      getTargetName()
-    );
-
-
-  const filename =
-    `rekap-poin-${target}-${latestReport.periode.mulai}-${latestReport.periode.akhir}.csv`;
-
-
-  const csv =
-    buildCSV();
-
-
-  const blob =
-    new Blob(
-      [csv],
-      {
-        type:
-          "text/csv;charset=utf-8"
-      }
-    );
-
-
-  downloadBlob(
-    blob,
-    filename
+  rows.push(
+    [],
+    ["DETAIL TRANSAKSI"],
+    [
+      "Tanggal",
+      "NISN",
+      "Nama",
+      "Kelas",
+      "Jenis",
+      "Poin",
+      "Keterangan",
+      "Dibuat Oleh",
+      "Peran"
+    ]
   );
 
+  (report.transaksi || []).forEach(item => {
+    rows.push([
+      item.tanggal,
+      item.nisn,
+      item.nama,
+      item.kelas,
+      item.jenis,
+      item.poin,
+      item.keterangan,
+      item.dibuatOleh,
+      item.peran
+    ]);
+  });
+
+  return rows;
 }
 
+/* ================= EKSPOR CSV ================= */
 
-/* =========================================================
-   BUILD XLS
-========================================================= */
+$("csv").addEventListener("click", () => {
+  if (!reportData) {
+    alert("Tampilkan rekap terlebih dahulu.");
+    return;
+  }
 
-function buildXLS() {
+  const rows = exportRows();
 
-  const report =
-    latestReport;
+  const csv = "\uFEFF" + rows.map(row =>
+    row.map(value =>
+      '"' + String(value ?? "").replace(/"/g,'""') + '"'
+    ).join(",")
+  ).join("\r\n");
 
-  let html = "";
+  const filename =
+    `rekap-${safeName(targetName())}-${reportData.periode.mulai}-${reportData.periode.akhir}.csv`;
 
+  download(
+    new Blob([csv], {
+      type: "text/csv;charset=utf-8"
+    }),
+    filename
+  );
+});
 
-  html += `
+/* ================= EKSPOR XLS ================= */
+
+$("xls").addEventListener("click", () => {
+  if (!reportData) {
+    alert("Tampilkan rekap terlebih dahulu.");
+    return;
+  }
+
+  const rows = exportRows();
+
+  let html = `
     <!DOCTYPE html>
-
     <html>
-
     <head>
-
       <meta charset="UTF-8">
-
-      <style>
-
-        body {
-          font-family: Arial, sans-serif;
-        }
-
-        h1 {
-          font-size: 20px;
-        }
-
-        h2 {
-          font-size: 15px;
-          background: #1c2541;
-          color: #fff;
-          padding: 7px;
-        }
-
-        table {
-          border-collapse: collapse;
-          margin-bottom: 25px;
-        }
-
-        th,
-        td {
-          border: 1px solid #999;
-          padding: 7px;
-        }
-
-        th {
-          background: #fbc02d;
-          color: #000;
-          font-weight: bold;
-        }
-
-      </style>
-
     </head>
-
     <body>
-
-      <h1>
-        REKAP POIN LENTERA SMANTI
-      </h1>
-
-      <p>
-        <b>Periode:</b>
-        ${escapeXml(report.periode.mulai)}
-        s/d
-        ${escapeXml(report.periode.akhir)}
-      </p>
-
-      <p>
-        <b>Jenis Rekap:</b>
-        ${
-          report.tipe === "siswa"
-            ? "Per Siswa"
-            : report.tipe === "kelas"
-              ? "Per Kelas"
-              : "Satu Sekolah"
-        }
-      </p>
-
-      <p>
-        <b>Target:</b>
-        ${escapeXml(getTargetName())}
-      </p>
+      <table border="1">
   `;
 
+  rows.forEach(row => {
+    html += "<tr>";
 
-  /* ================= RINGKASAN ================= */
+    row.forEach(value => {
+      html += `<td>${esc(value)}</td>`;
+    });
+
+    html += "</tr>";
+  });
 
   html += `
-
-    <h2>
-      RINGKASAN
-    </h2>
-
-    <table>
-
-      <tr>
-
-        <th>Jumlah Siswa</th>
-        <th>Total Penghargaan</th>
-        <th>Total Pelanggaran</th>
-        <th>Poin Bersih</th>
-        <th>Total Transaksi</th>
-
-      </tr>
-
-      <tr>
-
-        <td>
-          ${numberValue(
-            report.ringkasan.jumlahSiswa
-          )}
-        </td>
-
-        <td>
-          ${numberValue(
-            report.ringkasan.totalPenghargaan
-          )}
-        </td>
-
-        <td>
-          ${numberValue(
-            report.ringkasan.totalPelanggaran
-          )}
-        </td>
-
-        <td>
-          ${numberValue(
-            report.ringkasan.totalBersih
-          )}
-        </td>
-
-        <td>
-          ${numberValue(
-            report.ringkasan.totalTransaksi
-          )}
-        </td>
-
-      </tr>
-
-    </table>
-
-  `;
-
-
-  /* ================= KELAS ================= */
-
-  if (
-    report.tipe ===
-    "kelas"
-  ) {
-
-    html += `
-
-      <h2>
-        REKAP PER KELAS
-      </h2>
-
-      <table>
-
-        <tr>
-
-          <th>Kelas</th>
-          <th>Jumlah Siswa</th>
-          <th>Penghargaan</th>
-          <th>Pelanggaran</th>
-          <th>Poin Bersih</th>
-          <th>Transaksi</th>
-
-        </tr>
-
-    `;
-
-
-    (
-      report.kelas || []
-    ).forEach(
-      function(item) {
-
-        html += `
-
-          <tr>
-
-            <td>
-              ${escapeXml(item.kelas)}
-            </td>
-
-            <td>
-              ${numberValue(item.jumlahSiswa)}
-            </td>
-
-            <td>
-              ${numberValue(item.penghargaan)}
-            </td>
-
-            <td>
-              ${numberValue(item.pelanggaran)}
-            </td>
-
-            <td>
-              ${numberValue(item.total)}
-            </td>
-
-            <td>
-              ${numberValue(item.transaksi)}
-            </td>
-
-          </tr>
-
-        `;
-
-      }
-    );
-
-
-    html += `
       </table>
-    `;
-
-  }
-
-
-  /* ================= SISWA / SEKOLAH ================= */
-
-  else {
-
-    html += `
-
-      <h2>
-        ${
-          report.tipe === "siswa"
-            ? "REKAP PER SISWA"
-            : "REKAP SATU SEKOLAH"
-        }
-      </h2>
-
-      <table>
-
-        <tr>
-
-          <th>NISN</th>
-          <th>Nama</th>
-          <th>Kelas</th>
-          <th>Penghargaan</th>
-          <th>Pelanggaran</th>
-          <th>Poin Bersih</th>
-          <th>Transaksi</th>
-
-        </tr>
-
-    `;
-
-
-    (
-      report.siswa || []
-    ).forEach(
-      function(item) {
-
-        html += `
-
-          <tr>
-
-            <td>
-              ${escapeXml(item.nisn)}
-            </td>
-
-            <td>
-              ${escapeXml(item.nama)}
-            </td>
-
-            <td>
-              ${escapeXml(item.kelas)}
-            </td>
-
-            <td>
-              ${numberValue(item.penghargaan)}
-            </td>
-
-            <td>
-              ${numberValue(item.pelanggaran)}
-            </td>
-
-            <td>
-              ${numberValue(item.total)}
-            </td>
-
-            <td>
-              ${numberValue(item.transaksi)}
-            </td>
-
-          </tr>
-
-        `;
-
-      }
-    );
-
-
-    html += `
-      </table>
-    `;
-
-  }
-
-
-  /* ================= DETAIL ================= */
-
-  html += `
-
-    <h2>
-      DETAIL TRANSAKSI
-    </h2>
-
-    <table>
-
-      <tr>
-
-        <th>Tanggal</th>
-        <th>NISN</th>
-        <th>Nama</th>
-        <th>Kelas</th>
-        <th>Jenis</th>
-        <th>Poin</th>
-        <th>Keterangan</th>
-        <th>Dibuat Oleh</th>
-        <th>Peran</th>
-
-      </tr>
-
-  `;
-
-
-  (
-    report.transaksi || []
-  ).forEach(
-    function(item) {
-
-      html += `
-
-        <tr>
-
-          <td>
-            ${escapeXml(item.tanggal)}
-          </td>
-
-          <td>
-            ${escapeXml(item.nisn)}
-          </td>
-
-          <td>
-            ${escapeXml(item.nama)}
-          </td>
-
-          <td>
-            ${escapeXml(item.kelas)}
-          </td>
-
-          <td>
-            ${escapeXml(item.jenis)}
-          </td>
-
-          <td>
-            ${numberValue(item.poin)}
-          </td>
-
-          <td>
-            ${escapeXml(item.keterangan)}
-          </td>
-
-          <td>
-            ${escapeXml(
-              item.dibuatOleh || "-"
-            )}
-          </td>
-
-          <td>
-            ${escapeXml(
-              item.peran || "-"
-            )}
-          </td>
-
-        </tr>
-
-      `;
-
-    }
-  );
-
-
-  html += `
-
-      </table>
-
     </body>
-
     </html>
-
   `;
-
-
-  return html;
-
-}
-
-
-/* =========================================================
-   EXPORT XLS
-========================================================= */
-
-function exportXLS() {
-
-  if (!latestReport) {
-
-    alert(
-      "Tampilkan rekap terlebih dahulu."
-    );
-
-    return;
-
-  }
-
-
-  const target =
-    sanitizeFileName(
-      getTargetName()
-    );
-
 
   const filename =
-    `rekap-poin-${target}-${latestReport.periode.mulai}-${latestReport.periode.akhir}.xls`;
+    `rekap-${safeName(targetName())}-${reportData.periode.mulai}-${reportData.periode.akhir}.xls`;
 
-
-  const xls =
-    buildXLS();
-
-
-  const blob =
-    new Blob(
-      [xls],
-      {
-        type:
-          "application/vnd.ms-excel;charset=utf-8"
-      }
-    );
-
-
-  downloadBlob(
-    blob,
+  download(
+    new Blob([html], {
+      type: "application/vnd.ms-excel;charset=utf-8"
+    }),
     filename
   );
+});
 
-}
+/* ================= EVENT ================= */
 
+$("show").addEventListener("click", showReport);
 
-/* =========================================================
-   EVENT
-========================================================= */
+$("print").addEventListener("click", () => {
+  window.print();
+});
 
-tampilkanBtn.addEventListener(
-  "click",
-  tampilkanRekap
-);
+/* ================= MULAI ================= */
 
-
-exportXlsBtn.addEventListener(
-  "click",
-  exportXLS
-);
-
-
-exportCsvBtn.addEventListener(
-  "click",
-  exportCSV
-);
-
-
-cetakBtn.addEventListener(
-  "click",
-  function() {
-
-    window.print();
-
-  }
-);
-
-
-/* =========================================================
-   LOAD AWAL
-========================================================= */
-
-loadDataMaster();
-
+loadMaster();
 </script>
 
 </body>
