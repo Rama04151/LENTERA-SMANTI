@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manajemen Vote - LENTERA SMANTI</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:#0b132b;
+  --card:rgba(28,37,65,.88);
+  --border:rgba(255,255,255,.09);
+  --gold:#fbc02d;
+  --gold2:#f57f17;
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --input:rgba(11,19,43,.75);
+  --green:#22c55e;
+  --red:#ef4444;
+  --blue:#60a5fa;
+}
+
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+
+body {
+  min-height:100vh;
+  padding:22px 14px;
+  background:var(--bg);
+  background-image:
+    radial-gradient(circle at 10% 10%,rgba(251,192,45,.08),transparent 40%),
+    radial-gradient(circle at 90% 90%,rgba(28,37,65,.8),transparent 50%);
+  color:var(--text);
+}
+
+.container {
+  width:100%;
+  max-width:1000px;
+  margin:auto;
+}
+
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:22px;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo {
+  width:46px;
+  height:46px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--gold),#d48806);
+  color:var(--bg);
+  font-size:22px;
+  font-weight:800;
+}
+
+.brand h1 {
+  font-size:18px;
+  font-weight:800;
+}
+
+.brand p {
+  color:var(--gold);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1px;
+  margin-top:3px;
+}
+
+.back-btn {
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.04);
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:11px;
+  cursor:pointer;
+  font-weight:700;
+  font-size:12px;
+}
+
+.back-btn:hover {
+  border-color:var(--gold);
+  color:var(--gold);
+}
+
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 15px 35px rgba(0,0,0,.2);
+}
+
+.title {
+  margin-bottom:18px;
+}
+
+.title h2 {
+  color:var(--gold);
+  font-size:19px;
+  font-weight:800;
+}
+
+.title p {
+  color:var(--muted);
+  font-size:12px;
+  margin-top:5px;
+  line-height:1.6;
+}
+
+.form-group {
+  margin-bottom:15px;
+}
+
+label {
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:700;
+  margin-bottom:7px;
+}
+
+input,textarea,select {
+  width:100%;
+  padding:12px 13px;
+  background:var(--input);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:11px;
+  outline:none;
+  font-size:13px;
+}
+
+input:focus,textarea:focus,select:focus {
+  border-color:var(--gold);
+}
+
+textarea {
+  min-height:85px;
+  resize:vertical;
+}
+
+select option {
+  background:var(--bg);
+}
+
+.options-list {
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+
+.option-input {
+  display:flex;
+  gap:8px;
+}
+
+.option-input input {
+  flex:1;
+}
+
+.remove-option {
+  width:42px;
+  flex-shrink:0;
+  border:1px solid rgba(239,68,68,.3);
+  background:rgba(239,68,68,.1);
+  color:#f87171;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:17px;
+}
+
+.add-option {
+  width:100%;
+  padding:11px;
+  border:1px dashed rgba(251,192,45,.4);
+  background:rgba(251,192,45,.05);
+  color:var(--gold);
+  border-radius:10px;
+  margin-top:10px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:700;
+}
+
+.settings {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin:18px 0;
+}
+
+.setting {
+  display:flex;
+  align-items:flex-start;
+  gap:9px;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+}
+
+.setting input {
+  width:16px;
+  height:16px;
+  margin-top:2px;
+  accent-color:var(--gold);
+  flex-shrink:0;
+}
+
+.setting span {
+  font-size:11px;
+  line-height:1.5;
+  color:var(--text);
+}
+
+.primary-btn {
+  width:100%;
+  border:0;
+  padding:14px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--gold),#d48806);
+  color:#0b132b;
+  font-weight:800;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.primary-btn:hover {
+  filter:brightness(1.08);
+}
+
+.primary-btn:disabled {
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.event-list {
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.event-card {
+  border:1px solid var(--border);
+  background:rgba(11,19,43,.45);
+  border-radius:16px;
+  padding:17px;
+}
+
+.event-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.event-title {
+  font-size:15px;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+
+.event-description {
+  color:var(--muted);
+  font-size:11px;
+  margin-top:5px;
+  line-height:1.6;
+  white-space:pre-wrap;
+}
+
+.status {
+  padding:6px 10px;
+  border-radius:30px;
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.status.active {
+  color:#4ade80;
+  background:rgba(34,197,94,.12);
+}
+
+.status.closed {
+  color:#f87171;
+  background:rgba(239,68,68,.12);
+}
+
+.event-stats {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin:15px 0;
+}
+
+.stat {
+  padding:11px 7px;
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--border);
+  border-radius:10px;
+  text-align:center;
+}
+
+.stat strong {
+  display:block;
+  color:var(--gold);
+  font-size:17px;
+}
+
+.stat span {
+  display:block;
+  color:var(--muted);
+  font-size:9px;
+  margin-top:4px;
+}
+
+.result-title {
+  font-size:12px;
+  color:var(--gold);
+  font-weight:800;
+  margin:18px 0 12px;
+}
+
+.result-row {
+  margin-bottom:13px;
+}
+
+.result-head {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:11px;
+  margin-bottom:6px;
+}
+
+.result-head span:first-child {
+  overflow-wrap:anywhere;
+}
+
+.result-head span:last-child {
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+.progress {
+  height:8px;
+  border-radius:20px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+}
+
+.progress-bar {
+  height:100%;
+  border-radius:20px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+}
+
+.event-options {
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin-top:15px;
+}
+
+.option-admin {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:9px 11px;
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--border);
+  border-radius:9px;
+}
+
+.option-admin span {
+  font-size:11px;
+  overflow-wrap:anywhere;
+}
+
+.option-admin button {
+  border:0;
+  background:transparent;
+  color:#f87171;
+  cursor:pointer;
+  font-size:11px;
+  font-weight:800;
+  flex-shrink:0;
+}
+
+.add-option-inline {
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.add-option-inline input {
+  flex:1;
+}
+
+.add-option-inline button {
+  padding:0 14px;
+  border:1px solid rgba(251,192,45,.3);
+  background:rgba(251,192,45,.1);
+  color:var(--gold);
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:800;
+}
+
+.actions {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:15px;
+}
+
+.action-btn {
+  padding:10px 7px;
+  border-radius:9px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.04);
+  color:var(--text);
+  cursor:pointer;
+  font-size:10px;
+  font-weight:800;
+}
+
+.action-btn:hover {
+  border-color:var(--gold);
+}
+
+.action-btn.open {
+  color:#4ade80;
+  border-color:rgba(34,197,94,.25);
+  background:rgba(34,197,94,.08);
+}
+
+.action-btn.close {
+  color:#fca5a5;
+  border-color:rgba(239,68,68,.25);
+  background:rgba(239,68,68,.08);
+}
+
+.action-btn.delete {
+  color:#f87171;
+  border-color:rgba(239,68,68,.25);
+}
+
+.empty {
+  text-align:center;
+  padding:35px 15px;
+  color:var(--muted);
+  font-size:12px;
+  border:1px dashed var(--border);
+  border-radius:14px;
+}
+
+.notice {
+  display:none;
+  padding:12px 14px;
+  margin-bottom:15px;
+  border-radius:10px;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.notice.show {
+  display:block;
+}
+
+.notice.success {
+  color:#4ade80;
+  background:rgba(34,197,94,.1);
+  border:1px solid rgba(34,197,94,.2);
+}
+
+.notice.error {
+  color:#fca5a5;
+  background:rgba(239,68,68,.1);
+  border:1px solid rgba(239,68,68,.2);
+}
+
+.loading {
+  text-align:center;
+  color:var(--muted);
+  padding:25px;
+  font-size:12px;
+}
+
+@media(max-width:600px) {
+  body {
+    padding:15px 10px;
+  }
+
+  .card {
+    padding:17px;
+  }
+
+  .brand h1 {
+    font-size:15px;
+  }
+
+  .settings {
+    grid-template-columns:1fr;
+  }
+
+  .event-stats {
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .actions {
+    grid-template-columns:1fr 1fr;
+  }
+
+  .actions .delete {
+    grid-column:1/-1;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="container">
+
+  <header class="header">
+    <div class="brand">
+      <div class="logo">L</div>
+      <div>
+        <h1>LENTERA SMANTI</h1>
+        <p>MANAJEMEN VOTING</p>
+      </div>
+    </div>
+
+    <button class="back-btn" onclick="location.href='admin.html'">
+      ← Kembali
+    </button>
+  </header>
+
+  <section class="card">
+    <div class="title">
+      <h2>＋ Buat Event Voting</h2>
+      <p>Buat event pemungutan suara dan tentukan pilihan yang tersedia bagi siswa.</p>
+    </div>
+
+    <div id="noticeCreate" class="notice"></div>
+
+    <form id="createForm">
+
+      <div class="form-group">
+        <label for="judul">Judul Event</label>
+        <input id="judul" type="text" maxlength="150"
+          placeholder="Contoh: Pemilihan Ketua OSIS" required>
+      </div>
+
+      <div class="form-group">
+        <label for="deskripsi">Deskripsi Event</label>
+        <textarea id="deskripsi" maxlength="1000"
+          placeholder="Tuliskan keterangan atau petunjuk voting..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Opsi Voting</label>
+
+        <div id="optionsList" class="options-list">
+          <div class="option-input">
+            <input type="text" class="option-field"
+              maxlength="150" placeholder="Opsi 1" required>
+          </div>
+
+          <div class="option-input">
+            <input type="text" class="option-field"
+              maxlength="150" placeholder="Opsi 2" required>
+          </div>
+        </div>
+
+        <button type="button" class="add-option" id="addOptionBtn">
+          ＋ Tambah Opsi
+        </button>
+      </div>
+
+      <div class="settings">
+
+        <label class="setting">
+          <input type="checkbox" id="bolehPilihBanyak">
+          <span>
+            <strong>Pilihan Ganda</strong><br>
+            Siswa dapat memilih lebih dari satu opsi.
+          </span>
+        </label>
+
+        <label class="setting">
+          <input type="checkbox" id="bolehGantiPilihan">
+          <span>
+            <strong>Ubah Pilihan</strong><br>
+            Siswa dapat mengubah suaranya.
+          </span>
+        </label>
+
+        <label class="setting">
+          <input type="checkbox" id="tampilkanHasilSiswa">
+          <span>
+            <strong>Tampilkan Hasil</strong><br>
+            Siswa dapat melihat hasil voting.
+          </span>
+        </label>
+
+      </div>
+
+      <button type="submit" class="primary-btn" id="createBtn">
+        BUAT EVENT VOTING
+      </button>
+
+    </form>
+  </section>
+
+  <section class="card">
+
+    <div class="title">
+      <h2>📊 Daftar Event Voting</h2>
+      <p>Kelola event, pantau partisipasi siswa, dan lihat hasil pemungutan suara.</p>
+    </div>
+
+    <div id="noticeList" class="notice"></div>
+
+    <div id="eventList" class="event-list">
+      <div class="loading">Memuat data voting...</div>
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+// =====================================================
+// AUTH ADMIN
+// =====================================================
+
+const session = sessionStorage.getItem("lentera_admin_session");
+
+if (!session) {
+  window.location.replace("admin-login.html");
+}
+
+let admin = {};
+
+try {
+  admin = JSON.parse(session);
+  if (!admin || !admin.username) {
+    throw new Error("Sesi admin tidak valid.");
+  }
+} catch (error) {
+  sessionStorage.removeItem("lentera_admin_session");
+  window.location.replace("admin-login.html");
+}
+
+// =====================================================
+// ELEMENT
+// =====================================================
+
+const createForm = document.getElementById("createForm");
+const optionsList = document.getElementById("optionsList");
+const eventList = document.getElementById("eventList");
+const createBtn = document.getElementById("createBtn");
+
+let eventsData = [];
+
+// =====================================================
+// NOTICE
+// =====================================================
+
+function showNotice(id, message, type = "success") {
+  const el = document.getElementById(id);
+
+  el.textContent = message;
+  el.className = "notice show " + type;
+
+  setTimeout(() => {
+    el.classList.remove("show");
+  }, 4500);
+}
+
+// =====================================================
+// API
+// =====================================================
+
+async function apiRequest(method = "GET", data = null) {
+  const options = {
+    method,
+    headers: {
+      "Content-Type": "application/json"
+    }
+  };
+
+  if (data !== null) {
+    options.body = JSON.stringify(data);
+  }
+
+  const response = await fetch(
+    "/.netlify/functions/admin-vote",
+    options
+  );
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(
+      result.message || "Terjadi kesalahan server."
+    );
+  }
+
+  return result;
+}
+
+// =====================================================
+// TAMBAH INPUT OPSI
+// =====================================================
+
+function addOptionInput(value = "") {
+  const wrapper = document.createElement("div");
+  wrapper.className = "option-input";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "option-field";
+  input.maxLength = 150;
+  input.placeholder = "Nama opsi...";
+  input.value = value;
+
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "remove-option";
+  remove.textContent = "×";
+  remove.title = "Hapus opsi";
+
+  remove.addEventListener("click", () => {
+    if (optionsList.children.length <= 2) {
+      alert("Minimal harus ada 2 opsi.");
+      return;
+    }
+
+    wrapper.remove();
+  });
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(remove);
+  optionsList.appendChild(wrapper);
+}
+
+document.getElementById("addOptionBtn").onclick = () => {
+  addOptionInput();
+};
+
+// =====================================================
+// BUAT EVENT
+// =====================================================
+
+createForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const judul = document.getElementById("judul").value.trim();
+  const deskripsi = document.getElementById("deskripsi").value.trim();
+
+  const opsi = Array.from(
+    document.querySelectorAll(".option-field")
+  )
+    .map(input => input.value.trim())
+    .filter(Boolean);
+
+  if (!judul) {
+    showNotice("noticeCreate", "Judul event wajib diisi.", "error");
+    return;
+  }
+
+  if (opsi.length < 2) {
+    showNotice("noticeCreate", "Minimal harus ada 2 opsi.", "error");
+    return;
+  }
+
+  const uniqueOptions = opsi.map(x => x.toLowerCase());
+
+  if (new Set(uniqueOptions).size !== uniqueOptions.length) {
+    showNotice("noticeCreate", "Nama opsi tidak boleh sama.", "error");
+    return;
+  }
+
+  createBtn.disabled = true;
+  createBtn.textContent = "MENYIMPAN...";
+
+  try {
+    await apiRequest("POST", {
+      judul,
+      deskripsi,
+      opsi,
+      bolehPilihBanyak:
+        document.getElementById("bolehPilihBanyak").checked,
+      bolehGantiPilihan:
+        document.getElementById("bolehGantiPilihan").checked,
+      tampilkanHasilSiswa:
+        document.getElementById("tampilkanHasilSiswa").checked,
+      admin: admin.username
+    });
+
+    createForm.reset();
+
+    optionsList.innerHTML = "";
+    addOptionInput();
+    addOptionInput();
+
+    showNotice(
+      "noticeCreate",
+      "Event voting berhasil dibuat. Event masih tertutup sampai admin membukanya."
+    );
+
+    await loadEvents();
+
+  } catch (error) {
+    showNotice("noticeCreate", error.message, "error");
+  } finally {
+    createBtn.disabled = false;
+    createBtn.textContent = "BUAT EVENT VOTING";
+  }
+});
+
+// =====================================================
+// FORMAT ANGKA
+// =====================================================
+
+function numberFormat(value) {
+  return Number(value || 0).toLocaleString("id-ID");
+}
+
+// =====================================================
+// LOAD EVENTS
+// =====================================================
+
+async function loadEvents() {
+  eventList.innerHTML =
+    '<div class="loading">Memuat data voting...</div>';
+
+  try {
+    const result = await apiRequest("GET");
+    eventsData = Array.isArray(result.events) ? result.events : [];
+
+    renderEvents();
+
+  } catch (error) {
+    eventList.innerHTML = `
+      <div class="empty">
+        Gagal memuat data voting.<br><br>
+        ${escapeHTML(error.message)}
+      </div>
+    `;
+  }
+}
+
+// =====================================================
+// ESCAPE HTML
+// =====================================================
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
+}
+
+// =====================================================
+// RENDER EVENTS
+// =====================================================
+
+function renderEvents() {
+  if (!eventsData.length) {
+    eventList.innerHTML = `
+      <div class="empty">
+        Belum ada event voting.<br><br>
+        Buat event pertama melalui formulir di atas.
+      </div>
+    `;
+    return;
+  }
+
+  eventList.innerHTML = eventsData.map(ev => {
+    const active = ev.status === "Aktif";
+
+    const totalSuara = ev.opsi.reduce(
+      (total, op) => total + Number(op.jumlahSuara || 0),
+      0
+    );
+
+    const totalVoters = Number(ev.totalPemilih || 0);
+
+    const optionsHTML = ev.opsi.map(op => {
+      const votes = Number(op.jumlahSuara || 0);
+      const percentage = totalSuara
+        ? (votes / totalSuara) * 100
+        : 0;
+
+      return `
+        <div class="result-row">
+          <div class="result-head">
+            <span>${escapeHTML(op.namaOpsi)}</span>
+            <span>${numberFormat(votes)} suara · ${percentage.toFixed(1)}%</span>
+          </div>
+
+          <div class="progress">
+            <div class="progress-bar"
+              style="width:${percentage}%"></div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    const optionAdminHTML = ev.opsi.map(op => `
+      <div class="option-admin">
+        <span>${escapeHTML(op.namaOpsi)}</span>
+        <button type="button"
+          onclick="deleteOption('${escapeHTML(ev.id)}','${escapeHTML(op.id)}')">
+          Hapus
+        </button>
+      </div>
+    `).join("");
+
+    return `
+      <article class="event-card">
+
+        <div class="event-top">
+          <div>
+            <div class="event-title">${escapeHTML(ev.judul)}</div>
+            <div class="event-description">
+              ${escapeHTML(ev.deskripsi || "Tidak ada deskripsi.")}
+            </div>
+          </div>
+
+          <span class="status ${active ? "active" : "closed"}">
+            ${active ? "AKTIF" : "DITUTUP"}
+          </span>
+        </div>
+
+        <div class="event-stats">
+          <div class="stat">
+            <strong>${numberFormat(totalVoters)}</strong>
+            <span>Sudah Memilih</span>
+          </div>
+
+          <div class="stat">
+            <strong>${numberFormat(ev.belumMemilih)}</strong>
+            <span>Belum Memilih</span>
+          </div>
+
+          <div class="stat">
+            <strong>${numberFormat(ev.totalSiswaAktif)}</strong>
+            <span>Total Siswa Aktif</span>
+          </div>
+        </div>
+
+        <div class="result-title">
+          HASIL VOTING · ${numberFormat(totalSuara)} TOTAL SUARA
+        </div>
+
+        ${optionsHTML}
+
+        <div class="event-options">
+          <div class="result-title">PENGELOLAAN OPSI</div>
+
+          ${optionAdminHTML}
+
+          <div class="add-option-inline">
+            <input
+              type="text"
+              id="newOption-${escapeHTML(ev.id)}"
+              maxlength="150"
+              placeholder="Tambah opsi baru..."
+            >
+            <button type="button"
+              onclick="addEventOption('${escapeHTML(ev.id)}')">
+              ＋
+            </button>
+          </div>
+        </div>
+
+        <div class="event-description" style="margin-top:13px">
+          Mode: ${ev.bolehPilihBanyak ? "Pilihan ganda" : "Satu pilihan"}
+          · Ubah pilihan: ${ev.bolehGantiPilihan ? "Diizinkan" : "Tidak diizinkan"}
+          · Hasil siswa: ${ev.tampilkanHasilSiswa ? "Ditampilkan" : "Disembunyikan"}
+        </div>
+
+        <div class="actions">
+
+          <button type="button"
+            class="action-btn ${active ? "close" : "open"}"
+            onclick="changeStatus('${escapeHTML(ev.id)}','${active ? "Ditutup" : "Aktif"}')">
+            ${active ? "Tutup Voting" : "Buka Voting"}
+          </button>
+
+          <button type="button"
+            class="action-btn"
+            onclick="editEvent('${escapeHTML(ev.id)}')">
+            Edit Event
+          </button>
+
+          <button type="button"
+            class="action-btn delete"
+            onclick="deleteEvent('${escapeHTML(ev.id)}')">
+            Hapus Event
+          </button>
+
+        </div>
+
+      </article>
+    `;
+  }).join("");
+}
+
+// =====================================================
+// UBAH STATUS
+// =====================================================
+
+async function changeStatus(id, status) {
+  const message = status === "Aktif"
+    ? "Buka voting ini sekarang?"
+    : "Tutup voting ini sekarang?";
+
+  if (!confirm(message)) return;
+
+  try {
+    await apiRequest("PUT", {
+      id,
+      aksi: "status",
+      status
+    });
+
+    showNotice(
+      "noticeList",
+      status === "Aktif"
+        ? "Voting berhasil dibuka."
+        : "Voting berhasil ditutup."
+    );
+
+    await loadEvents();
+
+  } catch (error) {
+    showNotice("noticeList", error.message, "error");
+  }
+}
+
+// =====================================================
+// TAMBAH OPSI
+// =====================================================
+
+async function addEventOption(eventId) {
+  const input = document.getElementById("newOption-" + eventId);
+  const namaOpsi = input.value.trim();
+
+  if (!namaOpsi) {
+    alert("Nama opsi wajib diisi.");
+    return;
+  }
+
+  try {
+    await apiRequest("PUT", {
+      id: eventId,
+      aksi: "tambah_opsi",
+      namaOpsi
+    });
+
+    showNotice("noticeList", "Opsi berhasil ditambahkan.");
+    await loadEvents();
+
+  } catch (error) {
+    showNotice("noticeList", error.message, "error");
+  }
+}
+
+// =====================================================
+// HAPUS OPSI
+// =====================================================
+
+async function deleteOption(eventId, optionId) {
+  if (!confirm(
+    "Hapus opsi ini? Opsi yang sudah memiliki suara tidak dapat dihapus."
+  )) return;
+
+  try {
+    await apiRequest("DELETE", {
+      eventId,
+      optionId
+    });
+
+    showNotice("noticeList", "Opsi berhasil dihapus.");
+    await loadEvents();
+
+  } catch (error) {
+    showNotice("noticeList", error.message, "error");
+  }
+}
+
+// =====================================================
+// EDIT EVENT
+// =====================================================
+
+async function editEvent(id) {
+  const ev = eventsData.find(item => String(item.id) === String(id));
+
+  if (!ev) return;
+
+  const judul = prompt("Judul event:", ev.judul);
+  if (judul === null) return;
+
+  if (!judul.trim()) {
+    alert("Judul event tidak boleh kosong.");
+    return;
+  }
+
+  const deskripsi = prompt("Deskripsi event:", ev.deskripsi || "");
+  if (deskripsi === null) return;
+
+  const pilihBanyak = confirm(
+    "Izinkan siswa memilih lebih dari satu opsi?\n\nOK = Ya\nCancel = Tidak"
+  );
+
+  const bolehGanti = confirm(
+    "Izinkan siswa mengganti pilihan setelah memilih?\n\nOK = Ya\nCancel = Tidak"
+  );
+
+  const tampilkanHasil = confirm(
+    "Tampilkan hasil voting kepada siswa?\n\nOK = Ya\nCancel = Tidak"
+  );
+
+  if (!confirm("Simpan perubahan pengaturan event ini?")) return;
+
+  try {
+    await apiRequest("PUT", {
+      id,
+      judul: judul.trim(),
+      deskripsi: deskripsi.trim(),
+      bolehPilihBanyak: pilihBanyak,
+      bolehGantiPilihan: bolehGanti,
+      tampilkanHasilSiswa: tampilkanHasil
+    });
+
+    showNotice("noticeList", "Event berhasil diperbarui.");
+    await loadEvents();
+
+  } catch (error) {
+    showNotice("noticeList", error.message, "error");
+  }
+}
+
+// =====================================================
+// HAPUS EVENT
+// =====================================================
+
+async function deleteEvent(id) {
+  const ev = eventsData.find(item => String(item.id) === String(id));
+
+  if (!ev) return;
+
+  const confirmation = confirm(
+    `Hapus event "${ev.judul}"?\n\nSeluruh opsi dan suara pada event ini juga akan dihapus permanen.`
+  );
+
+  if (!confirmation) return;
+
+  const secondConfirmation = confirm(
+    "Apakah kamu benar-benar yakin? Data suara tidak dapat dikembalikan."
+  );
+
+  if (!secondConfirmation) return;
+
+  try {
+    await apiRequest("DELETE", {
+      eventId: id
+    });
+
+    showNotice("noticeList", "Event berhasil dihapus.");
+    await loadEvents();
+
+  } catch (error) {
+    showNotice("noticeList", error.message, "error");
+  }
+}
+
+// =====================================================
+// START
+// =====================================================
+
+loadEvents();
+
+</script>
+
+</body>
+</html>
