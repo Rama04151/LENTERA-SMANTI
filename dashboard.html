@@ -930,6 +930,227 @@
   }
 
 }
+
+    /* =========================
+   VOTING SISWA
+========================= */
+
+.vote-button {
+  width: 100%;
+  padding: 13px 16px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(251,192,45,.25);
+  border-radius: 13px;
+  background: linear-gradient(135deg, #26345b, #1c2541);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.vote-button:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent-gold);
+}
+
+.vote-button-label {
+  flex: 1;
+  text-align: left;
+}
+
+.vote-badge {
+  min-width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: 50px;
+  background: var(--accent-gold);
+  color: #0b132b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.vote-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.vote-modal {
+  width: 100%;
+  max-width: 500px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  color: #172033;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.vote-header {
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.vote-header-info {
+  flex: 1;
+}
+
+.vote-header h2 {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.vote-header p {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.vote-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: #f1f5f9;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.vote-content {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.vote-event {
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 15px;
+  background: #f8fafc;
+}
+
+.vote-event h3 {
+  font-size: 15px;
+  color: #172033;
+  margin-bottom: 6px;
+}
+
+.vote-description {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+}
+
+.vote-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  margin-top: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.vote-option input {
+  accent-color: #d49a00;
+  width: 17px;
+  height: 17px;
+}
+
+.vote-option:has(input:checked) {
+  border-color: #d49a00;
+  background: #fffbeb;
+}
+
+.vote-submit {
+  width: 100%;
+  padding: 12px;
+  margin-top: 13px;
+  border: none;
+  border-radius: 11px;
+  background: #d49a00;
+  color: #172033;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.vote-submit:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.vote-status {
+  display: inline-block;
+  padding: 5px 9px;
+  margin-bottom: 9px;
+  border-radius: 20px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.vote-status.closed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.vote-result {
+  margin-top: 12px;
+}
+
+.vote-result-row {
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.vote-result-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.vote-result-track {
+  height: 9px;
+  border-radius: 20px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.vote-result-fill {
+  height: 100%;
+  border-radius: 20px;
+  background: #d49a00;
+}
+
+.vote-empty {
+  text-align: center;
+  padding: 35px 15px;
+  color: #64748b;
+  font-size: 13px;
+}
   </style>
 </head>
 
@@ -961,6 +1182,19 @@
     class="inbox-badge"
     style="display:none;"
   >0</span>
+</button>
+
+      <!-- VOTING SISWA -->
+<button
+  type="button"
+  id="studentVoteButton"
+  class="vote-button"
+  onclick="openStudentVote()"
+  style="display:none;"
+>
+  <span>🗳️</span>
+  <span class="vote-button-label">Voting Siswa</span>
+  <span id="studentVoteBadge" class="vote-badge">0</span>
 </button>
 
 <div class="welcome">
@@ -2519,6 +2753,354 @@ document.addEventListener(
 
   }
 );
+
+    // =====================================
+// VOTING SISWA LENTERA SMANTI
+// =====================================
+
+let studentVoteEvents = [];
+
+function getStudentVoteSession() {
+  try {
+    const data = JSON.parse(
+      sessionStorage.getItem("lentera_session")
+    );
+
+    return data && data.id ? data : null;
+  } catch {
+    return null;
+  }
+}
+
+async function studentVoteRequest(payload) {
+  const response = await fetch(
+    "/.netlify/functions/student-vote",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(
+      result.message || "Permintaan voting gagal."
+    );
+  }
+
+  return result;
+}
+
+// Memeriksa voting aktif
+async function loadStudentVoteButton() {
+  const button = document.getElementById(
+    "studentVoteButton"
+  );
+
+  if (!button) return;
+
+  const siswa = getStudentVoteSession();
+  if (!siswa) return;
+
+  try {
+    const result = await studentVoteRequest({
+      siswaId: siswa.id,
+      aksi: "list"
+    });
+
+    studentVoteEvents = result.events || [];
+
+    if (studentVoteEvents.length > 0) {
+      button.style.display = "flex";
+
+      document.getElementById(
+        "studentVoteBadge"
+      ).textContent = studentVoteEvents.length;
+    } else {
+      button.style.display = "none";
+    }
+
+  } catch (error) {
+    console.error("VOTING BUTTON ERROR:", error);
+    button.style.display = "none";
+  }
+}
+
+// Membuka halaman voting
+async function openStudentVote() {
+  const siswa = getStudentVoteSession();
+
+  if (!siswa) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  let modal = document.getElementById(
+    "studentVoteModal"
+  );
+
+  if (modal) modal.remove();
+
+  modal = document.createElement("div");
+  modal.id = "studentVoteModal";
+  modal.className = "vote-overlay";
+
+  modal.innerHTML = `
+    <div class="vote-modal"
+      onclick="event.stopPropagation()">
+
+      <div class="vote-header">
+        <div class="vote-header-info">
+          <h2>🗳️ Voting Siswa</h2>
+          <p>Berikan suara terbaikmu.</p>
+        </div>
+
+        <button class="vote-close"
+          onclick="closeStudentVote()">
+          ✕
+        </button>
+      </div>
+
+      <div id="studentVoteContent"
+        class="vote-content">
+
+        <div class="vote-empty">
+          Memuat daftar voting...
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  modal.onclick = function(event) {
+    if (event.target === modal) {
+      closeStudentVote();
+    }
+  };
+
+  document.body.appendChild(modal);
+
+  await refreshStudentVoteContent();
+}
+
+// Memuat daftar voting
+async function refreshStudentVoteContent() {
+  const siswa = getStudentVoteSession();
+  const content = document.getElementById(
+    "studentVoteContent"
+  );
+
+  if (!content || !siswa) return;
+
+  content.innerHTML = `
+    <div class="vote-empty">Memuat voting...</div>
+  `;
+
+  try {
+    const result = await studentVoteRequest({
+      siswaId: siswa.id,
+      aksi: "list"
+    });
+
+    studentVoteEvents = result.events || [];
+
+    if (!studentVoteEvents.length) {
+      content.innerHTML = `
+        <div class="vote-empty">
+          <div style="font-size:38px">📭</div>
+          <strong>Tidak ada voting aktif</strong>
+          <p style="margin-top:6px">
+            Belum ada pemungutan suara saat ini.
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    content.innerHTML = studentVoteEvents.map(event => {
+      const options = event.options || [];
+      const selected = event.selectedOptionIds || [];
+      const multiple = event.boleh_pilih_banyak;
+
+      const alreadyVoted = selected.length > 0;
+
+      const resultsVisible =
+        event.tampilkan_hasil_siswa === true;
+
+      const results = event.results || [];
+
+      return `
+        <div class="vote-event">
+
+          <span class="vote-status">
+            ${alreadyVoted ? "SUDAH MEMILIH" : "VOTING AKTIF"}
+          </span>
+
+          <h3>${escapeHtml(event.judul)}</h3>
+
+          <div class="vote-description">
+            ${escapeHtml(event.deskripsi || "")}
+          </div>
+
+          <div style="
+            font-size:11px;
+            color:#64748b;
+            margin-bottom:8px;
+          ">
+            ${multiple
+              ? "Kamu dapat memilih lebih dari satu opsi."
+              : "Pilih satu opsi saja."}
+          </div>
+
+          <div>
+            ${options.map(option => `
+              <label class="vote-option">
+                <input
+                  type="${multiple ? "checkbox" : "radio"}"
+                  name="vote-${event.id}"
+                  value="${escapeHtml(option.id)}"
+                  ${selected.map(String).includes(String(option.id))
+                    ? "checked"
+                    : ""}
+                >
+                <span>${escapeHtml(option.nama_opsi)}</span>
+              </label>
+            `).join("")}
+          </div>
+
+          <button
+            class="vote-submit"
+            onclick="submitStudentVote('${event.id}')"
+          >
+            ${alreadyVoted ? "Simpan Perubahan Pilihan" : "Kirim Suara"}
+          </button>
+
+          ${
+            resultsVisible
+              ? `
+                <div class="vote-result">
+                  <strong style="font-size:13px">
+                    📊 Hasil Voting
+                  </strong>
+
+                  ${results.map(item => {
+                    const total = Number(item.total || 0);
+                    const max = Math.max(
+                      1,
+                      ...results.map(x => Number(x.total || 0))
+                    );
+
+                    return `
+                      <div class="vote-result-row">
+                        <div class="vote-result-label">
+                          <span>${escapeHtml(item.nama_opsi)}</span>
+                          <strong>${total} suara</strong>
+                        </div>
+
+                        <div class="vote-result-track">
+                          <div class="vote-result-fill"
+                            style="width:${total / max * 100}%">
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+      `;
+    }).join("");
+
+  } catch (error) {
+    content.innerHTML = `
+      <div class="vote-empty">
+        ${escapeHtml(error.message)}
+        <br><br>
+        <button class="vote-submit"
+          onclick="refreshStudentVoteContent()">
+          Coba Lagi
+        </button>
+      </div>
+    `;
+  }
+}
+
+// Mengirim pilihan siswa
+async function submitStudentVote(eventId) {
+  const siswa = getStudentVoteSession();
+
+  if (!siswa) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const event = studentVoteEvents.find(
+    item => String(item.id) === String(eventId)
+  );
+
+  if (!event) return;
+
+  const inputs = document.querySelectorAll(
+    `input[name="vote-${CSS.escape(String(eventId))}"]:checked`
+  );
+
+  const optionIds = Array.from(inputs).map(
+    input => input.value
+  );
+
+  if (!optionIds.length) {
+    alert("Silakan pilih minimal satu opsi.");
+    return;
+  }
+
+  if (
+    !event.boleh_pilih_banyak &&
+    optionIds.length > 1
+  ) {
+    alert("Kamu hanya boleh memilih satu opsi.");
+    return;
+  }
+
+  if (!confirm("Yakin ingin mengirim pilihan ini?")) {
+    return;
+  }
+
+  try {
+    await studentVoteRequest({
+      siswaId: siswa.id,
+      aksi: "vote",
+      eventId,
+      optionIds
+    });
+
+    alert("Suara berhasil disimpan!");
+
+    await refreshStudentVoteContent();
+    await loadStudentVoteButton();
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+// Menutup modal
+function closeStudentVote() {
+  const modal = document.getElementById(
+    "studentVoteModal"
+  );
+
+  if (modal) modal.remove();
+}
+
+// Jalankan saat dashboard dibuka
+loadStudentVoteButton();
 
     function escapeHtml(value) {
 
