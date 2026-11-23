@@ -2922,16 +2922,19 @@ async function refreshStudentVoteContent() {
     }
 
     content.innerHTML = studentVoteEvents.map(event => {
-      const options = event.options || [];
-      const selected = event.selectedOptionIds || [];
-      const multiple = event.boleh_pilih_banyak;
+      const options = event.opsi || [];
+const selected = event.pilihanSaya || [];
+const multiple = event.bolehPilihBanyak;
 
-      const alreadyVoted = selected.length > 0;
+const alreadyVoted = event.sudahMemilih;
 
-      const resultsVisible =
-        event.tampilkan_hasil_siswa === true;
+const resultsVisible =
+  event.tampilkanHasilSiswa === true;
 
-      const results = event.results || [];
+const results = options.map(option => ({
+  nama_opsi: option.namaOpsi,
+  total: option.jumlahSuara || 0
+}));
 
       return `
         <div class="vote-event">
