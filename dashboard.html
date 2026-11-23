@@ -2970,7 +2970,7 @@ const results = options.map(option => ({
                     ? "checked"
                     : ""}
                 >
-                <span>${escapeHtml(option.nama_opsi)}</span>
+                <span>${escapeHtml(option.namaOpsi)}</span>
               </label>
             `).join("")}
           </div>
@@ -3064,7 +3064,7 @@ async function submitStudentVote(eventId) {
   }
 
   if (
-    !event.boleh_pilih_banyak &&
+    !event.bolehPilihBanyak &&
     optionIds.length > 1
   ) {
     alert("Kamu hanya boleh memilih satu opsi.");
