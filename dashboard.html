@@ -3106,6 +3106,380 @@ const results = options.map(option => ({
 async function submitStudentVote(eventId) {
   const siswa = getStudentVoteSession();
 
+// =====================================
+// VOTING SISWA LENTERA SMANTI
+// =====================================
+
+let studentVoteEvents = [];
+let activeVoteEventId = null;
+
+function getStudentVoteSession() {
+  try {
+    const data = JSON.parse(
+      sessionStorage.getItem("lentera_session")
+    );
+
+    return data && data.id ? data : null;
+  } catch {
+    return null;
+  }
+}
+
+async function studentVoteRequest(payload) {
+  const response = await fetch(
+    "/.netlify/functions/student-vote",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(
+      result.message || "Permintaan voting gagal."
+    );
+  }
+
+  return result;
+}
+
+// Memeriksa voting aktif
+async function loadStudentVoteButton() {
+  const button = document.getElementById(
+    "studentVoteButton"
+  );
+
+  if (!button) return;
+
+  const siswa = getStudentVoteSession();
+  if (!siswa) return;
+
+  try {
+    const result = await studentVoteRequest({
+      siswaId: siswa.id,
+      aksi: "list"
+    });
+
+    studentVoteEvents = result.events || [];
+
+    if (studentVoteEvents.length > 0) {
+      button.style.display = "flex";
+
+      document.getElementById(
+        "studentVoteBadge"
+      ).textContent = studentVoteEvents.length;
+    } else {
+      button.style.display = "none";
+    }
+
+  } catch (error) {
+    console.error("VOTING BUTTON ERROR:", error);
+    button.style.display = "none";
+  }
+}
+
+// Membuka modal voting (selalu mulai dari daftar judul)
+async function openStudentVote() {
+  const siswa = getStudentVoteSession();
+
+  if (!siswa) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  activeVoteEventId = null;
+
+  let modal = document.getElementById(
+    "studentVoteModal"
+  );
+
+  if (modal) modal.remove();
+
+  modal = document.createElement("div");
+  modal.id = "studentVoteModal";
+  modal.className = "vote-overlay";
+
+  modal.innerHTML = `
+    <div class="vote-modal"
+      onclick="event.stopPropagation()">
+
+      <div class="vote-header">
+        <div class="vote-header-info">
+          <h2>🗳️ Voting Siswa</h2>
+          <p id="studentVoteSubtitle">Pilih kategori voting terlebih dahulu.</p>
+        </div>
+
+        <button class="vote-close"
+          onclick="closeStudentVote()">
+          ✕
+        </button>
+      </div>
+
+      <div id="studentVoteContent"
+        class="vote-content">
+
+        <div class="vote-empty">
+          Memuat daftar voting...
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  modal.onclick = function(event) {
+    if (event.target === modal) {
+      closeStudentVote();
+    }
+  };
+
+  document.body.appendChild(modal);
+
+  await refreshStudentVoteContent();
+}
+
+// Memilih satu judul voting untuk menampilkan opsinya
+function selectStudentVoteEvent(eventId) {
+  activeVoteEventId = String(eventId);
+  renderStudentVoteView();
+}
+
+// Kembali ke daftar judul voting
+function backToVoteTitles() {
+  activeVoteEventId = null;
+  renderStudentVoteView();
+}
+
+// Mengambil data terbaru dari server
+async function refreshStudentVoteContent() {
+  const siswa = getStudentVoteSession();
+  const content = document.getElementById(
+    "studentVoteContent"
+  );
+
+  if (!content || !siswa) return;
+
+  content.innerHTML = `
+    <div class="vote-empty">Memuat voting...</div>
+  `;
+
+  try {
+    const result = await studentVoteRequest({
+      siswaId: siswa.id,
+      aksi: "list"
+    });
+
+    studentVoteEvents = result.events || [];
+
+    // Jika event yang sedang dibuka sudah tidak ada, balik ke daftar judul
+    if (
+      activeVoteEventId !== null &&
+      !studentVoteEvents.some(
+        ev => String(ev.id) === String(activeVoteEventId)
+      )
+    ) {
+      activeVoteEventId = null;
+    }
+
+    renderStudentVoteView();
+
+  } catch (error) {
+    content.innerHTML = `
+      <div class="vote-empty">
+        ${escapeHtml(error.message)}
+        <br><br>
+        <button class="vote-submit"
+          onclick="refreshStudentVoteContent()">
+          Coba Lagi
+        </button>
+      </div>
+    `;
+  }
+}
+
+// Merender tampilan bertingkat: Judul saja -> Opsi & Vote
+function renderStudentVoteView() {
+  const content = document.getElementById(
+    "studentVoteContent"
+  );
+  const subtitle = document.getElementById(
+    "studentVoteSubtitle"
+  );
+
+  if (!content) return;
+
+  if (!studentVoteEvents.length) {
+    if (subtitle) {
+      subtitle.textContent = "Tidak ada voting aktif.";
+    }
+
+    content.innerHTML = `
+      <div class="vote-empty">
+        <div style="font-size:38px">📭</div>
+        <strong>Tidak ada voting aktif</strong>
+        <p style="margin-top:6px">
+          Belum ada pemungutan suara saat ini.
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  // TAHAP 1: Tampilkan judul saja
+  if (activeVoteEventId === null) {
+    if (subtitle) {
+      subtitle.textContent = "Klik judul untuk melihat opsi voting.";
+    }
+
+    content.innerHTML = studentVoteEvents.map(event => {
+      const alreadyVoted = Boolean(event.sudahMemilih);
+
+      return `
+        <button
+          type="button"
+          class="vote-title-card"
+          onclick="selectStudentVoteEvent('${escapeHtml(event.id)}')"
+        >
+          <div class="vote-title-card-main">
+            <span class="vote-status">
+              ${alreadyVoted ? "SUDAH MEMILIH" : "VOTING AKTIF"}
+            </span>
+            <h3>${escapeHtml(event.judul)}</h3>
+            <p>Klik untuk membuka opsi</p>
+          </div>
+          <span class="vote-title-arrow">›</span>
+        </button>
+      `;
+    }).join("");
+
+    return;
+  }
+
+  // TAHAP 2: Tampilkan judul terpilih + opsi + tombol Vote
+  const event = studentVoteEvents.find(
+    item => String(item.id) === String(activeVoteEventId)
+  );
+
+  if (!event) {
+    backToVoteTitles();
+    return;
+  }
+
+  if (subtitle) {
+    subtitle.textContent = event.judul;
+  }
+
+  const options = event.opsi || [];
+  const selected = event.pilihanSaya || [];
+  const multiple = Boolean(event.bolehPilihBanyak);
+  const alreadyVoted = Boolean(event.sudahMemilih);
+  const resultsVisible = event.tampilkanHasilSiswa === true;
+
+  const results = options.map(option => ({
+    nama_opsi: option.namaOpsi,
+    total: option.jumlahSuara || 0
+  }));
+
+  content.innerHTML = `
+    <button
+      type="button"
+      class="vote-back-btn"
+      onclick="backToVoteTitles()"
+    >
+      ← Kembali ke Judul
+    </button>
+
+    <div class="vote-event">
+      <span class="vote-status">
+        ${alreadyVoted ? "SUDAH MEMILIH" : "VOTING AKTIF"}
+      </span>
+
+      <h3>${escapeHtml(event.judul)}</h3>
+
+      <div class="vote-description">
+        ${escapeHtml(event.deskripsi || "")}
+      </div>
+
+      <div style="
+        font-size:11px;
+        color:#64748b;
+        margin-bottom:8px;
+      ">
+        ${multiple
+          ? "Kamu dapat memilih lebih dari satu opsi."
+          : "Pilih satu opsi saja."}
+      </div>
+
+      <div>
+        ${options.map(option => `
+          <label class="vote-option">
+            <input
+              type="${multiple ? "checkbox" : "radio"}"
+              name="vote-${escapeHtml(event.id)}"
+              value="${escapeHtml(option.id)}"
+              ${selected.map(String).includes(String(option.id))
+                ? "checked"
+                : ""}
+            >
+            <span>${escapeHtml(option.namaOpsi)}</span>
+          </label>
+        `).join("")}
+      </div>
+
+      <button
+        type="button"
+        class="vote-submit"
+        onclick="submitStudentVote('${escapeHtml(event.id)}')"
+      >
+        ${alreadyVoted ? "Simpan Perubahan Pilihan" : "Kirim Suara"}
+      </button>
+
+      ${
+        resultsVisible
+          ? `
+            <div class="vote-result">
+              <strong style="font-size:13px">
+                📊 Hasil Voting
+              </strong>
+
+              ${results.map(item => {
+                const total = Number(item.total || 0);
+                const max = Math.max(
+                  1,
+                  ...results.map(x => Number(x.total || 0))
+                );
+
+                return `
+                  <div class="vote-result-row">
+                    <div class="vote-result-label">
+                      <span>${escapeHtml(item.nama_opsi)}</span>
+                      <strong>${total} suara</strong>
+                    </div>
+
+                    <div class="vote-result-track">
+                      <div class="vote-result-fill"
+                        style="width:${total / max * 100}%">
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          `
+          : ""
+      }
+    </div>
+  `;
+}
+
+// Mengirim pilihan siswa
+async function submitStudentVote(eventId) {
+  const siswa = getStudentVoteSession();
+
   if (!siswa) {
     window.location.href = "index.html";
     return;
@@ -3152,6 +3526,8 @@ async function submitStudentVote(eventId) {
 
     alert("Suara berhasil disimpan!");
 
+    // Tetap di event yang baru di-vote agar siswa langsung melihat status/hasilnya
+    activeVoteEventId = String(eventId);
     await refreshStudentVoteContent();
     await loadStudentVoteButton();
 
@@ -3162,6 +3538,8 @@ async function submitStudentVote(eventId) {
 
 // Menutup modal
 function closeStudentVote() {
+  activeVoteEventId = null;
+
   const modal = document.getElementById(
     "studentVoteModal"
   );
