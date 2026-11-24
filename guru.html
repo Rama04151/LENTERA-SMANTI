@@ -602,6 +602,298 @@
 .danger-button:hover {
   opacity: 0.9;
 }
+  
+    /* =========================================================
+       DASHBOARD GURU — UI REFRESH ONLY
+       Tidak mengubah modal, API, session, atau fungsi JavaScript.
+    ========================================================= */
+    body {
+      padding: 24px;
+      background:
+        radial-gradient(circle at 8% 5%, rgba(251,192,45,.08), transparent 28%),
+        radial-gradient(circle at 95% 90%, rgba(59,130,246,.07), transparent 32%),
+        var(--bg-dark);
+    }
+
+    .guru-container {
+      max-width: 920px;
+    }
+
+    .dashboard-header {
+      padding: 26px;
+      margin-bottom: 30px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #202b4d 0%, #151e38 100%);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 16px 40px rgba(0,0,0,.22);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .eyebrow {
+      color: var(--accent-gold);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .header-top h1 {
+      margin: 7px 0 4px;
+      color: var(--text-main);
+      font-size: 27px;
+      font-weight: 800;
+    }
+
+    .header-top p {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .header-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border-radius: 18px;
+      background: rgba(251,192,45,.12);
+      font-size: 29px;
+    }
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 23px;
+      padding: 16px;
+      border-radius: 17px;
+      background: rgba(11,19,43,.62);
+      border: 1px solid var(--border-color);
+    }
+
+    .profile-avatar {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border-radius: 14px;
+      background: #29395f;
+      font-size: 23px;
+    }
+
+    .profile-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .profile-info strong,
+    .profile-info span,
+    .profile-info small {
+      display: block;
+    }
+
+    .profile-info strong {
+      color: var(--text-main);
+      font-size: 15px;
+    }
+
+    .profile-info span {
+      margin-top: 3px;
+      color: var(--accent-gold);
+      font-size: 12px;
+    }
+
+    .profile-info small {
+      margin-top: 4px;
+      color: var(--text-muted);
+      font-size: 10px;
+    }
+
+    .online-status {
+      color: #10b981;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .online-status span {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 4px;
+      border-radius: 50%;
+      background: #10b981;
+      vertical-align: middle;
+    }
+
+    .menu-section {
+      margin-bottom: 29px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 13px;
+      padding: 0 2px;
+    }
+
+    .section-heading h2 {
+      color: var(--text-main);
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .section-heading span {
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .guru-menu.menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .guru-menu .menu-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-width: 0;
+      min-height: 91px;
+      padding: 15px;
+      text-align: left;
+      color: var(--text-main);
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 17px;
+      cursor: pointer;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+
+    .guru-menu .menu-card:hover:not(.disabled) {
+      transform: translateY(-3px);
+      border-color: rgba(251,192,45,.55);
+      background: #222e50;
+      box-shadow: 0 10px 25px rgba(0,0,0,.2);
+    }
+
+    .guru-menu .menu-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      margin: 0;
+      border-radius: 13px;
+      font-size: 20px;
+    }
+
+    .menu-icon.blue { background: rgba(59,130,246,.15); }
+    .menu-icon.gold { background: rgba(251,192,45,.15); }
+    .menu-icon.red { background: rgba(239,68,68,.15); }
+    .menu-icon.green { background: rgba(16,185,129,.15); }
+    .menu-icon.purple { background: rgba(168,85,247,.15); }
+
+    .guru-menu .menu-copy {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .guru-menu .menu-title {
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .guru-menu .menu-desc {
+      margin-top: 4px;
+      color: var(--text-muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .guru-menu .arrow {
+      flex-shrink: 0;
+      color: var(--text-muted);
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .guru-menu .menu-card.featured {
+      border-color: rgba(251,192,45,.38);
+      background: linear-gradient(135deg, rgba(251,192,45,.11), var(--card-bg) 72%);
+    }
+
+    .dashboard-footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .dashboard-footer button {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--card-bg);
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .dashboard-footer button:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-2px);
+    }
+
+    .dashboard-footer .logout {
+      color: #f87171;
+      background: rgba(239,68,68,.10);
+      border-color: rgba(239,68,68,.25) !important;
+    }
+
+    .dashboard-footer p {
+      grid-column: 1 / -1;
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 10px;
+      text-align: center;
+    }
+
+    @media (max-width: 650px) {
+      body { padding: 14px; }
+      .guru-container { padding: 0; }
+      .dashboard-header { padding: 20px; margin-bottom: 25px; }
+      .header-top h1 { font-size: 24px; }
+      .header-icon { width: 49px; height: 49px; font-size: 25px; }
+      .guru-menu.menu-grid { grid-template-columns: 1fr; gap: 10px; }
+      .guru-menu .menu-card { min-height: 82px; padding: 13px; }
+      .guru-bottom { flex-direction: initial; }
+      .dashboard-footer { grid-template-columns: 1fr 1fr; }
+      .modal { padding: 10px; }
+      .modal-box { padding: 18px; }
+    }
+
+    @media (max-width: 360px) {
+      .profile-card { gap: 9px; padding: 12px; }
+      .online-status { font-size: 9px; }
+      .guru-menu .menu-card { gap: 9px; }
+      .guru-menu .menu-icon { width: 39px; height: 39px; }
+    }
+
   </style>
 </head>
 
@@ -609,107 +901,117 @@
 
   <div class="guru-container">
 
-    <!-- HEADER -->
-    <div class="guru-header">
-      <h1>Panel Guru</h1>
-      <p>LENTERA SMANTI</p>
-
-      <div class="guru-profile">
-        <strong id="guruName">Memuat...</strong>
-        <span id="guruUsername">@...</span>
+    <!-- HEADER DASHBOARD -->
+    <header class="dashboard-header">
+      <div class="header-top">
+        <div>
+          <span class="eyebrow">LENTERA SMANTI</span>
+          <h1>Panel Guru</h1>
+          <p>Selamat datang kembali!</p>
+        </div>
+        <div class="header-icon" aria-hidden="true">🎓</div>
       </div>
-    </div>
 
-    <!-- MENU -->
-    <div class="guru-menu">
+      <div class="profile-card">
+        <div class="profile-avatar" aria-hidden="true">👨‍🏫</div>
+        <div class="profile-info">
+          <strong id="guruName">Memuat...</strong>
+          <span id="guruUsername">@...</span>
+          <small>Guru LENTERA SMANTI</small>
+        </div>
+        <div class="online-status"><span></span> Aktif</div>
+      </div>
+    </header>
 
-      <button type="button" onclick="openStudents()">
-        <div class="menu-icon">👨‍🎓</div>
-        <div class="menu-title">Data Siswa</div>
-        <div class="menu-desc">Melihat data siswa dan jumlah poin.</div>
-      </button>
+    <!-- AKADEMIK -->
+    <section class="menu-section">
+      <div class="section-heading">
+        <h2>Akademik</h2>
+        <span>01</span>
+      </div>
 
-      <button type="button" onclick="openRewards()">
-        <div class="menu-icon">🏆</div>
-        <div class="menu-title">Penghargaan</div>
-        <div class="menu-desc">Menambahkan poin penghargaan.</div>
-      </button>
+      <div class="guru-menu menu-grid">
+        <button type="button" class="menu-card" onclick="openStudents()">
+          <div class="menu-icon blue">👨‍🎓</div>
+          <div class="menu-copy">
+            <div class="menu-title">Data Siswa</div>
+            <div class="menu-desc">Melihat data siswa dan jumlah poin.</div>
+          </div>
+          <span class="arrow" aria-hidden="true">›</span>
+        </button>
 
-      <button type="button" onclick="openViolations()">
-        <div class="menu-icon">⚠️</div>
-        <div class="menu-title">Pelanggaran</div>
-        <div class="menu-desc">Menambahkan poin pelanggaran.</div>
-      </button>
+        <button type="button" class="menu-card" onclick="window.location.href='guru-inbox.html'">
+          <div class="menu-icon purple">📨</div>
+          <div class="menu-copy">
+            <div class="menu-title">Inbox Siswa</div>
+            <div class="menu-desc">Kirim dan kelola pesan untuk siswa.</div>
+          </div>
+          <span class="arrow" aria-hidden="true">›</span>
+        </button>
+      </div>
+    </section>
 
-      <button type="button" onclick="openBulkPointModal()">
-        <div class="menu-icon">⭐</div>
-        <div class="menu-title">Poin Massal</div>
-        <div class="menu-desc">Menambahkan poin ke beberapa siswa sekaligus.</div>
-      </button>
+    <!-- MANAJEMEN POIN -->
+    <section class="menu-section">
+      <div class="section-heading">
+        <h2>Manajemen Poin</h2>
+        <span>02</span>
+      </div>
 
-      <button type="button" onclick="openMyPoints()">
+      <div class="guru-menu menu-grid">
+        <button type="button" class="menu-card" onclick="openRewards()">
+          <div class="menu-icon gold">🏆</div>
+          <div class="menu-copy">
+            <div class="menu-title">Penghargaan</div>
+            <div class="menu-desc">Menambahkan poin penghargaan.</div>
+          </div>
+          <span class="arrow" aria-hidden="true">›</span>
+        </button>
 
-  <div class="menu-icon">📋</div>
+        <button type="button" class="menu-card" onclick="openViolations()">
+          <div class="menu-icon red">⚠️</div>
+          <div class="menu-copy">
+            <div class="menu-title">Pelanggaran</div>
+            <div class="menu-desc">Menambahkan poin pelanggaran.</div>
+          </div>
+          <span class="arrow" aria-hidden="true">›</span>
+        </button>
 
-  <div class="menu-title">
-    Poin Saya
-  </div>
+        <button type="button" class="menu-card featured" onclick="openBulkPointModal()">
+          <div class="menu-icon gold">⭐</div>
+          <div class="menu-copy">
+            <div class="menu-title">Poin Massal</div>
+            <div class="menu-desc">Input poin untuk beberapa siswa sekaligus.</div>
+          </div>
+          <span class="arrow" aria-hidden="true">›</span>
+        </button>
 
-  <div class="menu-desc">
-    Melihat, mengedit, dan menghapus poin yang Anda tambahkan.
-  </div>
+        <button type="button" class="menu-card" onclick="openMyPoints()">
+          <div class="menu-icon green">📋</div>
+          <div class="menu-copy">
+            <div class="menu-title">Poin Saya</div>
+            <div class="menu-desc">Melihat, mengedit, dan menghapus poin yang Anda tambahkan.</div>
+          </div>
+          <span class="arrow" aria-hidden="true">›</span>
+        </button>
 
-</button>
+        <button type="button" class="menu-card" onclick="window.location.href='guru-poin.html'">
+          <div class="menu-icon blue">⚙️</div>
+          <div class="menu-copy">
+            <div class="menu-title">Manajemen Poin Tingkat Lanjut</div>
+            <div class="menu-desc">Tambah, edit, hapus, dan kelola poin siswa.</div>
+          </div>
+          <span class="arrow" aria-hidden="true">›</span>
+        </button>
+      </div>
+    </section>
 
-      <button
-  type="button"
-  onclick="window.location.href='guru-poin.html'"
->
-  <div class="menu-icon">⭐</div>
-
-  <div class="menu-title">
-    Manajemen Poin Tingkat Lanjut
-  </div>
-
-  <div class="menu-desc">
-    Tambah, edit, hapus, dan kelola poin siswa.
-  </div>
-</button>
-
-      <button
-  type="button"
-  onclick="window.location.href='guru-inbox.html'"
->
-  <div class="menu-icon">📨</div>
-
-  <div class="menu-title">
-    Inbox Siswa
-  </div>
-
-  <div class="menu-desc">
-    Kirim dan kelola pesan untuk siswa.
-  </div>
-</button>
-
-    </div>
-
-    <!-- BOTTOM -->
-    <div class="guru-bottom">
-      <button
-  type="button"
-  onclick="openGuruPassword()"
->
-  🔐 Ubah Password
-</button>
-
-      <button
-        type="button"
-        class="logout"
-        onclick="logoutGuru()"
-      >
-        🚪 Keluar
-      </button>
-    </div>
+    <!-- AKUN -->
+    <footer class="dashboard-footer guru-bottom">
+      <button type="button" onclick="openGuruPassword()">🔐 Ubah Password</button>
+      <button type="button" class="logout" onclick="logoutGuru()">🚪 Keluar</button>
+      <p>© 2026 LENTERA SMANTI</p>
+    </footer>
 
   </div>
 
