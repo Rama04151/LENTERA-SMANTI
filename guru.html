@@ -513,6 +513,56 @@
   transform: none !important;
 }
 
+    /* POIN MASSAL */
+    .bulk-modal-box { max-width: 650px; }
+    .bulk-student-list {
+      max-height: 260px; overflow: auto; display: grid; gap: 7px;
+      margin-top: 10px; padding: 8px; border: 1px solid var(--border-color);
+      border-radius: 12px;
+    }
+    .bulk-student-option {
+      display: flex; align-items: center; gap: 10px; padding: 10px;
+      border-radius: 9px; background: rgba(255,255,255,.035); cursor: pointer;
+    }
+    .bulk-student-option input { width: 17px; height: 17px; accent-color: var(--accent-gold); }
+    .bulk-student-option span { flex: 1; min-width: 0; }
+    .bulk-student-option strong { display: block; font-size: 12px; }
+    .bulk-student-option small { color: var(--text-muted); font-size: 10px; }
+    .bulk-selection-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px; margin-top: 10px; font-size: 11px;
+    }
+    .bulk-selection-bar button {
+      border: 0; background: transparent; color: var(--accent-gold);
+      font-weight: 700; cursor: pointer; padding: 5px;
+    }
+    .bulk-progress {
+      display: none; margin-top: 16px; padding: 14px;
+      border: 1px solid var(--border-color); border-radius: 12px;
+      background: rgba(255,255,255,.035);
+    }
+    .bulk-progress.show { display: block; }
+    .bulk-spinner {
+      width: 25px; height: 25px; margin: 0 auto 10px;
+      border: 3px solid rgba(255,255,255,.18);
+      border-top-color: var(--accent-gold); border-radius: 50%;
+      animation: bulkSpin .75s linear infinite;
+    }
+    @keyframes bulkSpin { to { transform: rotate(360deg); } }
+    .bulk-progress-text { text-align: center; font-size: 12px; font-weight: 700; }
+    .bulk-progress-track {
+      height: 7px; margin-top: 10px; overflow: hidden;
+      border-radius: 20px; background: rgba(255,255,255,.12);
+    }
+    .bulk-progress-fill {
+      width: 0; height: 100%; border-radius: 20px;
+      background: var(--accent-gold); transition: width .2s ease;
+    }
+    .bulk-result { margin-top: 10px; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; }
+    .bulk-submit-row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; margin-top: 16px; }
+    .bulk-submit-row button:disabled { opacity: .55; cursor: not-allowed; }
+    .help-text { margin-top: 6px; color: var(--text-muted); font-size: 11px; line-height: 1.5; }
+
     @media (max-width: 650px) {
       .guru-container {
         padding: 0;
@@ -591,6 +641,12 @@
         <div class="menu-desc">Menambahkan poin pelanggaran.</div>
       </button>
 
+      <button type="button" onclick="openBulkPointModal()">
+        <div class="menu-icon">⭐</div>
+        <div class="menu-title">Poin Massal</div>
+        <div class="menu-desc">Menambahkan poin ke beberapa siswa sekaligus.</div>
+      </button>
+
       <button type="button" onclick="openMyPoints()">
 
   <div class="menu-icon">📋</div>
@@ -655,6 +711,67 @@
       </button>
     </div>
 
+  </div>
+
+  <!-- MODAL INPUT POIN MASSAL -->
+  <div id="bulkPointModal" class="modal" aria-hidden="true">
+    <div class="modal-box bulk-modal-box">
+      <div class="modal-header">
+        <h2>＋ Input Poin Massal</h2>
+        <button type="button" class="close" onclick="closeBulkPointModal()" aria-label="Tutup">×</button>
+      </div>
+      <p style="margin-bottom:16px;color:var(--text-muted);font-size:12px">
+        Setiap siswa akan menerima satu transaksi poin individual.
+      </p>
+      <div class="form-group">
+        <label for="bulkPointType">Jenis Poin</label>
+        <select id="bulkPointType">
+          <option value="pelanggaran">⚠️ Pelanggaran</option>
+          <option value="penghargaan">🏆 Penghargaan</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="bulkPointValue">Jumlah Poin per Siswa</label>
+        <input type="number" id="bulkPointValue" min="1" max="100" value="1" placeholder="1–100">
+      </div>
+      <div class="form-group">
+        <label for="bulkPointDescription">Keterangan</label>
+        <textarea id="bulkPointDescription" maxlength="500" placeholder="Contoh: Bolos sekolah"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="bulkPointDate">Tanggal Kejadian</label>
+        <input type="date" id="bulkPointDate" required>
+        <div class="help-text">Boleh hari ini atau tanggal sebelumnya, tidak boleh tanggal mendatang.</div>
+      </div>
+      <div class="form-group">
+        <label for="bulkStudentClass">Filter Kelas</label>
+        <select id="bulkStudentClass"><option value="">Semua Kelas</option></select>
+      </div>
+      <div class="form-group">
+        <label for="bulkStudentSearch">Cari Siswa</label>
+        <input type="search" id="bulkStudentSearch" placeholder="Cari nama atau NISN...">
+      </div>
+      <div class="bulk-selection-bar">
+        <strong id="bulkSelectedCount">0 siswa dipilih</strong>
+        <div>
+          <button type="button" onclick="selectAllBulkStudents(true)">Pilih semua</button>
+          <button type="button" onclick="selectAllBulkStudents(false)">Kosongkan</button>
+        </div>
+      </div>
+      <div id="bulkStudentList" class="bulk-student-list">
+        <div class="loading">Memuat daftar siswa...</div>
+      </div>
+      <div id="bulkProgress" class="bulk-progress" aria-live="polite">
+        <div class="bulk-spinner"></div>
+        <div id="bulkProgressText" class="bulk-progress-text">Menyiapkan penyimpanan...</div>
+        <div class="bulk-progress-track"><div id="bulkProgressFill" class="bulk-progress-fill"></div></div>
+        <div id="bulkResult" class="bulk-result"></div>
+      </div>
+      <div class="bulk-submit-row">
+        <button type="button" class="submit red" id="bulkCancelButton" onclick="closeBulkPointModal()">Batal</button>
+        <button type="button" class="submit" id="bulkSubmitButton" onclick="submitBulkPoints()">Simpan untuk Siswa Terpilih</button>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL POIN SAYA -->
@@ -1158,6 +1275,209 @@
       }
 
       return Array.isArray(result.siswa) ? result.siswa : [];
+    }
+
+    /* =========================================================
+       INPUT POIN MASSAL — SATU TRANSAKSI PER SISWA
+    ========================================================= */
+    let bulkSaving = false;
+    const bulkSelectedStudentIds = new Set();
+
+    function getTodayIndonesia() {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit"
+      }).formatToParts(new Date());
+      const values = {};
+      parts.forEach(part => { if (part.type !== "literal") values[part.type] = part.value; });
+      return values.year + "-" + values.month + "-" + values.day;
+    }
+
+    function isValidBulkDate(value) {
+      if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(value || "")) return false;
+      const date = new Date(value + "T00:00:00Z");
+      return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+    }
+
+    async function openBulkPointModal() {
+      const modal = document.getElementById("bulkPointModal");
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
+      document.getElementById("bulkPointDate").max = getTodayIndonesia();
+      document.getElementById("bulkPointDate").value = getTodayIndonesia();
+      document.getElementById("bulkPointType").value = "pelanggaran";
+      document.getElementById("bulkProgress").classList.remove("show");
+      document.getElementById("bulkResult").textContent = "";
+      document.getElementById("bulkStudentSearch").value = "";
+      document.getElementById("bulkStudentClass").value = "";
+      bulkSelectedStudentIds.clear();
+      document.getElementById("bulkStudentList").innerHTML = '<div class="loading">Memuat data siswa...</div>';
+      try {
+        students = await getStudents();
+        renderBulkStudentList();
+      } catch (error) {
+        document.getElementById("bulkStudentList").innerHTML =
+          '<div class="empty">' + escapeHtml(error.message) + '</div>';
+      }
+    }
+
+    function closeBulkPointModal() {
+      if (bulkSaving) return;
+      const modal = document.getElementById("bulkPointModal");
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+    }
+
+    function getBulkFilteredStudents() {
+      const q = document.getElementById("bulkStudentSearch").value.trim().toLowerCase();
+      const kelas = document.getElementById("bulkStudentClass").value;
+      return students.filter(s => {
+        const status = String(s.status || "Aktif").toLowerCase();
+        const active = status === "aktif";
+        const matchesSearch = !q ||
+          String(s.nama || "").toLowerCase().includes(q) ||
+          String(s.nisn || "").toLowerCase().includes(q);
+        return active && matchesSearch && (!kelas || String(s.kelas || "") === kelas);
+      });
+    }
+
+    function renderBulkStudentList() {
+      const classSelect = document.getElementById("bulkStudentClass");
+      const currentClass = classSelect.value;
+      const classes = [...new Set(students.map(s => String(s.kelas || "").trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b));
+      classSelect.innerHTML = '<option value="">Semua Kelas</option>' +
+        classes.map(k => '<option value="' + escapeHtml(k) + '">' + escapeHtml(k) + '</option>').join("");
+      classSelect.value = classes.includes(currentClass) ? currentClass : "";
+      const list = getBulkFilteredStudents();
+      const container = document.getElementById("bulkStudentList");
+      if (!list.length) {
+        container.innerHTML = '<div class="empty">Tidak ada siswa ditemukan.</div>';
+        updateBulkSelectedCount();
+        return;
+      }
+      container.innerHTML = list.map(s => {
+        const id = String(s.id);
+        return '<label class="bulk-student-option"><input class="bulk-student-check" type="checkbox" value="' +
+          escapeHtml(id) + '"' + (bulkSelectedStudentIds.has(id) ? " checked" : "") +
+          ' onchange="toggleBulkStudent(this)"><span><strong>' + escapeHtml(s.nama || "-") +
+          '</strong><small>NISN: ' + escapeHtml(s.nisn || "-") + ' • Kelas: ' +
+          escapeHtml(s.kelas || "-") + '</small></span></label>';
+      }).join("");
+      updateBulkSelectedCount();
+    }
+
+    function toggleBulkStudent(input) {
+      if (input.checked) bulkSelectedStudentIds.add(input.value);
+      else bulkSelectedStudentIds.delete(input.value);
+      updateBulkSelectedCount();
+    }
+
+    function updateBulkSelectedCount() {
+      document.getElementById("bulkSelectedCount").textContent =
+        bulkSelectedStudentIds.size + " siswa dipilih";
+    }
+
+    function selectAllBulkStudents(checked) {
+      document.querySelectorAll("#bulkStudentList .bulk-student-check").forEach(input => {
+        input.checked = checked;
+        if (checked) bulkSelectedStudentIds.add(input.value);
+        else bulkSelectedStudentIds.delete(input.value);
+      });
+      updateBulkSelectedCount();
+    }
+
+    document.getElementById("bulkStudentSearch").addEventListener("input", renderBulkStudentList);
+    document.getElementById("bulkStudentClass").addEventListener("change", renderBulkStudentList);
+    document.getElementById("bulkPointModal").addEventListener("click", event => {
+      if (event.target.id === "bulkPointModal") closeBulkPointModal();
+    });
+
+    async function submitBulkPoints() {
+      if (bulkSaving) return;
+      const selectedIds = [...bulkSelectedStudentIds];
+      const jenis = document.getElementById("bulkPointType").value;
+      const poin = Number(document.getElementById("bulkPointValue").value);
+      const keterangan = document.getElementById("bulkPointDescription").value.trim();
+      const tanggal = document.getElementById("bulkPointDate").value;
+      const today = getTodayIndonesia();
+      const progress = document.getElementById("bulkProgress");
+      const resultBox = document.getElementById("bulkResult");
+
+      let validationError = "";
+      if (!selectedIds.length) validationError = "Pilih minimal satu siswa.";
+      else if (!Number.isInteger(poin) || poin < 1 || poin > 100) validationError = "Jumlah poin harus 1 sampai 100.";
+      else if (!keterangan) validationError = "Keterangan wajib diisi.";
+      else if (!isValidBulkDate(tanggal) || tanggal > today) validationError = "Tanggal tidak valid atau melebihi hari ini.";
+      if (validationError) {
+        progress.classList.add("show");
+        resultBox.textContent = validationError;
+        return;
+      }
+
+      const targets = selectedIds.map(id => students.find(s => String(s.id) === id)).filter(Boolean);
+      const submit = document.getElementById("bulkSubmitButton");
+      const cancel = document.getElementById("bulkCancelButton");
+      const progressText = document.getElementById("bulkProgressText");
+      const progressFill = document.getElementById("bulkProgressFill");
+
+      bulkSaving = true;
+      submit.disabled = true;
+      cancel.disabled = true;
+      submit.textContent = "Menyimpan...";
+      progress.classList.add("show");
+      resultBox.textContent = "Setiap siswa diproses sebagai transaksi poin tersendiri.";
+      progressFill.style.width = "0%";
+
+      let successCount = 0;
+      const failures = [];
+      try {
+        for (let i = 0; i < targets.length; i++) {
+          const siswa = targets[i];
+          progressText.textContent = "Menyimpan " + (i + 1) + " dari " + targets.length + ": " + (siswa.nama || "Siswa");
+          const response = await fetch("/.netlify/functions/guru-points", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              siswaId: siswa.id, poin, keterangan, jenis, tanggal,
+              guruId: guruSession.id, guruUsername: guruSession.username
+            })
+          });
+          const raw = await response.text();
+          let data;
+          try { data = JSON.parse(raw); }
+          catch { throw new Error("Respons server bukan JSON."); }
+          if (!response.ok || !data.success) {
+            failures.push((siswa.nama || siswa.id) + ": " + (data.message || "Gagal menyimpan"));
+          } else {
+            successCount++;
+          }
+          progressFill.style.width = Math.round(((i + 1) / targets.length) * 100) + "%";
+        }
+
+        progressText.textContent = "Proses penyimpanan selesai.";
+        resultBox.textContent = successCount + " transaksi individual berhasil dari " + targets.length + " siswa." +
+          (failures.length ? " Gagal: " + failures.join(" | ") : " Semua transaksi berhasil disimpan.");
+        if (successCount) {
+          students = await getStudents();
+          rewardStudents = students;
+          violationStudents = students;
+          filterStudents();
+          filterRewards();
+          filterViolations();
+          showMessage("myPointsMessage", successCount + " transaksi poin individual berhasil disimpan.", "success");
+        }
+        if (!failures.length) submit.textContent = "Selesai";
+      } catch (error) {
+        progressText.textContent = "Proses terhenti karena gangguan.";
+        resultBox.textContent = successCount + " transaksi berhasil. " + failures.length +
+          " gagal terkonfirmasi. Kesalahan: " + error.message +
+          ". Periksa data poin sebelum mencoba ulang agar tidak terjadi transaksi ganda.";
+      } finally {
+        bulkSaving = false;
+        submit.disabled = false;
+        cancel.disabled = false;
+        if (submit.textContent !== "Selesai") submit.textContent = "Simpan untuk Siswa Terpilih";
+      }
     }
 
     // DATA SISWA MODAL LOGIC
