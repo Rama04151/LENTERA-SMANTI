@@ -618,6 +618,28 @@
   }
 }
 
+
+    /* MODAL INPUT POIN MASSAL */
+    .bulk-modal-box { max-width:650px; }
+    .bulk-student-list { max-height:260px; overflow:auto; display:grid; gap:7px; margin-top:10px; padding:8px; border:1px solid var(--border-color); border-radius:12px; }
+    .bulk-student-option { display:flex; align-items:center; gap:10px; padding:10px; border-radius:9px; background:rgba(255,255,255,.035); cursor:pointer; }
+    .bulk-student-option input { width:17px; height:17px; accent-color:var(--primary); }
+    .bulk-student-option span { flex:1; min-width:0; }
+    .bulk-student-option strong { display:block; font-size:12px; }
+    .bulk-student-option small { color:var(--text-muted); font-size:10px; }
+    .bulk-selection-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:10px; font-size:11px; }
+    .bulk-selection-bar button { border:0; background:transparent; color:var(--primary); font-weight:700; cursor:pointer; padding:5px; }
+    .bulk-progress { display:none; margin-top:16px; padding:14px; border:1px solid var(--border-color); border-radius:12px; background:rgba(255,255,255,.035); }
+    .bulk-progress.show { display:block; }
+    .bulk-spinner { width:25px; height:25px; margin:0 auto 10px; border:3px solid rgba(255,255,255,.18); border-top-color:var(--primary); border-radius:50%; animation:bulkSpin .75s linear infinite; }
+    @keyframes bulkSpin { to { transform:rotate(360deg); } }
+    .bulk-progress-text { text-align:center; font-size:12px; font-weight:700; }
+    .bulk-progress-track { height:7px; margin-top:10px; overflow:hidden; border-radius:20px; background:rgba(255,255,255,.12); }
+    .bulk-progress-fill { width:0; height:100%; border-radius:20px; background:var(--primary); transition:width .2s ease; }
+    .bulk-result { margin-top:10px; font-size:11px; line-height:1.6; }
+    .bulk-submit-row { display:grid; grid-template-columns:1fr 1.4fr; gap:8px; margin-top:16px; }
+    .bulk-submit-row button:disabled { opacity:.55; cursor:not-allowed; }
+
     /* POINT LIST */
 
     .my-points-list {
@@ -890,6 +912,10 @@
       onclick="loadAllData()"
     >
       🔄 Refresh
+    </button>
+
+    <button type="button" class="btn btn-primary" onclick="openBulkPointModal()">
+      ＋ Poin Massal
     </button>
 
   </div>
@@ -1331,6 +1357,57 @@
     LENTERA SMANTI • Panel Manajemen Poin Guru
   </div>
 
+</div>
+
+<!-- MODAL INPUT POIN MASSAL -->
+<div id="bulkPointModal" class="modal" aria-hidden="true">
+  <div class="modal-box bulk-modal-box">
+    <div class="modal-header">
+      <h2>＋ Input Poin Massal</h2>
+      <button type="button" class="close" onclick="closeBulkPointModal()" aria-label="Tutup">×</button>
+    </div>
+    <p class="card-subtitle" style="margin-bottom:16px">Setiap siswa akan menerima satu transaksi poin individual.</p>
+    <div class="form-group">
+      <label for="bulkPointType">Jenis Poin</label>
+      <select id="bulkPointType"><option value="pelanggaran">⚠️ Pelanggaran</option><option value="penghargaan">🏆 Penghargaan</option></select>
+    </div>
+    <div class="form-group">
+      <label for="bulkPointValue">Jumlah Poin per Siswa</label>
+      <input type="number" id="bulkPointValue" min="1" max="100" value="1" placeholder="1–100">
+    </div>
+    <div class="form-group">
+      <label for="bulkPointDescription">Keterangan</label>
+      <textarea id="bulkPointDescription" maxlength="500" placeholder="Contoh: Bolos sekolah"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="bulkPointDate">Tanggal Kejadian</label>
+      <input type="date" id="bulkPointDate" required>
+      <div class="help-text">Boleh hari ini atau tanggal sebelumnya, tidak boleh tanggal mendatang.</div>
+    </div>
+    <div class="form-group">
+      <label for="bulkStudentClass">Filter Kelas</label>
+      <select id="bulkStudentClass"><option value="">Semua Kelas</option></select>
+    </div>
+    <div class="form-group">
+      <label for="bulkStudentSearch">Cari Siswa</label>
+      <input type="search" id="bulkStudentSearch" placeholder="Cari nama atau NISN...">
+    </div>
+    <div class="bulk-selection-bar">
+      <strong id="bulkSelectedCount">0 siswa dipilih</strong>
+      <div><button type="button" onclick="selectAllBulkStudents(true)">Pilih semua</button><button type="button" onclick="selectAllBulkStudents(false)">Kosongkan</button></div>
+    </div>
+    <div id="bulkStudentList" class="bulk-student-list"><div class="loading">Memuat daftar siswa...</div></div>
+    <div id="bulkProgress" class="bulk-progress" aria-live="polite">
+      <div class="bulk-spinner"></div>
+      <div id="bulkProgressText" class="bulk-progress-text">Menyiapkan penyimpanan...</div>
+      <div class="bulk-progress-track"><div id="bulkProgressFill" class="bulk-progress-fill"></div></div>
+      <div id="bulkResult" class="bulk-result"></div>
+    </div>
+    <div class="bulk-submit-row">
+      <button type="button" class="btn btn-secondary" id="bulkCancelButton" onclick="closeBulkPointModal()">Batal</button>
+      <button type="button" class="btn btn-primary" id="bulkSubmitButton" onclick="submitBulkPoints()">Simpan untuk Siswa Terpilih</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL EDIT -->
@@ -2157,6 +2234,167 @@ function setPointType(type) {
   }
 
   clearMessage("pointMessage");
+}
+
+
+/* =========================================================
+   INPUT POIN MASSAL — SATU POST PER SISWA
+========================================================= */
+let bulkSaving = false;
+
+function openBulkPointModal() {
+  if (!students.length) {
+    showMessage("pointMessage", "Data siswa belum tersedia. Silakan refresh terlebih dahulu.", "error");
+    return;
+  }
+  document.getElementById("bulkPointModal").classList.add("show");
+  document.getElementById("bulkPointModal").setAttribute("aria-hidden", "false");
+  document.getElementById("bulkPointDate").max = getTodayIndonesia();
+  document.getElementById("bulkPointDate").value = getTodayIndonesia();
+  document.getElementById("bulkProgress").classList.remove("show");
+  document.getElementById("bulkResult").textContent = "";
+  document.getElementById("bulkPointType").value = pointType;
+  renderBulkStudentList();
+}
+
+function closeBulkPointModal() {
+  if (bulkSaving) return;
+  const modal = document.getElementById("bulkPointModal");
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+function getBulkFilteredStudents() {
+  const q = document.getElementById("bulkStudentSearch").value.trim().toLowerCase();
+  const kelas = document.getElementById("bulkStudentClass").value;
+  return students.filter(s => {
+    const status = String(s.status || "Aktif").toLowerCase();
+    const matchSearch = !q || String(s.nama || "").toLowerCase().includes(q) || String(s.nisn || "").toLowerCase().includes(q);
+    return status === "aktif" && matchSearch && (!kelas || String(s.kelas || "") === kelas);
+  });
+}
+
+function renderBulkStudentList() {
+  const classSelect = document.getElementById("bulkStudentClass");
+  const currentClass = classSelect.value;
+  const classes = [...new Set(students.map(s => String(s.kelas || "").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  classSelect.innerHTML = '<option value="">Semua Kelas</option>' + classes.map(k => '<option value="' + escapeHtml(k) + '">' + escapeHtml(k) + '</option>').join("");
+  classSelect.value = classes.includes(currentClass) ? currentClass : "";
+  const chosen = new Set([...document.querySelectorAll(".bulk-student-check:checked")].map(el => el.value));
+  const list = getBulkFilteredStudents();
+  const container = document.getElementById("bulkStudentList");
+  if (!list.length) {
+    container.innerHTML = '<div class="empty">Tidak ada siswa ditemukan.</div>';
+    updateBulkSelectedCount();
+    return;
+  }
+  container.innerHTML = list.map(s => {
+    const id = String(s.id);
+    return '<label class="bulk-student-option"><input class="bulk-student-check" type="checkbox" value="' + escapeHtml(id) + '"' +
+      (chosen.has(id) ? " checked" : "") + ' onchange="updateBulkSelectedCount()"><span><strong>' + escapeHtml(s.nama) +
+      '</strong><small>NISN: ' + escapeHtml(s.nisn || "-") + ' • Kelas: ' + escapeHtml(s.kelas || "-") +
+      '</small></span></label>';
+  }).join("");
+  updateBulkSelectedCount();
+}
+
+function updateBulkSelectedCount() {
+  const count = document.querySelectorAll(".bulk-student-check:checked").length;
+  document.getElementById("bulkSelectedCount").textContent = count + " siswa dipilih";
+}
+
+function selectAllBulkStudents(checked) {
+  document.querySelectorAll("#bulkStudentList .bulk-student-check").forEach(el => { el.checked = checked; });
+  updateBulkSelectedCount();
+}
+
+document.getElementById("bulkStudentSearch").addEventListener("input", renderBulkStudentList);
+document.getElementById("bulkStudentClass").addEventListener("change", renderBulkStudentList);
+document.getElementById("bulkPointModal").addEventListener("click", event => {
+  if (event.target.id === "bulkPointModal") closeBulkPointModal();
+});
+
+async function submitBulkPoints() {
+  if (bulkSaving) return;
+  const selectedIds = [...document.querySelectorAll(".bulk-student-check:checked")].map(el => el.value);
+  const jenis = document.getElementById("bulkPointType").value;
+  const poin = Number(document.getElementById("bulkPointValue").value);
+  const keterangan = document.getElementById("bulkPointDescription").value.trim();
+  const tanggal = document.getElementById("bulkPointDate").value;
+  const today = getTodayIndonesia();
+  const progress = document.getElementById("bulkProgress");
+  const resultBox = document.getElementById("bulkResult");
+
+  if (!selectedIds.length) resultBox.textContent = "Pilih minimal satu siswa.";
+  else if (!Number.isInteger(poin) || poin < 1 || poin > 100) resultBox.textContent = "Jumlah poin harus 1 sampai 100.";
+  else if (!keterangan) resultBox.textContent = "Keterangan wajib diisi.";
+  else if (!isValidDateOnly(tanggal) || tanggal > today) resultBox.textContent = "Tanggal tidak valid atau melebihi hari ini.";
+  else resultBox.textContent = "";
+
+  if (resultBox.textContent) {
+    progress.classList.add("show");
+    return;
+  }
+
+  const targets = selectedIds.map(id => students.find(s => String(s.id) === String(id))).filter(Boolean);
+  const submit = document.getElementById("bulkSubmitButton");
+  const cancel = document.getElementById("bulkCancelButton");
+  const progressText = document.getElementById("bulkProgressText");
+  const progressFill = document.getElementById("bulkProgressFill");
+
+  bulkSaving = true;
+  submit.disabled = true;
+  cancel.disabled = true;
+  submit.textContent = "Menyimpan...";
+  progress.classList.add("show");
+  resultBox.textContent = "Setiap siswa diproses sebagai transaksi poin tersendiri.";
+  progressFill.style.width = "0%";
+
+  let successCount = 0;
+  const failures = [];
+
+  try {
+    for (let i = 0; i < targets.length; i++) {
+      const siswa = targets[i];
+      progressText.textContent = "Menyimpan " + (i + 1) + " dari " + targets.length + ": " + siswa.nama;
+      const response = await fetch("/.netlify/functions/guru-points", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          siswaId: siswa.id, poin, keterangan, jenis, tanggal,
+          guruId: guruSession.id, guruUsername: guruSession.username
+        })
+      });
+      const raw = await response.text();
+      let data;
+      try { data = JSON.parse(raw); } catch { throw new Error("Respons server bukan JSON."); }
+      if (!response.ok || !data.success) failures.push(siswa.nama + ": " + (data.message || "Gagal menyimpan"));
+      else successCount++;
+      progressFill.style.width = Math.round(((i + 1) / targets.length) * 100) + "%";
+    }
+
+    progressText.textContent = "Proses penyimpanan selesai.";
+    resultBox.textContent = successCount + " transaksi individual berhasil dari " + targets.length + " siswa." +
+      (failures.length ? " Gagal: " + failures.join(" | ") : " Semua transaksi berhasil ditulis ke database.");
+    if (successCount) {
+      students = await getStudents();
+      buildClassFilter();
+      filterPointStudents();
+      await loadMyPoints();
+      showMessage("pointMessage", successCount + " transaksi poin individual berhasil disimpan.", "success");
+    }
+    if (!failures.length) submit.textContent = "Selesai";
+  } catch (error) {
+    progressText.textContent = "Proses terhenti karena gangguan.";
+    resultBox.textContent = successCount + " transaksi berhasil. " + failures.length +
+      " gagal terkonfirmasi. Kesalahan: " + error.message +
+      ". Periksa riwayat poin sebelum mencoba ulang agar tidak terjadi transaksi ganda.";
+  } finally {
+    bulkSaving = false;
+    submit.disabled = false;
+    cancel.disabled = false;
+    if (submit.textContent !== "Selesai") submit.textContent = "Simpan untuk Siswa Terpilih";
+  }
 }
 
 
